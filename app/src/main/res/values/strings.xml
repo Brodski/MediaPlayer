@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MediaPlayer</string>
+    <string name="playback_channel_name">MediaPlayer channel name</string>
 </resources>

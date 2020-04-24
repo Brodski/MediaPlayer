@@ -1,5 +1,6 @@
 package com.example.mediaplayer
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
@@ -8,6 +9,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
+import android.os.Binder
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.media.MediaDescriptionCompat
@@ -23,7 +25,6 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -32,12 +33,20 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.util.Log
+import java.text.SimpleDateFormat
+import java.util.*
 
+// Building feature-rich media apps with ExoPlayer (Google I/O '18)
+// https://www.youtube.com/watch?v=svdq1BWl4r8
 class AudioPlayerService : Service() {
 
+    private val binder: IBinder? = LocalBinder()
 
     private var episodeTitle: String? = null
-    private var exoPlayer: SimpleExoPlayer? = null
+    private var playerView: PlayerView? = null
+    public var exoPlayer: SimpleExoPlayer? = null
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var mediaSession: MediaSessionCompat? = null
     private var mediaSessionConnector: MediaSessionConnector? = null
@@ -49,6 +58,10 @@ class AudioPlayerService : Service() {
     private val ARG_TITLE = "title"
     private val ARG_START_POSITION = "start_position"
     private val MEDIA_SESSION_TAG = "hello-world-media"
+
+    companion object {
+        const val TAG = "AudioPlayerService"
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -65,7 +78,7 @@ class AudioPlayerService : Service() {
         val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
         val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
         val dataSourceFactory: DataSource.Factory =
-            DefaultDataSourceFactory(this, Util.getUserAgent(this, this.getString(R.string.app_name)) )
+            DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
 
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
 
@@ -188,12 +201,20 @@ class AudioPlayerService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        ////To change body of created functions use File | Settings | File Templates.
-        return null
+        return binder
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         //return super.onStartCommand(intent, flags, startId)
         return START_STICKY
     }
+
+
+    // get() will be called everytime we access randomNumber
+   val randomNumber: Int get() = Random().nextInt(100)
+
+    inner class LocalBinder : Binder() {
+        fun getService(): AudioPlayerService = this@AudioPlayerService
+    }
+
 }

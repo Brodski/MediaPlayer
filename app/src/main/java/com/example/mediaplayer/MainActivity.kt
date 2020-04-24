@@ -3,15 +3,20 @@ package com.example.mediaplayer
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.media.audiofx.AudioEffect
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable
@@ -34,27 +39,48 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 
+// Media streaming with ExoPlayer
+// https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
 class MainActivity : AppCompatActivity() {
 
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
+    private lateinit var mService: AudioPlayerService
+    private var mBound: Boolean = false
+
     private var playerNotificationManager: PlayerNotificationManager? = null
     private val CHANNEL_ID = "69 channel"
     private val NOTIFICATION_ID = 420
     private var playWhenReady = true
     private var currentWindow = 0
     private var playBackPosition: Long = 0
-    companion object {
-        const val TAG = "MainActivity"
+
+    companion object { const val TAG = "MainActivity" }
+
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as AudioPlayerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+
+            playerView = findViewById(R.id.video_view)
+            playerView?.player = mService.exoPlayer
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            mBound = false
+        }
     }
 
     private fun initializePlayer() {
-        playerView = findViewById(R.id.video_view)
+//        playerView = findViewById(R.id.video_view)
         player = SimpleExoPlayer.Builder(this).build()
         var mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
         var videoSource: MediaSource = buildMediaSource(mp4VideoUri)
-        playerView?.player = player
+//        playerView?.player = player
 
+        playerView?.player = mService.exoPlayer
         player?.playWhenReady = playWhenReady
         player?.seekTo(currentWindow, playBackPosition)
         player?.prepare(videoSource, false, false)
@@ -87,8 +113,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
 
+//        playerView = findViewById(R.id.video_view)
+//        playerView?.player = mService.exoPlayer
+
+
+        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
         Util.startForegroundService(this, intent)
     }
 
@@ -116,8 +148,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
+
+        unbindService(connection)
+        mBound = false
+
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
       //      releasePlayer()
         }
     }
+
+    fun onButtonClick(v: View){
+        if (mBound) {
+            val num = mService.randomNumber
+            Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 }

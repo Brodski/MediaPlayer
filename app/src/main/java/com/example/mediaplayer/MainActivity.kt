@@ -38,6 +38,10 @@ import java.io.File
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
 class MainActivity : AppCompatActivity() {
 
+    data class AudioFile(val uri: Uri,
+                         val title: String,
+                         val artist: String?
+    )
     private val MY_PERM_REQUEST = 1
 
     private var playerView: PlayerView? = null
@@ -162,66 +166,62 @@ class MainActivity : AppCompatActivity() {
         if (mBound) {
             val num = mService.randomNumber
             Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
-            Log.e(TAG, "----0----")
-            Log.e(TAG, filesDir.toString())
-            Log.e(TAG, cacheDir.toString())
-            Log.e(TAG, "----1----")
-            Log.e(TAG, getExternalFilesDir(null).toString())
-            Log.e(TAG, getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString())
-            Log.e(TAG, getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.list()?.joinToString())
-            Log.e(TAG, "----2----")
-            Log.e(TAG, externalMediaDirs.joinToString())
-            Log.e(TAG, Environment.getDataDirectory().toString())
-  //          var files: Array<String> = this.fileList()
-            Log.e(TAG, "----3----")
-//            Log.e(TAG, Environment.getExternalStorageState())
-//            Log.e(TAG, Environment.getDownloadCacheDirectory().toString())
-
-
-            val file = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName")
-            val file2 = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName2")
-            if (!file?.mkdirs()) { Log.e(TAG, "Directory not created") }
-            if (!file2?.mkdirs()) {Log.e(TAG, "Directory2 not created") }
+//            Log.e(TAG, "----0----")
+//            Log.e(TAG, filesDir.toString())
+//            Log.e(TAG, cacheDir.toString())
+//            Log.e(TAG, "----1----")
+//            Log.e(TAG, getExternalFilesDir(null).toString())
+//            Log.e(TAG, getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString())
+//            Log.e(TAG, getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.list()?.joinToString())
+//            Log.e(TAG, "----2----")
+//            Log.e(TAG, externalMediaDirs.joinToString())
+//            Log.e(TAG, Environment.getDataDirectory().toString())
+//  //          var files: Array<String> = this.fileList()
+//            Log.e(TAG, "----3----")
+//            val file = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName")
+//            val file2 = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName2")
+//            if (!file?.mkdirs()) { Log.e(TAG, "Directory not created") }
+//            if (!file2?.mkdirs()) {Log.e(TAG, "Directory2 not created") }
             queryShit()
         }
     }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERM_REQUEST -> {
-                // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     Toast.makeText(this,":) Permission granted!", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":) Permission granted!")
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
                 } else {
                     Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":( Permission not granted.")
-                    // functionality that depends on this permission.
                 }
                 return
             }
-
-            // Add other 'when' lines to check for other
-            // permissions this app might request.
+            // Add other 'when' lines to check for other  permissions this app might request.
             else -> {
                 // Ignore all other requests.
             }
         }
     }
+
+    // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
     // How to Request a Run Time Permission - Android Studio Tutorial
     // https://www.youtube.com/watch?v=SMrB97JuIoM
     fun queryShit() {
-        //val cR: ContentResolver = contentResolver
-        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
+            doDankQuery()
+            Log.e(TAG, "Already granted")
+            Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
+        } else {
+
             Log.e(TAG, "READ EXTERNAL NOT GRANTED")
             Toast.makeText(this, "READ EXTERNAL NOT GRANTED", Toast.LENGTH_SHORT).show()
             //requestStoragePermission()
-            // the if = show a dialoag that expalins why we need permission. shows when user already denied it but trying again
+            // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
             if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 AlertDialog.Builder(this)
-                    .setTitle("Read External Storage permission needed")
-                    .setMessage("Required to access audio & video files")
+                    .setTitle("Read External Storage permission required")
+                    .setMessage("Allows read access audio & video files")
                     .setPositiveButton("Agree", object : DialogInterface.OnClickListener {
                         override fun onClick(dialog: DialogInterface?, which: Int) {
                             ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
@@ -235,70 +235,85 @@ class MainActivity : AppCompatActivity() {
                     .create().show()
 
             } else {
-                                                    //this?
+                //this?
                 ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
             }
-        } else {
-
-            doDankQuery()
-            Log.e(TAG, "Already granted")
-            Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
         }
     }
 
+
     fun doDankQuery() {
-        //val musicList = mutableListOf<>()
-        val projection = arrayOf(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        )
+        val audioList = mutableListOf<AudioFile>()
+
+//        var projection: Array<String> = arrayOf (
+//            MediaStore.Audio.Media._ID,
+//            MediaStore.Audio.Media.ARTIST,
+//            MediaStore.Audio.Media.TITLE,
+//            MediaStore.Audio.Media.DISPLAY_NAME,
+//            MediaStore.Audio.Media.DURATION
+//        )
 
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        Log.e(TAG, "MediaStore.Audio.Media.CONTENT_TYPE")
-        Log.e(TAG, MediaStore.Audio.Media.CONTENT_TYPE)
-        Log.e(TAG, "MediaStore.Audio.Media.EXTERNAL_CONTENT_URI")
-        Log.e(TAG, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString())
+
+        val selection = "${MediaStore.Audio.Media.IS_ALARM} != 1 AND " +
+                "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
+                "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
+
+
         val query = contentResolver.query(
             songUri,
             null,
-            null,
+            selection,
             null,
             null
         )
-        Log.e(TAG, "000000000000000000000000")
+
+
 
         query?.use { cursor ->
-            Log.e(TAG, "==========================")
+            Log.e(TAG, "000000000000000000000000")
             val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
-            val x = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
-            val x2 = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
-            val x3 = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-            val x4 = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
-            val x5 = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)
-            val x6 = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH)
-//            val contentUri: Uri = ContentUris.withAppendedId(
-//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                id)
-            Log.e(TAG, idColumn.toString())
-            Log.e(TAG, x.toString())
-            Log.e(TAG, x2.toString())
-            Log.e(TAG, x3.toString())
-            Log.e(TAG, x4.toString())
-            Log.e(TAG, x5.toString())
-            Log.e(TAG, x6.toString())
+            val titleColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
+            val albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
+            val artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+            val dateAddedColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
+            val mimeColumn = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)
+            val isMusicC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_MUSIC)
+            val isAlarmC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_ALARM)
+            val isNotifC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_NOTIFICATION)
+            val isPodC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_PODCAST)
+            val isRingC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE)
             while (cursor.moveToNext()) {
                 Log.e(TAG, "==========================")
-                val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
-                val x = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
-                val x2 = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
-                val x3 = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-                val x4 = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
-                val x5 = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)
-                val x6 = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH)
-//            val contentUri: Uri = ContentUris.withAppendedId(
-//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//                id)
+                val id = cursor.getLong(idColumn)
+                val title = cursor.getString(titleColumn)
+                val album = cursor.getString(albumColumn)
+                val artist = cursor.getString(artistColumn)
+                val dateAdded = cursor.getString(dateAddedColumn)
+                val mime = cursor.getString(mimeColumn)
+                val isMusic = cursor.getString(isMusicC)
+                val isAlarmC = cursor.getString(isAlarmC)
+                val isNotif = cursor.getString(isNotifC)
+                val isPod = cursor.getString(isPodC)
+                val isRing = cursor.getString(isRingC)
+                val audioUri: Uri = ContentUris.withAppendedId( MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id )
+              //  Log.e(TAG, contentUri.toString())
+                Log.e(TAG, "id $id")
+                Log.e(TAG, "audioUri $audioUri")
+                Log.e(TAG, "title $title")
+                Log.e(TAG, "album $album")
+                Log.e(TAG, "artist $artist")
+                Log.e(TAG, "mime $mime")
+                Log.e(TAG, "is isMusic $isMusic")
+                Log.e(TAG, "is isAlarmC $isAlarmC")
+                Log.e(TAG, "is isNotif $isNotif")
+                Log.e(TAG, "is isPod $isPod")
+                Log.e(TAG, "is isRing $isRing")
+                audioList.add( AudioFile(audioUri, title, artist))
             }
         }
+        Log.e(TAG, "audioList")
+        audioList.forEach { Log.e(TAG, it.toString()) }
     }
 
 

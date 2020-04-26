@@ -88,7 +88,7 @@ class AudioPlayerService : Service() {
         concatenatingMediaSource.addMediaSource(ms2)
 
         exoPlayer!!.prepare(concatenatingMediaSource)
-        exoPlayer!!.playWhenReady = true
+        exoPlayer!!.playWhenReady = false
 
         // Setup notification and media session.
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(

@@ -2,16 +2,10 @@ package com.example.mediaplayer
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.media.audiofx.AudioEffect
 import android.net.Uri
-import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -20,16 +14,10 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.DrawableRes
-import androidx.annotation.MainThread
-import androidx.annotation.Nullable
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ServiceCompat.stopForeground
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.view.accessibility.AccessibilityViewCommand
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -37,7 +25,6 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.SampleStream
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
@@ -136,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         Util.startForegroundService(this, intent)
     }
 
-    @SuppressLint("NewApi")
+
     override fun onStart() {
         super.onStart()
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
@@ -193,29 +180,23 @@ class MainActivity : AppCompatActivity() {
 
             val file = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName")
             val file2 = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName2")
-            if (!file?.mkdirs()) {
-                Log.e(TAG, "Directory not created")
-            }
-            if (!file2?.mkdirs()) {
-                Log.e(TAG, "Directory2 not created")
-            }
-
-
+            if (!file?.mkdirs()) { Log.e(TAG, "Directory not created") }
+            if (!file2?.mkdirs()) {Log.e(TAG, "Directory2 not created") }
             queryShit()
-
         }
-
     }
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERM_REQUEST -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    Toast.makeText(this,":) Permission granted!", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG,":) Permission granted!")
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                 } else {
-                    // permission denied, boo! Disable the
+                    Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG,":( Permission not granted.")
                     // functionality that depends on this permission.
                 }
                 return
@@ -228,8 +209,44 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+    // How to Request a Run Time Permission - Android Studio Tutorial
+    // https://www.youtube.com/watch?v=SMrB97JuIoM
     fun queryShit() {
+        //val cR: ContentResolver = contentResolver
+        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "READ EXTERNAL NOT GRANTED")
+            Toast.makeText(this, "READ EXTERNAL NOT GRANTED", Toast.LENGTH_SHORT).show()
+            //requestStoragePermission()
+            // the if = show a dialoag that expalins why we need permission. shows when user already denied it but trying again
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                AlertDialog.Builder(this)
+                    .setTitle("Read External Storage permission needed")
+                    .setMessage("Required to access audio & video files")
+                    .setPositiveButton("Agree", object : DialogInterface.OnClickListener {
+                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
+                        }
+                    })
+                    .setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
+                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                            dialog?.dismiss()
+                        }
+                    })
+                    .create().show()
+
+            } else {
+                                                    //this?
+                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
+            }
+        } else {
+
+            doDankQuery()
+            Log.e(TAG, "Already granted")
+            Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun doDankQuery() {
         //val musicList = mutableListOf<>()
         val projection = arrayOf(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -240,46 +257,17 @@ class MainActivity : AppCompatActivity() {
         Log.e(TAG, MediaStore.Audio.Media.CONTENT_TYPE)
         Log.e(TAG, "MediaStore.Audio.Media.EXTERNAL_CONTENT_URI")
         Log.e(TAG, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString())
-        //val cR: ContentResolver = contentResolver
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)  != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG, "READ EXTENRSL NOT SWERAGNTED")
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-               // poopy
-            } else {
-                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
-            }
-        }
-
         val query = contentResolver.query(
             songUri,
             null,
             null,
             null,
-        null
+            null
         )
         Log.e(TAG, "000000000000000000000000")
 
-        query?.use {cursor ->
-//            Log.e(TAG, "==========================")
-//            val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
-//            val x = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
-//            val x2 = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
-//            val x3 = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-//            val x4 = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
-//            val x5 = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)
-//            val x6 = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH)
-////            val contentUri: Uri = ContentUris.withAppendedId(
-////                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-////                id)
-//            Log.e(TAG, idColumn.toString())
-//            Log.e(TAG, x.toString())
-//            Log.e(TAG, x2.toString())
-//            Log.e(TAG, x3.toString())
-//            Log.e(TAG, x4.toString())
-//            Log.e(TAG, x5.toString())
-//            Log.e(TAG, x6.toString())
-            while (cursor.moveToNext())
-                Log.e(TAG, "==========================")
+        query?.use { cursor ->
+            Log.e(TAG, "==========================")
             val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
             val x = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
             val x2 = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
@@ -297,8 +285,20 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, x4.toString())
             Log.e(TAG, x5.toString())
             Log.e(TAG, x6.toString())
+            while (cursor.moveToNext()) {
+                Log.e(TAG, "==========================")
+                val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
+                val x = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
+                val x2 = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
+                val x3 = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+                val x4 = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
+                val x5 = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)
+                val x6 = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH)
+//            val contentUri: Uri = ContentUris.withAppendedId(
+//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                id)
+            }
         }
-
     }
 
 

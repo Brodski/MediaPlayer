@@ -10,7 +10,7 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="600dp"
 
         app:show_timeout="10000"
         app:fastforward_increment="30000"
@@ -25,9 +25,56 @@
             android:layout_height="wrap_content"
             android:text="Button"
             android:onClick="onButtonClick"
-            />
+        />
+
+        <Button
+            android:id="@+id/buttonId2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go to Frag"
+            android:onClick="goToFragment"
+            android:layout_marginTop="100dp"
+        />
+
+        <FrameLayout
+            android:id="@+id/container_a"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="200dp"
+        />
+
+        <FrameLayout
+            android:id="@+id/container_b"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="350dp"
+        />
+
 
     </com.google.android.exoplayer2.ui.PlayerView>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="500dp"
+        android:layout_above="@id/bottom_navigation"/>
+
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/fragment_selector"
+        android:layout_marginTop="600dp"
+        />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:menu="@menu/bottom_navigation"
+        android:background="@android:color/holo_red_dark"
+        android:layout_marginTop="600dp"
+    />
 
 </FrameLayout>
 

@@ -13,11 +13,15 @@ import android.os.IBinder
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ServiceCompat.stopForeground
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -30,13 +34,15 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
 import java.io.File
 
 // Media streaming with ExoPlayer
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
 // Notification
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentItemsListener, OtherFragment.FragmentItemsListener {
 
     data class AudioFile(val uri: Uri,
                          val title: String,
@@ -58,7 +64,17 @@ class MainActivity : AppCompatActivity() {
     private var currentWindow = 0
     private var playBackPosition: Long = 0
 
+
+    lateinit var fragmentContainer: FrameLayout
+    lateinit var itemsFragment: ItemsFragment
+    lateinit var otherFragment: OtherFragment
+    lateinit var btnFrag: Button
+
+
+    lateinit var mIMainActivity: IMainActivity
+
     companion object { const val TAG = "MainActivity" }
+
 
 
     private val connection = object : ServiceConnection {
@@ -113,18 +129,47 @@ class MainActivity : AppCompatActivity() {
             player = null
         }
     }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        //fragmentContainer = findViewById(R.id.fra)
 //        playerView = findViewById(R.id.video_view)
 //        playerView?.player = mService.exoPlayer
 
+        //multi fragments
+        itemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
+        otherFragment = OtherFragment.newInstance("pp1,", "pp2")
 
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(this, AudioPlayerService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
         Util.startForegroundService(this, intent)
+
+        var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNav.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_home -> {
+                    val message = "hello from nav_home"
+                    mIMainActivity?.inflateFragment("fragment_a", message)
+                    true
+                }
+                R.id.nav_favorites -> {
+                    val message = "hello from nav_favorites"
+                    mIMainActivity?.inflateFragment("fragment_b", message)
+                    true
+                }
+                R.id.nav_search -> {
+                    val message = "hello from nav_search"
+                    mIMainActivity?.inflateFragment("fragment_b", message)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
 
@@ -166,50 +211,17 @@ class MainActivity : AppCompatActivity() {
         if (mBound) {
             val num = mService.randomNumber
             Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
-//            Log.e(TAG, "----0----")
-//            Log.e(TAG, filesDir.toString())
-//            Log.e(TAG, cacheDir.toString())
-//            Log.e(TAG, "----1----")
-//            Log.e(TAG, getExternalFilesDir(null).toString())
-//            Log.e(TAG, getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString())
-//            Log.e(TAG, getExternalFilesDir(Environment.DIRECTORY_PICTURES)?.list()?.joinToString())
-//            Log.e(TAG, "----2----")
-//            Log.e(TAG, externalMediaDirs.joinToString())
-//            Log.e(TAG, Environment.getDataDirectory().toString())
-//  //          var files: Array<String> = this.fileList()
-//            Log.e(TAG, "----3----")
-//            val file = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName")
-//            val file2 = File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "albumName2")
-//            if (!file?.mkdirs()) { Log.e(TAG, "Directory not created") }
-//            if (!file2?.mkdirs()) {Log.e(TAG, "Directory2 not created") }
-            queryShit()
+            queryWithPermissions()
         }
     }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        when (requestCode) {
-            MY_PERM_REQUEST -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Toast.makeText(this,":) Permission granted!", Toast.LENGTH_SHORT).show()
-                    Log.e(TAG,":) Permission granted!")
-                } else {
-                    Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
-                    Log.e(TAG,":( Permission not granted.")
-                }
-                return
-            }
-            // Add other 'when' lines to check for other  permissions this app might request.
-            else -> {
-                // Ignore all other requests.
-            }
-        }
-    }
+
 
     // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
     // How to Request a Run Time Permission - Android Studio Tutorial
     // https://www.youtube.com/watch?v=SMrB97JuIoM
-    fun queryShit() {
+    fun queryWithPermissions() {
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
-            doDankQuery()
+            val audioList = queryActually()
             Log.e(TAG, "Already granted")
             Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
         } else {
@@ -242,7 +254,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun doDankQuery() {
+    fun queryActually(): MutableList<AudioFile> {
         val audioList = mutableListOf<AudioFile>()
 
 //        var projection: Array<String> = arrayOf (
@@ -256,19 +268,10 @@ class MainActivity : AppCompatActivity() {
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
         val selection = "${MediaStore.Audio.Media.IS_ALARM} != 1 AND " +
-                "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
-                "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
+            "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
+            "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
 
-
-        val query = contentResolver.query(
-            songUri,
-            null,
-            selection,
-            null,
-            null
-        )
-
-
+        val query = contentResolver.query(songUri, null, selection, null, null )
 
         query?.use { cursor ->
             Log.e(TAG, "000000000000000000000000")
@@ -314,7 +317,73 @@ class MainActivity : AppCompatActivity() {
         }
         Log.e(TAG, "audioList")
         audioList.forEach { Log.e(TAG, it.toString()) }
+        return audioList
     }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            MY_PERM_REQUEST -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    Toast.makeText(this,":) Permission granted!", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG,":) Permission granted!")
+                } else {
+                    Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG,":( Permission not granted.")
+                }
+                return
+            }
+            // Add other 'when' lines to check for other  permissions this app might request.
+            else -> {
+                // Ignore all other requests.
+            }
+        }
+    }
+
+
+    fun goToFragment(v: View){
+        // this object lets us put the fragment into the layout
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container_a, itemsFragment)
+            .replace(R.id.container_b, otherFragment)
+            //.addToBackStack(itemsFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun onInputOtherSent(input: CharSequence) {
+        itemsFragment.updateEditTest(input)
+    }
+
+    override fun onInputItemsSent(input: CharSequence) {
+        otherFragment.updateEditTest(input)
+    }
+
+    override fun inflateFragment(fragmentTag: String, message: String) {
+        if (fragmentTag == "fragment_a") {
+            var fragment: ItemsFragment = ItemsFragment()
+            doFragmentTransaction(fragment, fragmentTag, true, message);
+        }
+        else if (fragmentTag == "fragment_b") {
+            var fragment: OtherFragment = OtherFragment()
+            doFragmentTransaction(fragment, fragmentTag, true, message);
+        }
+    }
+
+    fun doFragmentTransaction(fragment: Fragment,tag: String, boolean: Boolean,  message: String){
+        var frag = ItemsFragment()
+        var bundle: Bundle  = Bundle();
+        bundle.putString( tag, message);
+        fragment.arguments = bundle;
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container_a, frag)
+//          .addToBackStack()
+            .commit()
+    }
+
+
+
 
 
 }

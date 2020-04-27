@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/holo_blue_dark"
+    android:orientation="vertical"
+    tools:context=".OtherFragment"
+    >
+
+    <TextView
+        android:id="@+id/fragTextIdB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="fragment B" />
+
+    <Button
+        android:id="@+id/btnB"
+        android:layout_width="171dp"
+        android:layout_height="wrap_content"
+        android:onClick="doSomething"
+        android:text="Button2" />
+
+
+</LinearLayout>

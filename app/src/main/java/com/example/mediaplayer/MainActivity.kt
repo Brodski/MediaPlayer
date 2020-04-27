@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
     lateinit var btnFrag: Button
 
 
-    lateinit var mIMainActivity: IMainActivity
+    //lateinit var mIMainActivity: IMainActivity
 
     companion object { const val TAG = "MainActivity" }
 
@@ -154,17 +154,18 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
             when (it.itemId) {
                 R.id.nav_home -> {
                     val message = "hello from nav_home"
-                    mIMainActivity?.inflateFragment("fragment_a", message)
+                 //   mIMainActivity?.inflateFragment("fragment_a", message)
+                    inflateFragment("fragment_a", message)
                     true
                 }
                 R.id.nav_favorites -> {
                     val message = "hello from nav_favorites"
-                    mIMainActivity?.inflateFragment("fragment_b", message)
+                    inflateFragment("fragment_b", message)
                     true
                 }
                 R.id.nav_search -> {
                     val message = "hello from nav_search"
-                    mIMainActivity?.inflateFragment("fragment_b", message)
+                    inflateFragment("fragment_b", message)
                     true
                 }
                 else -> false
@@ -370,14 +371,14 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
     }
 
     fun doFragmentTransaction(fragment: Fragment,tag: String, boolean: Boolean,  message: String){
-        var frag = ItemsFragment()
-        var bundle: Bundle  = Bundle();
-        bundle.putString( tag, message);
-        fragment.arguments = bundle;
+        var tag= "keyOther"
+        var bundle  = Bundle()
+        bundle.putString( tag, message)
+        fragment.arguments = bundle
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.container_a, frag)
+            .replace(R.id.container_a, fragment)
 //          .addToBackStack()
             .commit()
     }

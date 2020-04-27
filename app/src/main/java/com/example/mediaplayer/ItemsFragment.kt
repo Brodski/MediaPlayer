@@ -65,11 +65,13 @@ class ItemsFragment : Fragment() {
         textView = v.findViewById(R.id.fragTextId)
         btnOkay = v.findViewById(R.id.btnA)
 
-        var bundle: Bundle = this.arguments!!
+        var bundle: Bundle? = this.arguments
         var x: String = textView.text.toString()
         var x2 =" nope"
-        if (bundle.containsKey("keyOther")){
-            x2 = x + bundle?.getString("keyOther").toString()
+        if (bundle != null) {
+            if (bundle.containsKey("keyOther")){
+                x2 = x + bundle?.getString("keyOther").toString()
+            }
         }
         //textView.text = x2
         Log.e(TAG, "IN ITEMSz")

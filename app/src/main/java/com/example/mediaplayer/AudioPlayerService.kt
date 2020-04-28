@@ -200,6 +200,14 @@ class AudioPlayerService : Service() {
         super.onDestroy()
     }
 
+    // https://stackoverflow.com/questions/19568315/how-to-handle-code-when-app-is-killed-by-swiping-in-android/26882533#26882533
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        Log.e(TAG, "TASK REMOVED")
+
+        stopSelf()
+    }
+
     override fun onBind(intent: Intent?): IBinder? {
         return binder
     }

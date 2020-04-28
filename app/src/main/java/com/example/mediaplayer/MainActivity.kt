@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Log.e(TAG, "CONNECTED SERVICE")
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
             mBound = true
@@ -84,9 +85,28 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             playerView?.player = mService.exoPlayer
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
+//        override fun onServiceDisconnected(name: ComponentName?) {
+        override fun onServiceDisconnected(arg0: ComponentName?) {
+            Log.e(TAG, "DISCONNECTED SERVICE")
             mBound = false
         }
+    }
+
+    private fun initPlayer2(){
+        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
+        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        Util.startForegroundService(this, intent)
+
+    }
+
+    private fun releasePlayer2() {
+        Log.e(TAG,"Release called")
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        //stopService(intent)
+        unbindService(connection)
+        mBound = false
     }
 
     private fun initializePlayer() {
@@ -100,7 +120,18 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         player?.playWhenReady = playWhenReady
         player?.seekTo(currentWindow, playBackPosition)
         player?.prepare(videoSource, false, false)
+    }
 
+
+    private fun releasePlayer() {
+        if (player != null) {
+            playWhenReady = player!!.playWhenReady
+            Log.e("release,when ready", playWhenReady.toString())
+            playBackPosition = player!!.currentPosition
+            currentWindow = player!!.currentWindowIndex
+            player!!.release()
+            player = null
+        }
     }
 
     private fun buildMediaSource(uri: Uri): MediaSource {
@@ -116,21 +147,12 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         cs.addMediaSource(mediaSource2)
         return cs
     }
-    private fun releasePlayer() {
-        if (player != null) {
-            playWhenReady = player!!.playWhenReady
-            Log.e("release,when ready", playWhenReady.toString())
-            playBackPosition = player!!.currentPosition
-            currentWindow = player!!.currentWindowIndex
-            player!!.release()
-            player = null
-        }
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.e(TAG,"CREATED MainActivity")
 
 
         //fragmentContainer = findViewById(R.id.fra)
@@ -141,10 +163,10 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         itemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
         playerFragment = PlayerFragment.newInstance("pp1,", "pp2")
 
-        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(this, intent)
+//        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
+//        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+//        bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//        Util.startForegroundService(this, intent)
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
@@ -153,38 +175,49 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
     override fun onStart() {
         super.onStart()
+        Log.e(TAG,"START MainActivity")
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
         //    initializePlayer()
+            initPlayer2()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        //  hideSystemUi();
+        Log.e(TAG,"RESUME MainActivity")
         if (Util.SDK_INT < Build.VERSION_CODES.N || player == null) {
        //     initializePlayer()
+            initPlayer2()
         }
     }
 
     override fun onPause() {
         super.onPause()
+        Log.e(TAG,"PAUSE MainActivity")
         if (Util.SDK_INT < Build.VERSION_CODES.N) {
      //       releasePlayer()
+            releasePlayer2()
         }
     }
 
     override fun onStop() {
         super.onStop()
-
-        unbindService(connection)
-        mBound = false
+        Log.e(TAG,"STOP MainActivity")
+//        unbindService(connection)
+//        mBound = false
 
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
       //      releasePlayer()
+            releasePlayer2()
         }
     }
 
-    @SuppressLint("NewApi")
+    override fun onDestroy() {
+        super.onDestroy()
+
+        Log.e(TAG,"DESTROY MainActivity")
+    }
+
     fun onButtonClick(v: View){
         if (mBound) {
             val num = mService.randomNumber

@@ -42,7 +42,7 @@ import java.io.File
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
 // Notification
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
-class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentItemsListener, OtherFragment.FragmentItemsListener {
+class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentItemsListener, VideoFragment.FragmentItemsListener {
 
     data class AudioFile(val uri: Uri,
                          val title: String,
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
 
     lateinit var fragmentContainer: FrameLayout
     lateinit var itemsFragment: ItemsFragment
-    lateinit var otherFragment: OtherFragment
+    lateinit var videoFragment: VideoFragment
     lateinit var btnFrag: Button
 
 
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
 
         //multi fragments
         itemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
-        otherFragment = OtherFragment.newInstance("pp1,", "pp2")
+        videoFragment = VideoFragment.newInstance("pp1,", "pp2")
 
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(this, AudioPlayerService::class.java)
@@ -345,7 +345,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.container_a, itemsFragment)
-            .replace(R.id.container_b, otherFragment)
+            .replace(R.id.container_b, videoFragment)
             //.addToBackStack(itemsFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
@@ -356,7 +356,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
     }
 
     override fun onInputItemsSent(input: CharSequence) {
-        otherFragment.updateEditTest(input)
+        videoFragment.updateEditTest(input)
     }
 
     override fun inflateFragment(fragmentTag: String, message: String) {
@@ -365,7 +365,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
             doFragmentTransaction(fragment, fragmentTag, true, message);
         }
         else if (fragmentTag == "fragment_b") {
-            var fragment: OtherFragment = OtherFragment()
+            var fragment: VideoFragment = VideoFragment()
             doFragmentTransaction(fragment, fragmentTag, true, message);
         }
     }

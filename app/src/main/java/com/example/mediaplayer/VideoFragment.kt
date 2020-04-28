@@ -23,7 +23,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ItemsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class OtherFragment : Fragment() {
+class VideoFragment : Fragment() {
     private var listener: FragmentItemsListener? = null
     private lateinit var textView: TextView
     private lateinit var btnOkay: Button
@@ -96,15 +96,15 @@ class OtherFragment : Fragment() {
     }
 
     companion object {
-        const val TAG = "OtherFragment"
+        const val TAG = "VideoFragment"
         @JvmStatic
-        fun newInstance(param1: String, param2: String) : OtherFragment {
-            val otherFragment = OtherFragment()
+        fun newInstance(param1: String, param2: String) : VideoFragment {
+            val videoFragment = VideoFragment()
             val args = Bundle()
             args.putString(ARG_PARAM1, param1)
             args.putString(ARG_PARAM2, param2)
-            otherFragment.arguments = args
-            return otherFragment
+            videoFragment.arguments = args
+            return videoFragment
         }
     }
 

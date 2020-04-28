@@ -22,20 +22,28 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class PlayerFragment : Fragment() {
-    //private var listener: FragmentItemsListener? = null
+
     private lateinit var textView: TextView
-    private lateinit var btnOkay: Button
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.e(TAG,"Attached Player")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e(TAG,"Created Player")
     }
 
     override fun onDetach() {
         super.onDetach()
+        Log.e(TAG,"Detached Player")
+    }
+
+    override fun onDestroyView(){
+        super.onDestroyView()
+        Log.e(TAG,"Destroyed Player")
+
     }
 
     fun updateEditTest(newText: CharSequence){
@@ -47,23 +55,18 @@ class PlayerFragment : Fragment() {
         // Inflate the layout for this fragment
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
         textView = v.findViewById(R.id.fragTextIdB)
-        btnOkay = v.findViewById(R.id.btnB)
 
         var bundle: Bundle = this.arguments!!
         var x: String = textView.text.toString()
-        var x2 = "no way - player "
         if (bundle.containsKey("keyOther")) {
-            x2 = x + bundle?.getString("keyOther").toString()
+            x += bundle?.getString("keyOther").toString()
         }
-        textView.text = x2
+        textView.text = x
         Log.e(ItemsFragment.TAG, "In Othersz")
         Log.e(ItemsFragment.TAG, x)
-        Log.e(ItemsFragment.TAG, x2)
 
         val btn:Button = v.findViewById(R.id.btnB) as Button
-        btn.setOnClickListener {
-            Log.e(TAG, "FRAG OTHER CLICK")
-        }
+        btn.setOnClickListener { v -> doSomething(v)  }
         return v
     }
 
@@ -81,7 +84,7 @@ class PlayerFragment : Fragment() {
     }
 
     fun doSomething(v: View) {
-        Log.e(TAG, "SOMETHIGN! OTHER")
+        Log.e(TAG, "Clicked in Player Fragment")
     }
 
 

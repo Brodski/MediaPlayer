@@ -26,48 +26,45 @@ private const val ARG_PARAM2 = "param2"
 class ItemsFragment : Fragment() {
 
     private lateinit var textView: TextView
-    private lateinit var btnOkay: Button
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.e(TAG,"Attached Items")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.e(TAG, "onCreate() Items")
+        Log.e(TAG,"Created Items")
     }
 
     override fun onDetach() {
         super.onDetach()
-      //  listener = null
+        Log.e(TAG,"Detached Items")
     }
 
+    override fun onDestroyView(){
+        super.onDestroyView()
+        Log.e(TAG,"Destroyed Items")
+    }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        // Inflate the layout for this fragment
+
         var v: View = inflater.inflate(R.layout.fragment_items, container, false)
         textView = v.findViewById(R.id.fragTextId)
-        btnOkay = v.findViewById(R.id.btnA)
 
         var bundle: Bundle? = this.arguments
         var x: String = textView.text.toString()
-        var x2 =" nope"
         if (bundle != null) {
             if (bundle.containsKey("keyOther")){
-                x2 = x + bundle?.getString("keyOther").toString()
+                x += bundle?.getString("keyOther").toString()
             }
         }
-        //textView.text = x2
+
         Log.e(TAG, "IN ITEMSz")
         Log.e(TAG, x)
-        Log.e(TAG, x2)
 
-//        val btn:Button = v.findViewById(R.id.btnA) as Button
-//        btn.setOnClickListener {
-//            Log.e(TAG, "FRAG A CLICK")
-//            var input: CharSequence = "from frag Items" as CharSequence
-//            listener?.onInputItemsSent(input)
-//        }
+        val btn:Button = v.findViewById(R.id.btnA) as Button
+        btn.setOnClickListener { doSomething(it) }
         return v
     }
 
@@ -83,7 +80,9 @@ class ItemsFragment : Fragment() {
             return itemsFragment
 
         }
+
+        fun doSomething(v: View) {
+            Log.e(TAG, "Clicked in ITEMS Fragment")
+        }
     }
-
-
 }

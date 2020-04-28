@@ -19,7 +19,6 @@
         android:id="@+id/btnB"
         android:layout_width="171dp"
         android:layout_height="wrap_content"
-        android:onClick="doSomething"
         android:text="Button2" />
 
 

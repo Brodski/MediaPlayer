@@ -12,6 +12,7 @@ import android.os.Environment
 import android.os.IBinder
 import android.provider.MediaStore
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
@@ -146,27 +147,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         Util.startForegroundService(this, intent)
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNav.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.nav_home -> {
-                    val message = "hello from nav_home"
-                 //   mIMainActivity?.inflateFragment("fragment_a", message)
-                    inflateFragment("fragment_a", message)
-                    true
-                }
-                R.id.nav_favorites -> {
-                    val message = "hello from nav_favorites"
-                    inflateFragment("fragment_b", message)
-                    true
-                }
-                R.id.nav_search -> {
-                    val message = "hello from nav_search"
-                    inflateFragment("fragment_b", message)
-                    true
-                }
-                else -> false
-            }
-        }
+        bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
     }
 
 
@@ -373,8 +354,27 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             .commit()
     }
 
-
-
-
-
+    fun onNavClick(menuItem: MenuItem) : Boolean {
+        var bool = false
+        when (menuItem.itemId) {
+            R.id.nav_home -> {
+                val message = "hello from nav_home"
+                //   mIMainActivity?.inflateFragment("fragment_a", message)
+                inflateFragment("fragment_a", message)
+                bool = true
+            }
+            R.id.nav_favorites -> {
+                val message = "hello from nav_favorites"
+                inflateFragment("fragment_b", message)
+                bool = true
+            }
+            R.id.nav_search -> {
+                val message = "hello from nav_search"
+                inflateFragment("fragment_b", message)
+                bool = true
+            }
+            else -> bool = false
+        }
+        return bool
+    }
 }

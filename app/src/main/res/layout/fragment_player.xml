@@ -3,17 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="@android:color/holo_blue_dark"
     android:orientation="vertical"
-    tools:context=".OtherFragment"
+    tools:context=".PlayerFragment"
     >
 
     <TextView
         android:id="@+id/fragTextIdB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="fragment B" />
+        android:text="fragment Player" />
 
     <Button
         android:id="@+id/btnB"

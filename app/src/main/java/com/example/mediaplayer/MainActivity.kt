@@ -42,7 +42,7 @@ import java.io.File
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
 // Notification
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
-class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentItemsListener, VideoFragment.FragmentItemsListener {
+class MainActivity : AppCompatActivity(), IMainActivity {
 
     data class AudioFile(val uri: Uri,
                          val title: String,
@@ -67,15 +67,11 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
 
     lateinit var fragmentContainer: FrameLayout
     lateinit var itemsFragment: ItemsFragment
-    lateinit var videoFragment: VideoFragment
+    lateinit var playerFragment: PlayerFragment
     lateinit var btnFrag: Button
-
-
     //lateinit var mIMainActivity: IMainActivity
 
     companion object { const val TAG = "MainActivity" }
-
-
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -142,7 +138,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
 
         //multi fragments
         itemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
-        videoFragment = VideoFragment.newInstance("pp1,", "pp2")
+        playerFragment = PlayerFragment.newInstance("pp1,", "pp2")
 
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(this, AudioPlayerService::class.java)
@@ -344,19 +340,12 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
         // this object lets us put the fragment into the layout
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.container_a, itemsFragment)
-            .replace(R.id.container_b, videoFragment)
+            .replace(R.id.container_b, itemsFragment)
+            .replace(R.id.container_a, playerFragment)
+            //.replace(R.id.container_itmes, playerFragment)
             //.addToBackStack(itemsFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
-    }
-
-    override fun onInputOtherSent(input: CharSequence) {
-        itemsFragment.updateEditTest(input)
-    }
-
-    override fun onInputItemsSent(input: CharSequence) {
-        videoFragment.updateEditTest(input)
     }
 
     override fun inflateFragment(fragmentTag: String, message: String) {
@@ -365,7 +354,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
             doFragmentTransaction(fragment, fragmentTag, true, message);
         }
         else if (fragmentTag == "fragment_b") {
-            var fragment: VideoFragment = VideoFragment()
+            var fragment: PlayerFragment = PlayerFragment()
             doFragmentTransaction(fragment, fragmentTag, true, message);
         }
     }
@@ -379,6 +368,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, ItemsFragment.FragmentI
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.container_a, fragment)
+//          .replace(tag, fragment)
 //          .addToBackStack()
             .commit()
     }

@@ -24,40 +24,24 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class ItemsFragment : Fragment() {
-    private var listener: FragmentItemsListener? = null
+
     private lateinit var textView: TextView
     private lateinit var btnOkay: Button
 
-    interface FragmentItemsListener {
-        fun onInputItemsSent(input: CharSequence)
-    }
-
-    @Throws(IOException::class)
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.e(TAG, "onAttach() Items")
-        if (context is FragmentItemsListener) {
-            listener = context as FragmentItemsListener
-        } else {
-            throw RuntimeException(context.toString() + "must implement FragmentItemsListener")
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.e(TAG, "onCreate() Items")
-
     }
 
     override fun onDetach() {
         super.onDetach()
-        listener = null
+      //  listener = null
     }
 
-    fun updateEditTest(newText: CharSequence){
-        Log.e(TAG ,"recieved soemthing")
-        Log.e(TAG , newText.toString())
-    }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
         // Inflate the layout for this fragment

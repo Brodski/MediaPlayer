@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:clickable="true"
     android:background="@android:color/darker_gray"
+    android:clickable="true"
+    android:orientation="vertical"
     tools:context=".ItemsFragment">
 
     <TextView
@@ -18,7 +18,14 @@
         android:id="@+id/btnA"
         android:layout_width="171dp"
         android:layout_height="wrap_content"
-        android:text="Button"
-        />
+        android:text="Button" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_songs"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/song_item"
+    />
 
 </LinearLayout>

@@ -27,31 +27,26 @@ class PlayerFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.e(TAG,"Attached Player")
+        Log.e(TAG,"Attached Player Frag")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.e(TAG,"Created Player")
+        Log.e(TAG,"Created Player Frag")
     }
 
     override fun onDetach() {
         super.onDetach()
-        Log.e(TAG,"Detached Player")
+        Log.e(TAG,"Detached Player Frag")
     }
 
     override fun onDestroyView(){
         super.onDestroyView()
-        Log.e(TAG,"Destroyed Player")
-
-    }
-
-    fun updateEditTest(newText: CharSequence){
-        Log.e(TAG ,"recieved soemthing")
-        Log.e(TAG , newText.toString())
+        Log.e(TAG,"Destroyed Player Frag")
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
+        Log.e(TAG, "onCreateView Player Frag")
         // Inflate the layout for this fragment
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
         textView = v.findViewById(R.id.fragTextIdB)

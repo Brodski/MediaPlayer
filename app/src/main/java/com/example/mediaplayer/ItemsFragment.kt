@@ -11,6 +11,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.fragment_items.*
 import java.io.IOException
 import java.lang.RuntimeException
 
@@ -23,9 +26,11 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ItemsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ItemsFragment : Fragment() {
+class ItemsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     private lateinit var textView: TextView
+    private lateinit var songList: MutableList<Song>
+    private lateinit var recycler_songs: RecyclerView
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -49,8 +54,8 @@ class ItemsFragment : Fragment() {
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
 
-        var v: View = inflater.inflate(R.layout.fragment_items, container, false)
-        textView = v.findViewById(R.id.fragTextId)
+        var view: View = inflater.inflate(R.layout.fragment_items, container, false)
+        textView = view.findViewById(R.id.fragTextId)
 
         var bundle: Bundle? = this.arguments
         var x: String = textView.text.toString()
@@ -60,12 +65,21 @@ class ItemsFragment : Fragment() {
             }
         }
 
-        Log.e(TAG, "IN ITEMSz")
-        Log.e(TAG, x)
+        songList = ArrayList<Song>()
+        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
+        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
+        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
 
-        val btn:Button = v.findViewById(R.id.btnA) as Button
+        //Log.e(TAG, view.toString())
+        recycler_songs = view.findViewById(R.id.recycler_songs)
+        recycler_songs.adapter = SongsAdaptor(songList, this)
+        //recycler_songs.layoutManager = LinearLayoutManager(activity)
+        recycler_songs.layoutManager = LinearLayoutManager(context)
+        recycler_songs.setHasFixedSize(true)
+
+        val btn:Button = view.findViewById(R.id.btnA) as Button
         btn.setOnClickListener { doSomething(it) }
-        return v
+        return view
     }
 
     companion object {
@@ -84,5 +98,23 @@ class ItemsFragment : Fragment() {
         fun doSomething(v: View) {
             Log.e(TAG, "Clicked in ITEMS Fragment")
         }
+    }
+
+    override fun onItemClick(postion: Int) {
+
+        // var mIntent: Intent = Intent(this, SomeActiviytlol.class)
+        // startActivity(intent)
+        //
+        // to pass the item mList[1[ to activity
+        //mIntent.putExtra("someKey", mList[postion]) //the item at postion must implent Parcelable
+        // at SomActicitylol
+//        if (intent.hasExtra("someKey")) {
+//            var xx: Item4list = intent.getParcelableExtra("someKey")
+//        }
+        Log.e(TAG, songList[postion]?.mainText)
+        Log.e(TAG, songList[postion]?.subText)
+        Log.e(TAG, songList[postion]?.imageResource.toString())
+
+        Toast.makeText(activity, "BITCH! $postion", Toast.LENGTH_SHORT).show()
     }
 }

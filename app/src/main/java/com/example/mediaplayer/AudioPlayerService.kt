@@ -65,8 +65,6 @@ class AudioPlayerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val context: Context = this
-        exoPlayer = SimpleExoPlayer.Builder(this).build()
 
         //https://medium.com/google-exoplayer/easy-audio-focus-with-exoplayer-a2dcbbe4640e
 //        val audioAttributes = AudioAttributes.Builder()
@@ -75,13 +73,12 @@ class AudioPlayerService : Service() {
 //            .build()
 //        exoPlayer!!.setAudioAttributes(audioAttributes, true)
 
+        val context: Context = this
+        exoPlayer = SimpleExoPlayer.Builder(this).build()
         val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
         val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-        val dataSourceFactory: DataSource.Factory =
-            DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
-
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
-
         val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
         val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
         concatenatingMediaSource.addMediaSource(ms)
@@ -154,10 +151,6 @@ class AudioPlayerService : Service() {
                 }
             })
         mediaSessionConnector!!.setPlayer(exoPlayer)
-
-//        //playerNotificationManager.setPlayer(exoPlayer)
-//        playerNotificationManager?.setMediaSessionToken(mediaSession!!.sessionToken)
-
     }
 
     private fun mediaHelper(context: Context, someshit: Unit?): MediaDescriptionCompat {

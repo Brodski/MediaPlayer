@@ -67,8 +67,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
 
     lateinit var fragmentContainer: FrameLayout
-    lateinit var itemsFragment: ItemsFragment
-    lateinit var playerFragment: PlayerFragment
     lateinit var btnFrag: Button
     //lateinit var mIMainActivity: IMainActivity
 
@@ -81,7 +79,8 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             mService = binder.getService()
             mBound = true
 
-            playerView = findViewById(R.id.video_view)
+            playerView = findViewById(R.id.main_view)
+            //playerView = findViewById(R.id.viewId)
             playerView?.player = mService.exoPlayer
         }
 
@@ -110,7 +109,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     }
 
     private fun initializePlayer() {
-//        playerView = findViewById(R.id.video_view)
+//        playerView = findViewById(R.id.main_view)
         player = SimpleExoPlayer.Builder(this).build()
         var mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
         var videoSource: MediaSource = buildMediaSource(mp4VideoUri)
@@ -154,19 +153,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
 
-
-        //fragmentContainer = findViewById(R.id.fra)
-//        playerView = findViewById(R.id.video_view)
-//        playerView?.player = mService.exoPlayer
-
-        //multi fragments
-        itemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
-        playerFragment = PlayerFragment.newInstance("pp1,", "pp2")
-
-//        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-//        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-//        bindService(intent, connection, Context.BIND_AUTO_CREATE)
-//        Util.startForegroundService(this, intent)
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
@@ -330,6 +316,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         audioList.forEach { Log.e(TAG, it.toString()) }
         return audioList
     }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERM_REQUEST -> {
@@ -351,6 +338,9 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
 
     fun goToFragment(v: View){
+        //multi fragments
+        var itemsFragment: ItemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
+        var playerFragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
         // this object lets us put the fragment into the layout
         supportFragmentManager
             .beginTransaction()
@@ -364,16 +354,16 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
     override fun inflateFragment(fragmentTag: String, message: String) {
         if (fragmentTag == "fragment_a") {
-            var fragment: ItemsFragment = ItemsFragment()
-            doFragmentTransaction(fragment, fragmentTag, true, message);
+            var fragment = ItemsFragment()
+            doFragmentTransaction(fragment, fragmentTag, message);
         }
         else if (fragmentTag == "fragment_b") {
-            var fragment: PlayerFragment = PlayerFragment()
-            doFragmentTransaction(fragment, fragmentTag, true, message);
+            var fragment = PlayerFragment()
+            doFragmentTransaction(fragment, fragmentTag, message);
         }
     }
 
-    fun doFragmentTransaction(fragment: Fragment,tag: String, boolean: Boolean,  message: String){
+    fun doFragmentTransaction(fragment: Fragment, tag: String,  message: String){
         var tag= "keyOther"
         var bundle  = Bundle()
         bundle.putString( tag, message)
@@ -381,8 +371,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.container_a, fragment)
-//          .replace(tag, fragment)
+            .replace(R.id.main_view, fragment)
 //          .addToBackStack()
             .commit()
     }

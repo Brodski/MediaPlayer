@@ -94,8 +94,11 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         recycler_songs.layoutManager = LinearLayoutManager(context)
         recycler_songs.setHasFixedSize(true)
 
-        val btn:Button = view.findViewById(R.id.btnA) as Button
+        val btn: Button = view.findViewById(R.id.btnA) as Button
         btn.setOnClickListener { doSomething(it) }
+
+        val btnB: Button = view.findViewById(R.id.btnB) as Button
+        btn.setOnClickListener { v -> getSongs(v)  }
         return view
     }
 
@@ -114,6 +117,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
         fun doSomething(v: View) {
             Log.e(TAG, "Clicked in ITEMS Fragment")
+        }
+
+        fun getSongs(v: View) {
+            Log.e(TAG, "Clicked in get Songs")
         }
     }
 

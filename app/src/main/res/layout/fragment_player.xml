@@ -16,11 +16,20 @@
         app:hide_on_touch="false"
 
 
-        app:show_timeout="10000"
+        app:show_timeout="0"
         app:fastforward_increment="30000"
         app:rewind_increment="30000"
         app:use_sensor_rotation="true"
+        app:controller_layout_id="@layout/controls_playback"
         />
+
+<!--    <com.google.android.exoplayer2.ui.PlayerControlView-->
+<!--        android:id="@+id/controls"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/main_view2"-->
+<!--        app:show_timeout="0"-->
+<!--        />-->
     <TextView
         android:id="@+id/fragTextIdB"
         android:layout_width="match_parent"

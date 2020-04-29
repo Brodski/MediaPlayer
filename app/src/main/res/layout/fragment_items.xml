@@ -20,6 +20,13 @@
         android:layout_height="wrap_content"
         android:text="Button" />
 
+    <Button
+        android:id="@+id/btnB"
+        android:layout_width="171dp"
+        android:layout_height="wrap_content"
+        android:text="Get Songs"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_songs"
         xmlns:android="http://schemas.android.com/apk/res/android"

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="600dp"
 
-        app:show_timeout="10000"
+        app:show_timeout="0"
         app:fastforward_increment="30000"
         app:rewind_increment="30000"
         app:use_sensor_rotation="true"

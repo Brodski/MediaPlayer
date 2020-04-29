@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
 import java.io.IOException
@@ -30,6 +31,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class PlayerFragment : Fragment(), IMainActivity {
 
+    private lateinit var playerControls: PlayerControlView
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
     private lateinit var textView: TextView
@@ -43,8 +45,8 @@ class PlayerFragment : Fragment(), IMainActivity {
             mService = binder.getService()
             mBound = true
 
-            //playerView =  view.findViewById(R.id.main_view)
             playerView?.player = mService.exoPlayer
+
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -108,7 +110,8 @@ class PlayerFragment : Fragment(), IMainActivity {
         textView = v.findViewById(R.id.fragTextIdB)
 
         playerView =  v.findViewById(R.id.main_view2)
-//        playerView?.player = mService.exoPlayer
+        //playerView?.controllerShowTimeoutMs = 0
+
 
         var bundle: Bundle = this.arguments!!
         var x: String = textView.text.toString()
@@ -116,8 +119,6 @@ class PlayerFragment : Fragment(), IMainActivity {
             x += bundle?.getString("keyOther").toString()
         }
         textView.text = x
-        Log.e(SongsFragment.TAG, "In Othersz")
-        Log.e(SongsFragment.TAG, x)
 
         val btn:Button = v.findViewById(R.id.btnB) as Button
         btn.setOnClickListener { v -> doSomething(v)  }
@@ -139,6 +140,10 @@ class PlayerFragment : Fragment(), IMainActivity {
 
     fun doSomething(v: View) {
         Log.e(TAG, "Clicked in Player Fragment")
+        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString() )
+        Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
+        Log.e(TAG, mService.exoPlayer!!.toString())
+
     }
 
     override fun inflateFragment(fragmentTag: String, message: String) {

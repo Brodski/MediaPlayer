@@ -79,12 +79,15 @@ class AudioPlayerService : Service() {
         //buildMedia()
         val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
         val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        val mp4VideoUri2: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
         val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
         val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
+        val ms3: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri2)
         concatenatingMediaSource.addMediaSource(ms)
         concatenatingMediaSource.addMediaSource(ms2)
+        concatenatingMediaSource.addMediaSource(ms3)
 
         exoPlayer!!.prepare(concatenatingMediaSource)
         exoPlayer!!.playWhenReady = false

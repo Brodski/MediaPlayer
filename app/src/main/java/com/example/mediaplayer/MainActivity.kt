@@ -54,10 +54,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
 
-
-    private var playerView2: PlayerView? = null
-    private var player2: SimpleExoPlayer? = null
-
     private lateinit var mService: AudioPlayerService
     private var mBound: Boolean = false
 
@@ -70,65 +66,20 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     private var currentWindow = 0
     private var playBackPosition: Long = 0
 
-
-    lateinit var fragmentContainer: FrameLayout
-    lateinit var btnFrag: Button
     //lateinit var mIMainActivity: IMainActivity
 
     companion object { const val TAG = "MainActivity" }
 
-    private val connection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.e(TAG, "CONNECTED SERVICE")
-            val binder = service as AudioPlayerService.LocalBinder
-            mService = binder.getService()
-            mBound = true
-
-//            playerView = findViewById(R.id.main_view)
-//            playerView?.player = mService.exoPlayer
-
-//            playerView2 = findViewById(R.id.main_view2)
-//            playerView2?.player = mService.exoPlayer
-            inflateFragment("fragment_player", "123!")
-        }
-
-//        override fun onServiceDisconnected(arg0: ComponentName?) {
-        override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e(TAG, "DISCONNECTED SERVICE")
-            mBound = false
-        }
-    }
-
-    private fun initPlayer2(){
-        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
-        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(this, intent)
-
-    }
-
-    private fun releasePlayer2() {
-        Log.e(TAG,"Release called")
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        //stopService(intent)
-        unbindService(connection)
-        mBound = false
-    }
-
     private fun initializePlayer() {
-//        playerView = findViewById(R.id.main_view)
         player = SimpleExoPlayer.Builder(this).build()
         var mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-        var videoSource: MediaSource = buildMediaSource(mp4VideoUri)
-//        playerView?.player = player
+        //var videoSource: MediaSource = buildMediaSource(mp4VideoUri)
 
         playerView?.player = mService.exoPlayer
         player?.playWhenReady = playWhenReady
         player?.seekTo(currentWindow, playBackPosition)
-        player?.prepare(videoSource, false, false)
+  //      player?.prepare(videoSource, false, false)
     }
-
 
     private fun releasePlayer() {
         if (player != null) {
@@ -141,21 +92,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         }
     }
 
-    private fun buildMediaSource(uri: Uri): MediaSource {
-        val dataSourceFactory: DataSource.Factory =
-            DefaultDataSourceFactory(this, Util.getUserAgent(this, this.getString(R.string.app_name)) )
-
-        val videoSource: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
-        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
-
-        val mediaSource2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
-        val cs = ConcatenatingMediaSource()
-        cs.addMediaSource(videoSource)
-        cs.addMediaSource(mediaSource2)
-        return cs
-    }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -164,7 +100,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -208,7 +143,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
     override fun onDestroy() {
         super.onDestroy()
-
         Log.e(TAG,"DESTROY MainActivity")
     }
 
@@ -219,7 +153,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             queryWithPermissions()
         }
     }
-
 
     // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
     // How to Request a Run Time Permission - Android Studio Tutorial

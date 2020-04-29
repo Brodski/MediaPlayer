@@ -45,13 +45,8 @@ class PlayerFragment : Fragment(), IMainActivity {
 
             //playerView =  view.findViewById(R.id.main_view)
             playerView?.player = mService.exoPlayer
-
-//            playerView2 = findViewById(R.id.main_view2)
-//            playerView2?.player = mService.exoPlayer
-//            inflateFragment("fragment_player", "123!")
         }
 
-        //        override fun onServiceDisconnected(arg0: ComponentName?) {
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e(MainActivity.TAG, "DISCONNECTED SERVICE")
             mBound = false
@@ -92,7 +87,6 @@ class PlayerFragment : Fragment(), IMainActivity {
     private fun releasePlayer2() {
         Log.e(TAG,"Release called")
         var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-        //stopService(intent)
         activity?.unbindService(connection)
         mBound = false
     }
@@ -100,10 +94,8 @@ class PlayerFragment : Fragment(), IMainActivity {
     private fun initPlayer2(){
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-//        var intent: Intent = Intent(this, AudioPlayerService::class.java)
         var intent: Intent = Intent(activity, AudioPlayerService::class.java)
         activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        //Util.startForegroundService(this, intent)
         Util.startForegroundService(activity!!, intent)
 
     }

@@ -13,6 +13,8 @@
         android:id="@+id/main_view2"
         android:layout_width="match_parent"
         android:layout_height="500dp"
+        app:hide_on_touch="false"
+
 
         app:show_timeout="10000"
         app:fastforward_increment="30000"

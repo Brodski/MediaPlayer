@@ -34,7 +34,12 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.e(TAG,"Attached Items")
+        Log.e(TAG,"onAttach Items")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.e(TAG,"onStart Items")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +58,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-
+        Log.e(TAG,"onCreateView Items")
         var view: View = inflater.inflate(R.layout.fragment_items, container, false)
         textView = view.findViewById(R.id.fragTextId)
 
@@ -111,6 +116,8 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
             Log.e(TAG, "Clicked in ITEMS Fragment")
         }
     }
+
+
 
     override fun onItemClick(postion: Int) {
 

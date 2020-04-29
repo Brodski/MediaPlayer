@@ -84,12 +84,12 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             mService = binder.getService()
             mBound = true
 
-            playerView = findViewById(R.id.main_view)
-            playerView?.player = mService.exoPlayer
+//            playerView = findViewById(R.id.main_view)
+//            playerView?.player = mService.exoPlayer
 
 //            playerView2 = findViewById(R.id.main_view2)
 //            playerView2?.player = mService.exoPlayer
-//            inflateFragment("fragment_player", "123!")
+            inflateFragment("fragment_player", "123!")
         }
 
 //        override fun onServiceDisconnected(arg0: ComponentName?) {
@@ -171,8 +171,9 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         Log.e(TAG,"START MainActivity")
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
         //    initializePlayer()
-            initPlayer2()
+//            initPlayer2()
         }
+        inflateFragment("fragment_player", "123!")
     }
 
     override fun onResume() {
@@ -180,7 +181,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         Log.e(TAG,"RESUME MainActivity")
         if (Util.SDK_INT < Build.VERSION_CODES.N || player == null) {
        //     initializePlayer()
-            initPlayer2()
+ //           initPlayer2()
         }
     }
 
@@ -189,7 +190,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         Log.e(TAG,"PAUSE MainActivity")
         if (Util.SDK_INT < Build.VERSION_CODES.N) {
      //       releasePlayer()
-            releasePlayer2()
+     //       releasePlayer2()
         }
     }
 
@@ -201,7 +202,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
       //      releasePlayer()
-            releasePlayer2()
+      //      releasePlayer2()
         }
     }
 
@@ -351,7 +352,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             R.id.nav_home -> {
                 val message = "hello from nav_home"
                 //   mIMainActivity?.inflateFragment("fragment_a", message)
-                inflateFragment("fragment_songs", message)
+                inflateFragment("fragment_player", message)
                 bool = true
             }
             R.id.nav_favorites -> {
@@ -398,6 +399,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         var songsFragment: SongsFragment = SongsFragment.newInstance("pp1,", "pp2")
         var playerFragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
         // this object lets us put the fragment into the layout
+
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.container_b, songsFragment)

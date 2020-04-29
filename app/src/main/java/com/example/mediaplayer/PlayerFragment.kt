@@ -57,8 +57,8 @@ class PlayerFragment : Fragment() {
             x += bundle?.getString("keyOther").toString()
         }
         textView.text = x
-        Log.e(ItemsFragment.TAG, "In Othersz")
-        Log.e(ItemsFragment.TAG, x)
+        Log.e(SongsFragment.TAG, "In Othersz")
+        Log.e(SongsFragment.TAG, x)
 
         val btn:Button = v.findViewById(R.id.btnB) as Button
         btn.setOnClickListener { v -> doSomething(v)  }

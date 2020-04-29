@@ -53,6 +53,11 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
+
+
+    private var playerView2: PlayerView? = null
+    private var player2: SimpleExoPlayer? = null
+
     private lateinit var mService: AudioPlayerService
     private var mBound: Boolean = false
 
@@ -80,12 +85,15 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             mBound = true
 
             playerView = findViewById(R.id.main_view)
-            //playerView = findViewById(R.id.viewId)
             playerView?.player = mService.exoPlayer
+
+//            playerView2 = findViewById(R.id.main_view2)
+//            playerView2?.player = mService.exoPlayer
+//            inflateFragment("fragment_player", "123!")
         }
 
-//        override fun onServiceDisconnected(name: ComponentName?) {
-        override fun onServiceDisconnected(arg0: ComponentName?) {
+//        override fun onServiceDisconnected(arg0: ComponentName?) {
+        override fun onServiceDisconnected(name: ComponentName?) {
             Log.e(TAG, "DISCONNECTED SERVICE")
             mBound = false
         }
@@ -152,7 +160,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
-
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
@@ -337,28 +344,38 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     }
 
 
-    fun goToFragment(v: View){
-        //multi fragments
-        var itemsFragment: ItemsFragment = ItemsFragment.newInstance("pp1,", "pp2")
-        var playerFragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
-        // this object lets us put the fragment into the layout
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container_b, itemsFragment)
-            .replace(R.id.container_a, playerFragment)
-            //.replace(R.id.container_itmes, playerFragment)
-            //.addToBackStack(itemsFragment.toString())
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .commit()
-    }
 
+    fun onNavClick(menuItem: MenuItem) : Boolean {
+        var bool = false
+        when (menuItem.itemId) {
+            R.id.nav_home -> {
+                val message = "hello from nav_home"
+                //   mIMainActivity?.inflateFragment("fragment_a", message)
+                inflateFragment("fragment_songs", message)
+                bool = true
+            }
+            R.id.nav_favorites -> {
+                val message = "hello from nav_favorites"
+                inflateFragment("fragment_songs", message)
+                bool = true
+            }
+            R.id.nav_search -> {
+                val message = "hello from nav_search"
+                inflateFragment("fragment_songs", message)
+                bool = true
+            }
+            else -> bool = false
+        }
+        return bool
+    }
     override fun inflateFragment(fragmentTag: String, message: String) {
-        if (fragmentTag == "fragment_a") {
-            var fragment = ItemsFragment()
+        if (fragmentTag == "fragment_songs") {
+            var fragment = SongsFragment()
             doFragmentTransaction(fragment, fragmentTag, message);
         }
-        else if (fragmentTag == "fragment_b") {
-            var fragment = PlayerFragment()
+        else if (fragmentTag == "fragment_player") {
+            //var fragment = PlayerFragment()
+            var fragment = PlayerFragment.newInstance("pp1,", "pp2")
             doFragmentTransaction(fragment, fragmentTag, message);
         }
     }
@@ -376,27 +393,18 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             .commit()
     }
 
-    fun onNavClick(menuItem: MenuItem) : Boolean {
-        var bool = false
-        when (menuItem.itemId) {
-            R.id.nav_home -> {
-                val message = "hello from nav_home"
-                //   mIMainActivity?.inflateFragment("fragment_a", message)
-                inflateFragment("fragment_a", message)
-                bool = true
-            }
-            R.id.nav_favorites -> {
-                val message = "hello from nav_favorites"
-                inflateFragment("fragment_b", message)
-                bool = true
-            }
-            R.id.nav_search -> {
-                val message = "hello from nav_search"
-                inflateFragment("fragment_b", message)
-                bool = true
-            }
-            else -> bool = false
-        }
-        return bool
+    fun myGoToFragment(v: View){
+        //multi fragments
+        var songsFragment: SongsFragment = SongsFragment.newInstance("pp1,", "pp2")
+        var playerFragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
+        // this object lets us put the fragment into the layout
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container_b, songsFragment)
+            .replace(R.id.container_a, playerFragment)
+            //.replace(R.id.container_itmes, playerFragment)
+            //.addToBackStack(songsFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
     }
 }

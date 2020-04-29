@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
-class SelectorFragment : Fragment() {
+class zzSelectorFragment : Fragment() {
 
 
     private val mIMainActivity: IMainActivity? = null

@@ -17,7 +17,7 @@ class SongsAdaptor(private val songList: List<Song>, private val onItemListener:
     // ctrl I
     // called by rcyc viewr when its time to create a new view holder, return type is ExViewhodler
     override fun onCreateViewHolder( parent: ViewGroup, viewType: Int ): SongsViewHolder {
-        // class responsidble 4 turning xml layoutfiles to View Objects is layoutInflater (from android fraimwork)
+        // class responsible 4 turning xml layoutfiles to View Objects is layoutInflater (from android fraimwork)
         // .inflate turns layout to view
         // handle to layout inflator, parent = recycler viwer, .context = our activiy of rec
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.song_item, parent, false)
@@ -36,11 +36,7 @@ class SongsAdaptor(private val songList: List<Song>, private val onItemListener:
 
     }
     override fun getItemCount() = songList.size
-//    override fun getItemViewType(position: Int): Int {
-//        return R.layout.song_item
-//    }
 
-    //    override fun getItemCount(): Int { return items4List.size }
 
     // row
     class SongsViewHolder(itemView: View, val onItemListener: OnItemListener ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {

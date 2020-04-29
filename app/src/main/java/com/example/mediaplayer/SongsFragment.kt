@@ -23,10 +23,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ItemsFragment.newInstance] factory method to
+ * Use the [SongsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ItemsFragment : Fragment(),  SongsAdaptor.OnItemListener {
+class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     private lateinit var textView: TextView
     private lateinit var songList: MutableList<Song>
@@ -69,6 +69,18 @@ class ItemsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
         songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
         songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
+        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
+        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
+        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
+        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
+        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
+        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
+        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
+        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
+        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
+        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
+        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
+        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
 
         //Log.e(TAG, view.toString())
         recycler_songs = view.findViewById(R.id.recycler_songs)
@@ -83,15 +95,15 @@ class ItemsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     companion object {
-        const val TAG = "ItemsFragment"
+        const val TAG = "SongsFragment"
         @JvmStatic
-        fun newInstance(param1: String, param2: String) : ItemsFragment {
-            val itemsFragment = ItemsFragment()
+        fun newInstance(param1: String, param2: String) : SongsFragment {
+            val songsFragment = SongsFragment()
             val args = Bundle()
             args.putString(ARG_PARAM1, param1)
             args.putString(ARG_PARAM2, param2)
-            itemsFragment.arguments = args
-            return itemsFragment
+            songsFragment.arguments = args
+            return songsFragment
 
         }
 

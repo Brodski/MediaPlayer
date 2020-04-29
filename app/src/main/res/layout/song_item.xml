@@ -25,7 +25,7 @@
 
         <TextView
             android:id="@+id/songMainTextId"
-            android:text="Line lol 1"
+            android:text="Main text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/imageId"
@@ -36,7 +36,7 @@
 
         <TextView
             android:id="@+id/songSubTextId"
-            android:text="Line 2!"
+            android:text="Subtext"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/songMainTextId"

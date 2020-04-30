@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/darker_gray"
-    android:clickable="true"
     android:orientation="vertical"
     tools:context=".SongsFragment">
 
@@ -24,15 +25,13 @@
         android:id="@+id/btnB"
         android:layout_width="171dp"
         android:layout_height="wrap_content"
-        android:text="Get Songs"
-        />
+        android:text="Get Songs" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_songs"
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/recycler_songs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/song_item"
-    />
+        tools:listitem="@layout/song_item" />
 
 </LinearLayout>

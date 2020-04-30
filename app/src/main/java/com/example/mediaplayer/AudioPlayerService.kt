@@ -92,6 +92,7 @@ class AudioPlayerService : Service() {
         exoPlayer!!.prepare(concatenatingMediaSource)
         exoPlayer!!.playWhenReady = false
 
+
         // Setup notification and media session.
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
             context,

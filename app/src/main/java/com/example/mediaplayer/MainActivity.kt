@@ -304,7 +304,8 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     }
     override fun inflateFragment(fragmentTag: String, message: String) {
         if (fragmentTag == "fragment_songs") {
-            var fragment = SongsFragment()
+            //var fragment = SongsFragment()
+            var fragment = SongsFragment.newInstance("pp1", "pp2")
             doFragmentTransaction(fragment, fragmentTag, message);
         }
         else if (fragmentTag == "fragment_player") {
@@ -322,7 +323,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.main_view, fragment)
+            .replace(R.id.newmain_view, fragment)
 //          .addToBackStack()
             .commit()
     }
@@ -333,13 +334,13 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         var playerFragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
         // this object lets us put the fragment into the layout
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container_b, songsFragment)
-            .replace(R.id.container_a, playerFragment)
-            //.replace(R.id.container_itmes, playerFragment)
-            //.addToBackStack(songsFragment.toString())
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-            .commit()
+//        supportFragmentManager
+//            .beginTransaction()
+//            .replace(R.id.container_b, songsFragment)
+//            .replace(R.id.container_a, playerFragment)
+//            //.replace(R.id.container_itmes, playerFragment)
+//            //.addToBackStack(songsFragment.toString())
+//            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//            .commit()
     }
 }

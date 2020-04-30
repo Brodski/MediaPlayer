@@ -40,17 +40,17 @@ class PlayerFragment : Fragment(), IMainActivity {
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.e(MainActivity.TAG, "CONNECTED SERVICE")
+            Log.e(TAG, "CONNECTED SERVICE")
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
             mBound = true
 
             playerView?.player = mService.exoPlayer
-
+            playerView?.showController()
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e(MainActivity.TAG, "DISCONNECTED SERVICE")
+            Log.e(TAG, "DISCONNECTED SERVICE")
             mBound = false
         }
     }
@@ -110,6 +110,7 @@ class PlayerFragment : Fragment(), IMainActivity {
         textView = v.findViewById(R.id.fragTextIdB)
 
         playerView =  v.findViewById(R.id.main_view2)
+        //playerView?.controllerHideOnTouch = false
         //playerView?.controllerShowTimeoutMs = 0
 
 
@@ -123,6 +124,10 @@ class PlayerFragment : Fragment(), IMainActivity {
         val btn:Button = v.findViewById(R.id.btnB) as Button
         btn.setOnClickListener { v -> doSomething(v)  }
         return v
+
+//        var v2: View = inflater.inflate(R.layout.controls_playback, container, false)
+//        var cnt = v2.findViewById(R.id.controllerId)
+
     }
 
     companion object {
@@ -166,7 +171,7 @@ class PlayerFragment : Fragment(), IMainActivity {
 
         fragmentManager
             ?.beginTransaction()
-            ?.replace(R.id.main_view, fragment)
+            ?.replace(R.id.newmain_view, fragment)
 //          .addToBackStack()
             ?.commit()
     }

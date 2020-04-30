@@ -2,12 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/holo_blue_dark"
     android:orientation="vertical"
     tools:context=".PlayerFragment"
+
     >
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/main_view2"
@@ -15,21 +16,14 @@
         android:layout_height="500dp"
         app:hide_on_touch="false"
 
-
+        app:show_shuffle_button="true"
         app:show_timeout="0"
         app:fastforward_increment="30000"
         app:rewind_increment="30000"
-        app:use_sensor_rotation="true"
         app:controller_layout_id="@layout/controls_playback"
+        app:use_sensor_rotation="true"
         />
 
-<!--    <com.google.android.exoplayer2.ui.PlayerControlView-->
-<!--        android:id="@+id/controls"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@id/main_view2"-->
-<!--        app:show_timeout="0"-->
-<!--        />-->
     <TextView
         android:id="@+id/fragTextIdB"
         android:layout_width="match_parent"

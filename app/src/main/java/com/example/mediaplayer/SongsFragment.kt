@@ -22,6 +22,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.fragment_items.*
 import java.io.IOException
 import java.lang.RuntimeException
@@ -37,11 +43,27 @@ private const val ARG_PARAM2 = "param2"
  */
 class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
+    private lateinit var mService: AudioPlayerService
     private lateinit var textView: TextView
     private lateinit var songList: MutableList<Song>
     private lateinit var recycler_songs: RecyclerView
     private val MY_PERM_REQUEST = 1
 
+    companion object {
+        const val TAG = "SongsFragment"
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) : SongsFragment {
+            val songsFragment = SongsFragment()
+            val args = Bundle()
+            args.putString(ARG_PARAM1, param1)
+            args.putString(ARG_PARAM2, param2)
+            songsFragment.arguments = args
+            return songsFragment
+
+        }
+
+
+    }
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Log.e(TAG,"onAttach Items")
@@ -55,6 +77,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.e(TAG,"Created Items")
+        mService = AudioPlayerService()
     }
 
     override fun onDetach() {
@@ -97,10 +120,8 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
         songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
 
-        //Log.e(TAG, view.toString())
         recycler_songs = view.findViewById(R.id.recycler_songs)
         recycler_songs.adapter = SongsAdaptor(songList, this)
-        //recycler_songs.layoutManager = LinearLayoutManager(activity)
         recycler_songs.layoutManager = LinearLayoutManager(context)
         recycler_songs.setHasFixedSize(true)
 
@@ -112,25 +133,25 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         return view
     }
 
-    companion object {
-        const val TAG = "SongsFragment"
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) : SongsFragment {
-            val songsFragment = SongsFragment()
-            val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
-            songsFragment.arguments = args
-            return songsFragment
 
-        }
+    fun doSomething(v: View) {
+//        mService.buildMedia(context!!)
+        mService.buildMedia(activity!!.applicationContext)
+        Log.e(TAG, "Something happend")
 
-        fun doSomething(v: View) {
-            Log.e(TAG, "Clicked in ITEMS Fragment")
-        }
+//        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
+//        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+//        val mp4VideoUri2: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+//        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(activity!!.applicationContext, this.getString(R.string.app_name)) )
+////        concatenatingMediaSource = ConcatenatingMediaSource()
+////
+////        queryWithPermissions(context)
+//
+//        val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
+//        val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
+//        val ms3: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri2)
 
     }
-
     override fun onItemClick(postion: Int) {
 
         // var mIntent: Intent = Intent(this, SomeActiviytlol.class)
@@ -151,19 +172,20 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     fun getSongs(v: View) {
         Log.e(TAG, "Clicked in get Songs")
-        queryWithPermissions()
+        Log.e(TAG, mService.randomNumber.toString())
+        //queryWithPermissions()
     }
 
 
     fun queryWithPermissions() {
         if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
             val audioList = queryActually()
+            songList = audioList
+            recycler_songs.adapter = SongsAdaptor(songList, this)
             Log.e(TAG, "Permission already granted")
-            //Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
         } else {
 
             Log.e(TAG, "Read Permission not granted")
-            //Toast.makeText(this, "READ EXTERNAL NOT GRANTED", Toast.LENGTH_SHORT).show()
             //requestStoragePermission()
             // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -183,16 +205,15 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                     .create().show()
 
             } else {
-                //this?
                 ActivityCompat.requestPermissions(activity!!, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
             }
         }
     }
 
 
-    fun queryActually(): MutableList<MainActivity.AudioFile> {
+    fun queryActually(): MutableList<Song> {
         val audioList = mutableListOf<MainActivity.AudioFile>()
-
+        val mSongList = mutableListOf<Song>()
 //        var projection: Array<String> = arrayOf (
 //            MediaStore.Audio.Media._ID,
 //            MediaStore.Audio.Media.ARTIST,
@@ -250,21 +271,20 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 //                Log.e(TAG, "is isPod $isPod")
 //                Log.e(TAG, "is isRing $isRing")
                 audioList.add(MainActivity.AudioFile(audioUri, title, artist))
+                mSongList.add( Song(uri = audioUri, mainText = title, subText = artist, imageResource = R.drawable.ic_search_black_24dp))
             }
         }
         Log.e(TAG, "audioList")
         audioList.forEach { Log.e(TAG, it.toString()) }
-        return audioList
+        return mSongList
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERM_REQUEST -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    //Toast.makeText(this,":) Permission granted!", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":) Permission granted!")
                 } else {
-                    //Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":( Permission not granted.")
                 }
                 return
@@ -275,8 +295,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
             }
         }
     }
-
-
 
 
 }

@@ -1,23 +1,28 @@
 package com.example.mediaplayer
 
+import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
+import android.content.ContentUris
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.MediaStore
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.exoplayer2.audio.AudioAttributes
@@ -33,7 +38,11 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
+import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.upstream.DataSpec
+import com.google.android.exoplayer2.upstream.FileDataSource
 import com.google.android.exoplayer2.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,6 +59,9 @@ class AudioPlayerService : Service() {
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var mediaSession: MediaSessionCompat? = null
     private var mediaSessionConnector: MediaSessionConnector? = null
+    //private lateinit var concatenatingMediaSource: ConcatenatingMediaSource
+
+    private val MY_PERM_REQUEST = 1
 
     private val PLAYBACK_CHANNEL_ID = "playback_channel"
     private val PLAYBACK_NOTIFICATION_ID = 1
@@ -61,6 +73,13 @@ class AudioPlayerService : Service() {
 
     companion object {
         const val TAG = "AudioPlayerService"
+    }
+
+    // get() will be called everytime we access randomNumber
+    val randomNumber: Int get() = Random().nextInt(100)
+
+    inner class LocalBinder : Binder() {
+        fun getService(): AudioPlayerService = this@AudioPlayerService
     }
 
     override fun onCreate() {
@@ -76,22 +95,12 @@ class AudioPlayerService : Service() {
         val context: Context = this
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
-        //buildMedia()
-        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
-        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-        val mp4VideoUri2: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
-        var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
-        val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
-        val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
-        val ms3: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri2)
-        concatenatingMediaSource.addMediaSource(ms)
-        concatenatingMediaSource.addMediaSource(ms2)
-        concatenatingMediaSource.addMediaSource(ms3)
+        /////////////////////////////////////////
+        var concatenatingMediaSource = buildMedia(context)
 
         exoPlayer!!.prepare(concatenatingMediaSource)
         exoPlayer!!.playWhenReady = false
-
+/////////////////////////////////
 
         // Setup notification and media session.
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
@@ -101,8 +110,8 @@ class AudioPlayerService : Service() {
             PLAYBACK_NOTIFICATION_ID,
             object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun getCurrentContentTitle(player: Player): String {
-                    //return player.currentWindowIndex.toString() + "title"
-                    return "title"
+                    return player.currentWindowIndex.toString()
+                    //return "title"
                 }
 
                 @Nullable
@@ -115,8 +124,9 @@ class AudioPlayerService : Service() {
 
                 @Nullable
                 override fun getCurrentContentText(player: Player): String? {
-                    // return  player.currentWindowIndex.toString() + "text/desciption"
-                    return  "text/desciption"
+                    //player.
+                    return  player.currentWindowIndex.toString()
+                    //return  "text/desciption"
                 }
 
                 @Nullable
@@ -152,14 +162,25 @@ class AudioPlayerService : Service() {
         playerNotificationManager!!.setMediaSessionToken(mediaSession!!.sessionToken)
         mediaSessionConnector = MediaSessionConnector(mediaSession!!)
         mediaSessionConnector?.setQueueNavigator(object : TimelineQueueNavigator(mediaSession!!) {
-                override fun getMediaDescription(player: Player, windowIndex: Int ): MediaDescriptionCompat {
-                    return mediaHelper(context, null)
-                }
-            })
+            override fun getMediaDescription(player: Player, windowIndex: Int ): MediaDescriptionCompat {
+                var x0 = mediaSession
+                var x = concatenatingMediaSource.getMediaSource(windowIndex)
+                var x2 = mediaSession!!.controller.metadata.description
+//                Log.e(TAG, "x2.mediaId.toString()")
+//                Log.e(TAG, x2.mediaId.toString())
+//                Log.e(TAG, x2.description.toString())
+//                Log.e(TAG, x2.iconBitmap.toString())
+//                Log.e(TAG, x2.iconUri.toString())
+//                Log.e(TAG, x2.title .toString())
+                //Log.e(TAG, x2.mediaId.toString())
+
+                return mediaHelper(context, mediaSession!!.controller.metadata )
+            }
+        })
         mediaSessionConnector!!.setPlayer(exoPlayer)
     }
 
-    private fun mediaHelper(context: Context, someshit: Unit?): MediaDescriptionCompat {
+    private fun mediaHelper(context: Context,  metaData: MediaMetadataCompat): MediaDescriptionCompat {
         var extras: Bundle? = null
         var bitmap: Bitmap? = getBitmapFromVectorDrawable(context, R.drawable.ic_queue_music)
         extras?.putParcelable(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
@@ -175,11 +196,11 @@ class AudioPlayerService : Service() {
 
     }
 
+    // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
     @MainThread
     private fun getBitmapFromVectorDrawable(context: Context, @DrawableRes drawableId: Int): Bitmap? {
         return ContextCompat.getDrawable(context, drawableId)?.let {
-            val drawable = DrawableCompat.wrap(it).mutate()
-
+           val drawable = DrawableCompat.wrap(it).mutate()
             val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
@@ -217,13 +238,138 @@ class AudioPlayerService : Service() {
     }
 
 
-    // get() will be called everytime we access randomNumber
-   val randomNumber: Int get() = Random().nextInt(100)
 
-    inner class LocalBinder : Binder() {
-        fun getService(): AudioPlayerService = this@AudioPlayerService
+
+    fun buildMedia(context: Context ): ConcatenatingMediaSource {
+
+        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
+        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        val mp4VideoUri2: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        var wut = context.resources
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
+        var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
+
+
+        var mSongs = queryWithPermissions(context)
+
+        Log.e(TAG, "HERE")
+        var dataSpec = DataSpec(mSongs!![0].uri);
+        var fileDataSource = FileDataSource();
+        fileDataSource.open(dataSpec);
+        //var audioSource: MediaSource = ExtractorMediaSource(,
+
+
+//        var s: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mSongs!![0].uri)
+        var s: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(fileDataSource.getUri())
+//        var s: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse("sleeps in the poop"))
+        var s2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mSongs!![1].uri)
+
+        Log.e(TAG, fileDataSource.getUri().toString())
+        Log.e(TAG, mSongs[0].uri.toString())
+        Log.e(TAG, mSongs[1].uri.toString())
+        Log.e(TAG, audioUri.toString())
+        Log.e(TAG, Uri.parse("sleeps in the poop").toString())
+        Log.e(TAG, s.toString())
+        if (s is MediaSource){
+            Log.e(TAG, "IT IS IS!!")
+        }
+
+        //concatenatingMediaSource.addMediaSource(s)
+        concatenatingMediaSource.addMediaSource(s2)
+
+        val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
+        val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
+        val ms3: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri2)
+
+//        concatenatingMediaSource.addMediaSource(ms)
+//        concatenatingMediaSource.addMediaSource(ms2)
+//        concatenatingMediaSource.addMediaSource(ms3)
+        return concatenatingMediaSource
     }
 
+
+    fun queryWithPermissions(context: Context): List<Song>? {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
+            //val audioList = queryActually(context)
+        //    recycler_songs.adapter = SongsAdaptor(songList, this)
+            Log.e(TAG, "Permission already granted")
+            return queryActually(context)
+        } else {
+            Log.e(TAG, "Read Permission not granted")
+            return null
+        }
+    }
+
+
+    private fun queryActually(context: Context): MutableList<Song> {
+        val audioList = mutableListOf<MainActivity.AudioFile>()
+        val mSongList = mutableListOf<Song>()
+//        var projection: Array<String> = arrayOf (
+//            MediaStore.Audio.Media._ID,
+//            MediaStore.Audio.Media.ARTIST,
+//            MediaStore.Audio.Media.TITLE,
+//            MediaStore.Audio.Media.DISPLAY_NAME,
+//            MediaStore.Audio.Media.DURATION
+//        )
+
+        val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+        val selection = "${MediaStore.Audio.Media.IS_ALARM} != 1 AND " +
+                "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
+                "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
+
+        val query =  context.contentResolver.query(songUri, null, selection, null, null )
+
+        query?.use { cursor ->
+            android.util.Log.e(TAG, "000000000000000000000000")
+            val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
+            val titleColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
+            val albumColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
+            val artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+            val dateAddedColumn = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
+            val mimeColumn = cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE)
+            val isMusicC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_MUSIC)
+            val isAlarmC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_ALARM)
+            val isNotifC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_NOTIFICATION)
+            val isPodC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_PODCAST)
+            val isRingC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE)
+            Log.e(TAG, cursor.count.toString())
+            while (cursor.moveToNext()) {
+                Log.e(TAG, "==========================")
+                val id = cursor.getLong(idColumn)
+                val title = cursor.getString(titleColumn)
+                val album = cursor.getString(albumColumn)
+                val artist = cursor.getString(artistColumn)
+                val dateAdded = cursor.getString(dateAddedColumn)
+                val mime = cursor.getString(mimeColumn)
+                val isMusic = cursor.getString(isMusicC)
+                val isAlarmC = cursor.getString(isAlarmC)
+                val isNotif = cursor.getString(isNotifC)
+                val isPod = cursor.getString(isPodC)
+                val isRing = cursor.getString(isRingC)
+                val audioUri: Uri = ContentUris.withAppendedId( MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id )
+                //  Log.e(TAG, contentUri.toString())
+//                Log.e(TAG, "id $id")
+                Log.e(TAG, "audioUri $audioUri")
+                Log.e(TAG, "title $title")
+                Log.e(TAG, "album $album")
+                Log.e(TAG, "artist $artist")
+//                Log.e(TAG, "mime $mime")
+//                Log.e(TAG, "is isMusic $isMusic")
+//                Log.e(TAG, "is isAlarmC $isAlarmC")
+//                Log.e(TAG, "is isNotif $isNotif")
+//                Log.e(TAG, "is isPod $isPod")
+//                Log.e(TAG, "is isRing $isRing")
+                audioList.add(MainActivity.AudioFile(audioUri, title, artist))
+                mSongList.add( Song(uri = audioUri, mainText = title, subText = artist, imageResource = R.drawable.ic_search_black_24dp))
+            }
+        }
+//        Log.e(TAG, "audioList")
+//        audioList.forEach { Log.e(TAG, it.toString()) }
+        Log.e(TAG, "SongList")
+        mSongList.forEach { Log.e(TAG, it.toString()) }
+        return mSongList
+    }
 }
 
 

@@ -38,9 +38,11 @@ class PlayerFragment : Fragment(), IMainActivity {
     private lateinit var mService: AudioPlayerService
     private var mBound: Boolean = false
 
+
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.e(TAG, "CONNECTED SERVICE")
+
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
             mBound = true

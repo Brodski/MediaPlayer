@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:onClick="onButtonClick"
         android:text="Button"
-        android:layout_marginTop="180dp"
+        android:layout_alignParentRight="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -32,7 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="myGoToFragment"
-        android:text="myGoToFragment (does nothing)"
+        android:layout_alignParentRight="true"
+        android:text="goToF (does nothing)"
         android:layout_below="@+id/buttonId"
         />
 

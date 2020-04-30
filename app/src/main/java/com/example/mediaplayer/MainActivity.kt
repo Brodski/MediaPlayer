@@ -97,6 +97,9 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
 
+        mService = AudioPlayerService()
+        Log.e(TAG,mService.randomNumber.toString())
+
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
     }
@@ -108,7 +111,8 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         //    initializePlayer()
 //            initPlayer2()
         }
-        inflateFragment("fragment_player", "123!")
+        //inflateFragment("fragment_player", "123!")
+        askPermissions()
     }
 
     override fun onResume() {
@@ -147,48 +151,19 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     }
 
     fun onButtonClick(v: View){
-        if (mBound) {
+        //if (mBound)
             val num = mService.randomNumber
             Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
-            queryWithPermissions()
-        }
+            Log.e(TAG,mService.randomNumber.toString())
+      //      askPermissions()
     }
 
-    // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
-    // How to Request a Run Time Permission - Android Studio Tutorial
-    // https://www.youtube.com/watch?v=SMrB97JuIoM
-    fun queryWithPermissions() {
-        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
-            val audioList = queryActually()
-            Log.e(TAG, "Already granted")
-            Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
-        } else {
 
-            Log.e(TAG, "READ EXTERNAL NOT GRANTED")
-            Toast.makeText(this, "READ EXTERNAL NOT GRANTED", Toast.LENGTH_SHORT).show()
-            //requestStoragePermission()
-            // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                AlertDialog.Builder(this)
-                    .setTitle("Read External Storage permission required")
-                    .setMessage("Allows read access audio & video files")
-                    .setPositiveButton("Agree", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
-                        }
-                    })
-                    .setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            dialog?.dismiss()
-                        }
-                    })
-                    .create().show()
-
-            } else {
-                //this?
-                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
-            }
-        }
+    fun continueBuildApp() {
+        inflateFragment("fragment_player", "123!")
+        val audioList = queryActually()
+        Log.e(TAG, "Is granted")
+        //Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -258,13 +233,39 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         return audioList
     }
 
+    // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
+    // How to Request a Run Time Permission - Android Studio Tutorial
+    // https://www.youtube.com/watch?v=SMrB97JuIoM
+    fun askPermissions() {
+        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
+            // Has permissions
+            continueBuildApp()
+        } else {
+
+            Log.e(TAG, "READ EXTERNAL NOT GRANTED")
+            Toast.makeText(this, "READ EXTERNAL NOT GRANTED", Toast.LENGTH_SHORT).show()
+            //requestStoragePermission()
+            // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
+            } else {
+                //this?
+                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
+            }
+        }
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERM_REQUEST -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     Toast.makeText(this,":) Permission granted!", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":) Permission granted!")
+                    continueBuildApp()
                 } else {
+                    var startMain = Intent(Intent.ACTION_MAIN);
+                    startMain.addCategory(Intent.CATEGORY_HOME);
+                    startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(startMain);
                     Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":( Permission not granted.")
                 }
@@ -276,6 +277,8 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             }
         }
     }
+
+
 
 
 
@@ -302,6 +305,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         }
         return bool
     }
+
     override fun inflateFragment(fragmentTag: String, message: String) {
         if (fragmentTag == "fragment_songs") {
             //var fragment = SongsFragment()

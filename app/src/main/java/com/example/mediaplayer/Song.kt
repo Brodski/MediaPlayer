@@ -1,3 +1,5 @@
 package com.example.mediaplayer
 
-data class Song(var imageResource: Int, var mainText: String, var subText:String)
+import android.net.Uri
+
+data class Song(var imageResource: Int, var mainText: String, var subText:String, var uri: Uri? = null)

@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.*
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -111,8 +112,9 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         //    initializePlayer()
 //            initPlayer2()
         }
-        //inflateFragment("fragment_player", "123!")
         askPermissions()
+        //var cs = buildMedia(context)
+        //Log.e(TAG, cs.toString())
     }
 
     override fun onResume() {
@@ -151,32 +153,21 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     }
 
     fun onButtonClick(v: View){
-        //if (mBound)
-            val num = mService.randomNumber
-            Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
-            Log.e(TAG,mService.randomNumber.toString())
-      //      askPermissions()
+        val num = mService.randomNumber
+        Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
+        Log.e(TAG,mService.randomNumber.toString())
     }
 
 
     fun continueBuildApp() {
         inflateFragment("fragment_player", "123!")
-        val audioList = queryActually()
+        //val audioList = queryActually()
         Log.e(TAG, "Is granted")
-        //Toast.makeText(this, "Already granted", Toast.LENGTH_SHORT).show()
     }
 
 
     fun queryActually(): MutableList<AudioFile> {
         val audioList = mutableListOf<AudioFile>()
-
-//        var projection: Array<String> = arrayOf (
-//            MediaStore.Audio.Media._ID,
-//            MediaStore.Audio.Media.ARTIST,
-//            MediaStore.Audio.Media.TITLE,
-//            MediaStore.Audio.Media.DISPLAY_NAME,
-//            MediaStore.Audio.Media.DURATION
-//        )
 
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
@@ -184,7 +175,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
             "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
 
-        val query = contentResolver.query(songUri, null, selection, null, null )
+        val query = applicationContext.contentResolver.query(songUri, null, selection, null, null )
 
         query?.use { cursor ->
             Log.e(TAG, "000000000000000000000000")
@@ -199,8 +190,9 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             val isNotifC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_NOTIFICATION)
             val isPodC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_PODCAST)
             val isRingC = cursor.getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE)
+            val dispCol = cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
             while (cursor.moveToNext()) {
-                Log.e(TAG, "==========================")
+                Log.e(TAG, "+++++++++++++++++++++++++++")
                 val id = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
                 val album = cursor.getString(albumColumn)
@@ -212,7 +204,10 @@ class MainActivity : AppCompatActivity(), IMainActivity {
                 val isNotif = cursor.getString(isNotifC)
                 val isPod = cursor.getString(isPodC)
                 val isRing = cursor.getString(isRingC)
-                val audioUri: Uri = ContentUris.withAppendedId( MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id )
+                val disp = cursor.getString(dispCol)
+                val audioUri: Uri = ContentUris.withAppendedId( MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id )
+
+                //applicationContext.contentResolver.openInputStream(audioUri)
               //  Log.e(TAG, contentUri.toString())
                 Log.e(TAG, "id $id")
                 Log.e(TAG, "audioUri $audioUri")
@@ -225,6 +220,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
                 Log.e(TAG, "is isNotif $isNotif")
                 Log.e(TAG, "is isPod $isPod")
                 Log.e(TAG, "is isRing $isRing")
+                Log.e(TAG, "disp $disp")
                 audioList.add( AudioFile(audioUri, title, artist))
             }
         }
@@ -243,8 +239,7 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         } else {
 
             Log.e(TAG, "READ EXTERNAL NOT GRANTED")
-            Toast.makeText(this, "READ EXTERNAL NOT GRANTED", Toast.LENGTH_SHORT).show()
-            //requestStoragePermission()
+            // shouldShowRequestPermissionRationale: false if disabled or "do not ask again"
             // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
             if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
@@ -266,7 +261,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
                     startMain.addCategory(Intent.CATEGORY_HOME);
                     startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(startMain);
-                    Toast.makeText(this,":( Permission not granted.", Toast.LENGTH_SHORT).show()
                     Log.e(TAG,":( Permission not granted.")
                 }
                 return
@@ -277,9 +271,6 @@ class MainActivity : AppCompatActivity(), IMainActivity {
             }
         }
     }
-
-
-
 
 
     fun onNavClick(menuItem: MenuItem) : Boolean {
@@ -346,5 +337,68 @@ class MainActivity : AppCompatActivity(), IMainActivity {
 //            //.addToBackStack(songsFragment.toString())
 //            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 //            .commit()
+    }
+
+
+    fun buildMedia(context: Context ): ConcatenatingMediaSource {
+
+        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
+        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        val mp4VideoUri2: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
+        var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
+
+
+        var mSongs = queryActually()
+
+        Log.e(TAG, "HERE")
+        var s: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mSongs!![0].uri)
+//        var s: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse("sleeps in the poop"))
+        var s2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mSongs!![1].uri)
+
+        Log.e(TAG, mSongs[0].uri.toString())
+        Log.e(TAG, mSongs[1].uri.toString())
+        Log.e(TAG, audioUri.toString())
+        Log.e(TAG, Uri.parse("sleeps in the poop").toString())
+        Log.e(TAG, s.toString())
+        if (s is MediaSource){
+            Log.e(TAG, "IT IS IS!!")
+        }
+        val uri = mSongs[0].uri
+        Log.e(TAG, uri?.getScheme().toString())
+        //var proj: Array<String> = arrayOf(MediaStore.Audio.Media.DATA.toString() )
+        val proj: Array<String> = arrayOf(MediaStore.Audio.Media._ID )
+        if (uri != null && "content".equals(uri.getScheme())) {
+            val cursor: Cursor? = context.contentResolver.query(uri,  null, null,null, null);
+            if ( cursor!!.moveToNext()) {
+                Log.e(TAG,"YES")
+            } else {
+                Log.e(TAG,"NOPE")
+            }
+            while (cursor!!.moveToNext()) {
+                Log.e(TAG, "-0-0-0--")
+                val col = cursor!!.getColumnIndex(MediaStore.Audio.Media._ID)
+                val id = cursor?.getLong(col)
+                val uriImage =Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, "" + id)
+                Log.e(TAG, uriImage.toString())
+            }
+            cursor?.close();
+        }
+//        else {
+//            filePath = _uri.getPath();
+//        }
+//        Log.d("","Chosen path = "+ filePath);
+
+        //concatenatingMediaSource.addMediaSource(s)
+        concatenatingMediaSource.addMediaSource(s2)
+
+        val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
+        val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
+        val ms3: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri2)
+
+//        concatenatingMediaSource.addMediaSource(ms)
+//        concatenatingMediaSource.addMediaSource(ms2)
+//        concatenatingMediaSource.addMediaSource(ms3)
+        return concatenatingMediaSource
     }
 }

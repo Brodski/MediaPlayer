@@ -4,6 +4,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -13,6 +17,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.core.graphics.drawable.toBitmap
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
@@ -39,7 +45,9 @@ class PlayerFragment : Fragment(), IMainActivity {
     private var mBound: Boolean = false
 
 
+    //https://www.freeiconspng.com/downloadimg/34238
     private val connection = object : ServiceConnection {
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Log.e(TAG, "CONNECTED SERVICE")
 
@@ -180,6 +188,13 @@ class PlayerFragment : Fragment(), IMainActivity {
 
 
 }
+
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+////                return resources.getDrawable(id, context.getTheme());
+////            } else {
+////                return resources.getDrawable(id);
+////            }
+
 //btn.setOnClickListener {
 //    Log.e(TAG, "FRAG OTHER CLICK")
 //            var bundle: Bundle = Bundle()

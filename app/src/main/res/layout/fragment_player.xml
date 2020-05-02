@@ -22,6 +22,7 @@
         app:rewind_increment="30000"
         app:controller_layout_id="@layout/controls_playback"
         app:use_sensor_rotation="true"
+        app:default_artwork="@drawable/ic_music_noteinv"
         />
 
     <TextView

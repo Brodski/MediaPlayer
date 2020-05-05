@@ -35,7 +35,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [ItemsFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class PlayerFragment : Fragment(), IMainActivity {
+class PlayerFragment : Fragment() {
 
     private lateinit var playerControls: PlayerControlView
     private var playerView: PlayerView? = null
@@ -49,7 +49,6 @@ class PlayerFragment : Fragment(), IMainActivity {
     private val connection = object : ServiceConnection {
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Log.e(TAG, "CONNECTED SERVICE")
 
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
@@ -64,46 +63,24 @@ class PlayerFragment : Fragment(), IMainActivity {
             mBound = false
         }
     }
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.e(TAG,"Attach Player Frag")
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.e(TAG,"Creat Player Frag")
-    }
 
     override fun onStart() {
         super.onStart()
-        Log.e(TAG,"onStart Player Frag")
         initPlayer2()
     }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.e(TAG,"Detach Player Frag")
-    }
-
-    override fun onDestroyView(){
-        super.onDestroyView()
-        Log.e(TAG,"Destroyed Player Frag")
-    }
-
     override fun onStop() {
         super.onStop()
-        Log.e(TAG,"onStop Player Frag")
         releasePlayer2()
     }
 
     private fun releasePlayer2() {
-        Log.e(TAG,"Release called")
+        Log.e(TAG, "Release called")
         var intent: Intent = Intent(activity, AudioPlayerService::class.java)
         activity?.unbindService(connection)
         mBound = false
     }
 
-    private fun initPlayer2(){
+    private fun initPlayer2() {
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(activity, AudioPlayerService::class.java)
@@ -115,24 +92,22 @@ class PlayerFragment : Fragment(), IMainActivity {
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
 
         Log.e(TAG, "onCreateView Player Frag")
-        // Inflate the layout for this fragment
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
-        textView = v.findViewById(R.id.fragTextIdB)
 
-        playerView =  v.findViewById(R.id.main_view2)
-        //playerView?.controllerHideOnTouch = false
-        //playerView?.controllerShowTimeoutMs = 0
+        playerView = v.findViewById(R.id.main_view2)
 
 
         var bundle: Bundle = this.arguments!!
-        var x: String = textView.text.toString()
-        if (bundle.containsKey("keyOther")) {
-            x += bundle?.getString("keyOther").toString()
+        val wtf= bundle?.getString("keyOther2")
+        if (wtf != null) {
+           Log.e(TAG, "found keyOther2 in bundle")
+           Log.e(TAG, bundle?.getString("keyOther2").toString())
+        } else {
+            Log.e(TAG, "found jack shit")
         }
-        textView.text = x
 
-        val btn:Button = v.findViewById(R.id.btnB) as Button
-        btn.setOnClickListener { v -> doSomething(v)  }
+        val btn: Button = v.findViewById(R.id.btnB) as Button
+        btn.setOnClickListener { v -> doSomething(v) }
         return v
 
 //        var v2: View = inflater.inflate(R.layout.controls_playback, container, false)
@@ -143,7 +118,7 @@ class PlayerFragment : Fragment(), IMainActivity {
     companion object {
         const val TAG = "PlayerFragment"
         @JvmStatic
-        fun newInstance(param1: String, param2: String) : PlayerFragment {
+        fun newInstance(param1: String, param2: String): PlayerFragment {
             val playerFragment = PlayerFragment()
             val args = Bundle()
             args.putString(ARG_PARAM1, param1)
@@ -155,39 +130,41 @@ class PlayerFragment : Fragment(), IMainActivity {
 
     fun doSomething(v: View) {
         Log.e(TAG, "Clicked in Player Fragment")
-        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString() )
+        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString())
         Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
         Log.e(TAG, mService.exoPlayer!!.toString())
 
     }
-
-    override fun inflateFragment(fragmentTag: String, message: String) {
-        if (fragmentTag == "fragment_songs") {
-            var fragment = SongsFragment()
-            doFragmentTransaction(fragment, fragmentTag, message);
-        }
-        else if (fragmentTag == "fragment_player") {
-            //var fragment = PlayerFragment()
-            var fragment = PlayerFragment.newInstance("pp1,", "pp2")
-            doFragmentTransaction(fragment, fragmentTag, message);
-        }
-    }
-
-    fun doFragmentTransaction(fragment: Fragment, tag: String,  message: String){
-        var tag= "keyOther"
-        var bundle  = Bundle()
-        bundle.putString( tag, message)
-        fragment.arguments = bundle
-
-        fragmentManager
-            ?.beginTransaction()
-            ?.replace(R.id.newmain_view, fragment)
-//          .addToBackStack()
-            ?.commit()
-    }
-
-
 }
+//
+//    override fun inflateFragment(fragmentTag: String, message: String) {
+//        if (fragmentTag == "fragment_songs") {
+//            var fragment = SongsFragment()
+//            doFragmentTransaction(fragment, fragmentTag, message);
+//        }
+//        else if (fragmentTag == "fragment_player") {
+//            //var fragment = PlayerFragment()
+//            var fragment = PlayerFragment.newInstance("pp1,", "pp2")
+//            doFragmentTransaction(fragment, fragmentTag, message);
+//        }
+//    }
+//
+//    fun doFragmentTransaction(fragment: Fragment, tag: String,  message: String){
+//        var tag= "keyOther"
+//        var bundle  = Bundle()
+//        bundle.putString( tag, message)
+//        fragment.arguments = bundle
+//
+//        fragmentManager
+//            ?.beginTransaction()
+//            ?.replace(R.id.newmain_view, fragment)
+////          .addToBackStack()
+//            ?.commit()
+//    }
+//
+//
+//}
+/////////////////////////////////////////////////////////
 
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 ////                return resources.getDrawable(id, context.getTheme());

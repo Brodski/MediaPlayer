@@ -28,7 +28,7 @@ class SongsAdaptor(private val songList: List<Song>, private val onItemListener:
     override fun onBindViewHolder( holder: SongsViewHolder, position: Int ) {
         val currentItem = songList[position]
 
-        holder.imageView.setImageResource(currentItem.imageResource)
+        holder.imageView.setImageBitmap(currentItem.art)
         holder.songMainText.text = currentItem.mainText
         holder.songSubText.text = currentItem.subText
 

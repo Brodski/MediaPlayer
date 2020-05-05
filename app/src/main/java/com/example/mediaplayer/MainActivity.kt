@@ -7,10 +7,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.IBinder
+import android.os.*
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
@@ -44,7 +41,7 @@ import java.io.File
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
 // Notification
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
-class MainActivity : AppCompatActivity(), IMainActivity {
+class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFragListener {
 
     data class AudioFile(val uri: Uri,
                          val title: String,
@@ -60,44 +57,23 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     private var playWhenReady = true
     private var currentWindow = 0
     private var playBackPosition: Long = 0
-    //private static appContext: Context
 
     companion object { const val TAG = "MainActivity" }
 
-    private fun initializePlayer() {
-        player = SimpleExoPlayer.Builder(this).build()
-        var mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-        //var videoSource: MediaSource = buildMediaSource(mp4VideoUri)
-
-        playerView?.player = mService.exoPlayer
-        player?.playWhenReady = playWhenReady
-        player?.seekTo(currentWindow, playBackPosition)
-  //      player?.prepare(videoSource, false, false)
-    }
-
-    private fun releasePlayer() {
-        if (player != null) {
-            playWhenReady = player!!.playWhenReady
-            Log.e("release,when ready", playWhenReady.toString())
-            playBackPosition = player!!.currentPosition
-            currentWindow = player!!.currentWindowIndex
-            player!!.release()
-            player = null
-        }
-    }
+    private lateinit var songsFragment: SongsFragment
+    private lateinit var playerFragment: PlayerFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-   //     appContext = applicationContext
-
         Log.e(TAG,"CREATED MainActivity")
 
+        songsFragment = SongsFragment.newInstance("pp1", "pp2")
+        playerFragment = PlayerFragment.newInstance("pp1", "pp2")
         mService = AudioPlayerService()
-        Log.e(TAG,mService.randomNumber.toString())
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNav.setOnNavigationItemSelectedListener {onNavClick(it) }
+        bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
     }
 
     override fun onStart() {
@@ -110,6 +86,23 @@ class MainActivity : AppCompatActivity(), IMainActivity {
     override fun onResume() {
         super.onResume()
         Log.e(TAG,"RESUME MainActivity")
+    }
+
+    fun saveThingy() {
+        var frag: Fragment? = null
+        Log.e(TAG, "Found fragment: " + supportFragmentManager.backStackEntryCount.toString())
+        for (entry: Int in 0 until supportFragmentManager.backStackEntryCount) {
+            val ff = supportFragmentManager.getBackStackEntryAt(entry)
+            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).id)
+            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).name)
+        }
+
+        if (frag != null) {
+            Log.e(TAG, "FRAG AINT NULL")
+        } else {
+            Log.e(TAG, "FRAG NULL")
+
+        }
     }
 
     override fun onPause() {
@@ -127,15 +120,8 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         Log.e(TAG,"DESTROY MainActivity")
     }
 
-    fun onButtonClick(v: View){
-        val num = mService.randomNumber
-        Toast.makeText(this,"num: $num", Toast.LENGTH_SHORT).show()
-        Log.e(TAG,mService.randomNumber.toString())
-    }
-
-
     fun continueBuildApp() {
-        inflateFragment("fragment_player", "123!")
+        inflateFragment("fragment_player")
         //val audioList = queryActually()
         Log.e(TAG, "Is granted")
     }
@@ -182,19 +168,15 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         var bool = false
         when (menuItem.itemId) {
             R.id.nav_home -> {
-                val message = "hello from nav_home"
-                //   mIMainActivity?.inflateFragment("fragment_a", message)
-                inflateFragment("fragment_player", message)
+                inflateFragment("fragment_player")
                 bool = true
             }
             R.id.nav_favorites -> {
-                val message = "hello from nav_favorites"
-                inflateFragment("fragment_songs", message)
+                inflateFragment("fragment_songs")
                 bool = true
             }
             R.id.nav_search -> {
-                val message = "hello from nav_search"
-                inflateFragment("fragment_songs", message)
+                inflateFragment("fragment_songs")
                 bool = true
             }
             else -> bool = false
@@ -202,45 +184,126 @@ class MainActivity : AppCompatActivity(), IMainActivity {
         return bool
     }
 
-    override fun inflateFragment(fragmentTag: String, message: String) {
-        if (fragmentTag == "fragment_songs") {
-            //var fragment = SongsFragment()
-            var fragment = SongsFragment.newInstance("pp1", "pp2")
-            doFragmentTransaction(fragment, fragmentTag, message);
+    override fun inflateFragment(nameFrag: String) {
+
+        var frag: Fragment? = null
+        Log.e(TAG, "Backstack count: " + supportFragmentManager.backStackEntryCount.toString())
+
+
+
+
+        var frag2: Fragment? = null
+//        when (nameFrag) {
+//            getString(R.string.player_frag_tag) -> frag2 = supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag))
+//            getString(R.string.song_frag_tag) -> frag2 = supportFragmentManager.findFragmentByTag(getString(R.string.song_frag_tag))
+//        }
+//        if (frag2 != null){
+//            Log.e(TAG,"FRAG 2 AINT NULL")
+//        } else {
+//            Log.e(TAG,"FRAG 2 NULL")
+//            Log.e(TAG, frag2.toString())
+//        }
+
+
+        if (nameFrag == "fragment_songs") {
+            //var fragment: SongsFragment = SongsFragment.newInstance("pp1", "pp2")
+            //doFragmentTransaction(fragment, getString(R.string.song_frag_tag))
+            doFragmentTransaction(songsFragment, getString(R.string.song_frag_tag))
         }
-        else if (fragmentTag == "fragment_player") {
-            //var fragment = PlayerFragment()
-            var fragment = PlayerFragment.newInstance("pp1,", "pp2")
-            doFragmentTransaction(fragment, fragmentTag, message);
+        else if (nameFrag == "fragment_player") {
+            //var fragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
+            doFragmentTransaction(playerFragment, getString(R.string.player_frag_tag))
         }
     }
 
-    fun doFragmentTransaction(fragment: Fragment, tag: String,  message: String){
-        var tag= "keyOther"
-        var bundle  = Bundle()
-        bundle.putString( tag, message)
-        fragment.arguments = bundle
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.newmain_view, fragment)
-//          .addToBackStack()
-            .commit()
-    }
+    fun doFragmentTransaction(fragment: Fragment, tag: String){
 
-    fun myGoToFragment(v: View){
-        //multi fragments
-        var songsFragment: SongsFragment = SongsFragment.newInstance("pp1,", "pp2")
-        var playerFragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
-        // this object lets us put the fragment into the layout
-
+//        supportFragmentManager.beginTransaction().attach(playerFragment)
+        var frag: Fragment? = null
+        for ( f in supportFragmentManager.fragments) {
+            frag = f
+            Log.e(TAG, "Fragment :")
+            Log.e(TAG, f.toString())
+            Log.e(TAG, f.tag)
+            Log.e(TAG, f.id.toString())
+        }
+        Log.e(TAG, tag)
+        Log.e(TAG, frag?.tag.toString())
+        if ( frag == null ){
+            supportFragmentManager
+                .beginTransaction()
+                //.addToBackStack(tag)
+                //.add(R.id.newmain_view, fragment, tag)
+                .replace(R.id.newmain_view, fragment, tag)
+                .commit()
+        } else if (frag?.tag == tag) {
+            Log.e(TAG, "is equal")
+            return
+        } else {
+            supportFragmentManager
+                .beginTransaction()
+                .addToBackStack(tag)
+                //.add(R.id.newmain_view, fragment, tag)
+                .replace(R.id.newmain_view, fragment, tag)
+                .commit()
+        }
 //        supportFragmentManager
 //            .beginTransaction()
-//            .replace(R.id.container_b, songsFragment)
-//            .replace(R.id.container_a, playerFragment)
-//            //.replace(R.id.container_itmes, playerFragment)
-//            //.addToBackStack(songsFragment.toString())
-//            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//    //        .addToBackStack(tag)
+//            .add(R.id.newmain_view, fragment, tag)
+//            //.replace(R.id.newmain_view, fragment)
 //            .commit()
     }
+
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        Log.e(TAG, "MainActivity, saving")
+        Log.e(TAG, "MainActivity, saving")
+        Log.e(TAG, "MainActivity, saving")
+        Log.e(TAG, "MainActivity, saving")
+        //supportFragmentManager.putFragment((outState, "myFragments", ))
+
+    }
+
+    override fun onSongSelect() {
+
+    }
+
+
+
+
+
+
+
+    private fun initializePlayer() {
+        player = SimpleExoPlayer.Builder(this).build()
+        var mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        //var videoSource: MediaSource = buildMediaSource(mp4VideoUri)
+
+        playerView?.player = mService.exoPlayer
+        player?.playWhenReady = playWhenReady
+        player?.seekTo(currentWindow, playBackPosition)
+        //      player?.prepare(videoSource, false, false)
+    }
+
+    private fun releasePlayer() {
+        if (player != null) {
+            playWhenReady = player!!.playWhenReady
+            Log.e("release,when ready", playWhenReady.toString())
+            playBackPosition = player!!.currentPosition
+            currentWindow = player!!.currentWindowIndex
+            player!!.release()
+            player = null
+        }
+    }
+
 }
+
+
+
+
+
+
+

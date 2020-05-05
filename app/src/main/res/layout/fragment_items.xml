@@ -19,13 +19,13 @@
         android:id="@+id/btnA"
         android:layout_width="171dp"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="Button A" />
 
     <Button
         android:id="@+id/btnB"
         android:layout_width="171dp"
         android:layout_height="wrap_content"
-        android:text="Get Songs" />
+        android:text="Button B" />
 
     <androidx.recyclerview.widget.RecyclerView
         xmlns:android="http://schemas.android.com/apk/res/android"

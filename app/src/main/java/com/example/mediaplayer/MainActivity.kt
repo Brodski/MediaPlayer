@@ -1,41 +1,21 @@
 package com.example.mediaplayer
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.*
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.net.Uri
-import android.os.*
-import android.provider.MediaStore
+import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ServiceCompat.stopForeground
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationView
-import java.io.File
 
 // Media streaming with ExoPlayer
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
@@ -43,14 +23,12 @@ import java.io.File
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
 class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFragListener {
 
-    data class AudioFile(val uri: Uri,
-                         val title: String,
-                         val artist: String?
-    )
     private val MY_PERM_REQUEST = 1
 
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
+
+    private  var someInt: Int = 0
 
     private lateinit var mService: AudioPlayerService
 
@@ -63,10 +41,19 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
     private lateinit var songsFragment: SongsFragment
     private lateinit var playerFragment: PlayerFragment
 
+    private var restoredFragment: Fragment? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment")) {
+            restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
+            Log.e(TAG, "++++++++++++++++++++++++onCreate bundle Frag $restoredFragment++++++++++++++++++++++++")
+        } else {
+            Log.e(TAG, "---------------------------onCreate no bundlde---------------------------")
+        }
 
         songsFragment = SongsFragment.newInstance("pp1", "pp2")
         playerFragment = PlayerFragment.newInstance("pp1", "pp2")
@@ -80,12 +67,22 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
         super.onStart()
         Log.e(TAG,"START MainActivity")
         askPermissions()
+
+        Log.e(TAG,"START 2 MainActivity")
+        Log.e(TAG, someInt.toString())
      //   mService.queryWithPermissions(this)
     }
 
     override fun onResume() {
         super.onResume()
         Log.e(TAG,"RESUME MainActivity")
+        Log.e(TAG, someInt.toString())
+        if (restoredFragment != null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
+                .commit()
+        }
     }
 
     fun saveThingy() {
@@ -97,22 +94,29 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
             Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).name)
         }
 
-        if (frag != null) {
-            Log.e(TAG, "FRAG AINT NULL")
-        } else {
-            Log.e(TAG, "FRAG NULL")
-
-        }
     }
+
 
     override fun onPause() {
         super.onPause()
         Log.e(TAG,"PAUSE MainActivity")
+
+        //someInt = 666
+        if (Util.SDK_INT < Build.VERSION_CODES.N) {
+            Log.e(TAG, "PAUSE, int it")
+            //someInt = 666
+        }
+        Log.e(TAG, "PAUSE, saving")
     }
 
     override fun onStop() {
         super.onStop()
         Log.e(TAG,"STOP MainActivity")
+        if (Util.SDK_INT >= Build.VERSION_CODES.N) {
+            Log.e(TAG,"STOP int int it")
+            //someInt = 666
+        }
+
     }
 
     override fun onDestroy() {
@@ -186,32 +190,10 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
 
     override fun inflateFragment(nameFrag: String) {
 
-        var frag: Fragment? = null
-        Log.e(TAG, "Backstack count: " + supportFragmentManager.backStackEntryCount.toString())
-
-
-
-
-        var frag2: Fragment? = null
-//        when (nameFrag) {
-//            getString(R.string.player_frag_tag) -> frag2 = supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag))
-//            getString(R.string.song_frag_tag) -> frag2 = supportFragmentManager.findFragmentByTag(getString(R.string.song_frag_tag))
-//        }
-//        if (frag2 != null){
-//            Log.e(TAG,"FRAG 2 AINT NULL")
-//        } else {
-//            Log.e(TAG,"FRAG 2 NULL")
-//            Log.e(TAG, frag2.toString())
-//        }
-
-
         if (nameFrag == "fragment_songs") {
-            //var fragment: SongsFragment = SongsFragment.newInstance("pp1", "pp2")
-            //doFragmentTransaction(fragment, getString(R.string.song_frag_tag))
             doFragmentTransaction(songsFragment, getString(R.string.song_frag_tag))
         }
         else if (nameFrag == "fragment_player") {
-            //var fragment: PlayerFragment = PlayerFragment.newInstance("pp1,", "pp2")
             doFragmentTransaction(playerFragment, getString(R.string.player_frag_tag))
         }
     }
@@ -219,27 +201,24 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
 
     fun doFragmentTransaction(fragment: Fragment, tag: String){
 
-//        supportFragmentManager.beginTransaction().attach(playerFragment)
         var frag: Fragment? = null
         for ( f in supportFragmentManager.fragments) {
             frag = f
-            Log.e(TAG, "Fragment :")
-            Log.e(TAG, f.toString())
-            Log.e(TAG, f.tag)
-            Log.e(TAG, f.id.toString())
+//            Log.e(TAG, "Fragment :")
+//            Log.e(TAG, f.toString())
+//            Log.e(TAG, f.tag)
+//            Log.e(TAG, f.id.toString())
         }
         Log.e(TAG, tag)
         Log.e(TAG, frag?.tag.toString())
-        if ( frag == null ){
-            supportFragmentManager
-                .beginTransaction()
-                //.addToBackStack(tag)
-                //.add(R.id.newmain_view, fragment, tag)
-                .replace(R.id.newmain_view, fragment, tag)
-                .commit()
-        } else if (frag?.tag == tag) {
+        if (frag?.tag == tag) {
             Log.e(TAG, "is equal")
             return
+        } else if ( frag == null ){
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.newmain_view, fragment, tag)
+                .commit()
         } else {
             supportFragmentManager
                 .beginTransaction()
@@ -248,22 +227,37 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
                 .replace(R.id.newmain_view, fragment, tag)
                 .commit()
         }
-//        supportFragmentManager
-//            .beginTransaction()
-//    //        .addToBackStack(tag)
-//            .add(R.id.newmain_view, fragment, tag)
-//            //.replace(R.id.newmain_view, fragment)
-//            .commit()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("num", 6565);
+        Log.e(TAG,"onSaveInstanceState")
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        super.onSaveInstanceState(outState, outPersistentState)
-        Log.e(TAG, "MainActivity, saving")
-        Log.e(TAG, "MainActivity, saving")
-        Log.e(TAG, "MainActivity, saving")
-        Log.e(TAG, "MainActivity, saving")
-        //supportFragmentManager.putFragment((outState, "myFragments", ))
+        // only 1 fragment present
+        var frag: Fragment? = null
+        for ( f in supportFragmentManager.fragments) {
+            frag = f
+        }
+        if (frag != null) {
+            supportFragmentManager.putFragment(outState, "currentFragment", frag)
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Log.e(TAG,"onRestoreInstanceState")
+        Log.e(TAG,"onRestoreInstanceState")
+        Log.e(TAG,"onRestoreInstanceState")
+        someInt = savedInstanceState.getInt("num")
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
+            restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
+            Log.e(TAG, "--__--_-__-__-__-onCreate bundle Frag $restoredFragment--__--_-__-__-__-")
+        } else {
+            Log.e(TAG, ">>>>>>>>>>>>>>>>>>>>onCreate no bundlde<<<<<<<<<<<<<<<<<}")
+        }
+
 
     }
 

@@ -59,7 +59,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         super.onCreate(savedInstanceState)
         mService = AudioPlayerService()
         if (savedInstanceState?.containsKey("counter") == true) {
-            Log.e(TAG,"contains counter ^>^")
+            Log.e(TAG,"contains counter ^.^")
             Log.e(TAG, savedInstanceState.getInt("counter").toString())
         } else { Log.e(TAG,"does not countain :(") }
     }

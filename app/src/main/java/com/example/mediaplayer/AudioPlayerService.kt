@@ -269,13 +269,12 @@ class AudioPlayerService : Service() {
                 var dateAdded = cursor.getString(dateAddedC)
                 var dur = cursor.getString(durationC)
 
-                val audioUri: Uri =
-                    ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                val audioUri: Uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
                 val mmr = MediaMetadataRetriever()
                 mmr.setDataSource(context, audioUri)
-                //        var rawArt: ByteArray? = mmr.embeddedPicture
-                var rawArt: ByteArray? = null
+                var rawArt: ByteArray? = mmr.embeddedPicture
+                //var rawArt: ByteArray? = null
 
                 val bfo = BitmapFactory.Options()
                 var art: Bitmap? = if (rawArt != null) {

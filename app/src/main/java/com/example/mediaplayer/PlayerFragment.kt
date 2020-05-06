@@ -114,6 +114,9 @@ class PlayerFragment : Fragment() {
 
         playerView = v.findViewById(R.id.main_view2)
         listener!!.onPlayerSent(420);
+//        if (mService?.exoPlayer != null){
+//            Log.e(tag,"SHIT IS NULL AF")
+//        }
         //playerView?.player = mService.exoPlayer
 //        playerView?.player = (activity as MainActivity).getPlayer()
 //        playerView?.showController()
@@ -155,6 +158,12 @@ class PlayerFragment : Fragment() {
     }
 
     fun configPlayer(mPlayer: SimpleExoPlayer?){
+        Log.e(tag,"configPlayer")
+
+        Log.e(tag, mPlayer.toString())
+        Log.e(tag, playerView?.player.toString())
+        Log.e(tag, mPlayer.toString())
+        Log.e(tag, mPlayer.toString())
         playerView?.player = mPlayer
         playerView?.showController()
     }

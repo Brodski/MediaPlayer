@@ -84,8 +84,8 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        this?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(this!!, intent)
+        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        Util.startForegroundService(this, intent)
     }
 
     private fun releasePlayer2() {
@@ -102,6 +102,8 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
+
+//        initPlayer2()
 
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment")) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
@@ -170,13 +172,13 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
     override fun onDestroy() {
         super.onDestroy()
         Log.e(TAG,"DESTROY MainActivity")
-        releasePlayer2()
+      //  releasePlayer2()
     }
 
     fun continueBuildApp() {
         inflateFragment("fragment_player")
         //val audioList = queryActually()
-        Log.e(TAG, "Is granted")
+     //   Log.e(TAG, "Is granted")
     }
 
 
@@ -263,7 +265,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
     }
 
     fun doFragmentTransaction(fragment: Fragment, tag: String){
-        findFrag()
+       // findFrag()
         var currentFrag: Fragment? = null
         for ( f in supportFragmentManager.fragments) {
             currentFrag = f

@@ -51,7 +51,6 @@ class AudioPlayerService : Service() {
 
     private val binder: IBinder? = LocalBinder()
 
-    // get() will be called everytime we access randomNumber
     inner class LocalBinder : Binder() {
         fun getService(): AudioPlayerService = this@AudioPlayerService
     }

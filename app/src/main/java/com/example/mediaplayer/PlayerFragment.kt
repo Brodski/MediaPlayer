@@ -43,6 +43,11 @@ class PlayerFragment : Fragment() {
     private lateinit var textView: TextView
     private lateinit var mService: AudioPlayerService
     private var mBound: Boolean = false
+    private var listener: PlayerFragListener? = null
+
+    interface PlayerFragListener {
+        fun onPlayerSent(num: Int)
+    }
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -62,16 +67,32 @@ class PlayerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        initPlayer2()
+       // initPlayer2()
+        Log.e(tag, "onstart Player frag")
+//        playerView?.player = (activity as MainActivity).getPlayer()
+//        playerView?.showController()
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.e(tag, "onAttach Player frag")
+        // mainactivity class must implement this
+        listener = context as PlayerFragListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
+
     override fun onStop() {
         super.onStop()
-        releasePlayer2()
+    //    releasePlayer2()
     }
 
     private fun releasePlayer2() {
         Log.e(TAG, "Release called")
-        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
+//        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
         activity?.unbindService(connection)
         mBound = false
     }
@@ -80,6 +101,7 @@ class PlayerFragment : Fragment() {
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(activity, AudioPlayerService::class.java)
+        //startService(intent)
         activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
         Util.startForegroundService(activity!!, intent)
 
@@ -91,7 +113,10 @@ class PlayerFragment : Fragment() {
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
 
         playerView = v.findViewById(R.id.main_view2)
-
+        listener!!.onPlayerSent(420);
+        //playerView?.player = mService.exoPlayer
+//        playerView?.player = (activity as MainActivity).getPlayer()
+//        playerView?.showController()
 
         var bundle: Bundle = this.arguments!!
         if (bundle.containsKey(getString(R.string.song_bundle))){
@@ -129,11 +154,21 @@ class PlayerFragment : Fragment() {
         }
     }
 
+    fun configPlayer(mPlayer: SimpleExoPlayer?){
+        playerView?.player = mPlayer
+        playerView?.showController()
+    }
+
+    fun talkService2() {
+        Log.e(TAG, "were takling and i'm in player")
+    }
+
     fun talkService(v: View) {
         Log.e(TAG, "Clicked in Player Fragment")
-        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString())
-        Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
-        Log.e(TAG, mService.exoPlayer!!.toString())
+        (activity as MainActivity).talkToMain()
+//        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString())
+//        Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
+//        Log.e(TAG, mService.exoPlayer!!.toString())
 
     }
 }

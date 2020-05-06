@@ -28,7 +28,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
 // Notification
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
-class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFragListener {
+class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFragListener, SongsFragment.SongsFragListener {
 
     private val MY_PERM_REQUEST = 1
 
@@ -43,7 +43,8 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
     private var currentWindow = 0
     private var playBackPosition: Long = 0
 
-    companion object { const val TAG = "MainActivity" }
+    companion object { const val TAG = "MainActivity"
+                        const val tag ="MainActivity"}
 
     private lateinit var songsFragment: SongsFragment
     private lateinit var playerFragment: PlayerFragment
@@ -51,20 +52,50 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
     private var restoredFragment: Fragment? = null
 
 
+    override fun onPlayerSent(num: Int) {
+        Log.e(tag, "HEY!!! I'm in main")
+        Log.e(tag, "HEY!!! I'm in main")
+        Log.e(tag, "$num")
+        playerFragment.talkService2()
+        //mService.makeStuff(65)
+    }
+
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as AudioPlayerService.LocalBinder
+            Log.e(TAG, "onServiceConnected...")
+            Log.e(TAG, "onServiceConnected...")
+            Log.e(TAG, "onServiceConnected...")
+            Log.e(TAG, "onServiceConnected...")
             mService = binder.getService()
 
-            playerView?.player = mService.exoPlayer
-            playerView?.showController()
+//            playerView?.player = mService.exoPlayer
+//            playerView?.showController()
             //Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
+
+            playerFragment.configPlayer(mService.exoPlayer)
         }
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e(TAG, "Disconnected Service :o")
         }
     }
 
+    private fun initPlayer2() {
+        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
+        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        this?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        Util.startForegroundService(this!!, intent)
+    }
+
+    private fun releasePlayer2() {
+        Log.e(TAG, "Release called")
+        if (mService != null) {
+            Log.e(TAG, "Releasing some shit")
+            var intent: Intent = Intent(this, AudioPlayerService::class.java)
+            this.unbindService(connection)
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +112,9 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
 
         songsFragment = SongsFragment.newInstance("pp1", "pp2")
         playerFragment = PlayerFragment.newInstance("pp1", "pp2")
-        mService = AudioPlayerService()
+//        Log.e(TAG, "++++OnCreate mService before")
+//        mService = AudioPlayerService()
+//        Log.e(TAG, "++++OnCreate mService after")
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
@@ -94,6 +127,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
 
         Log.e(TAG,"START 2 MainActivity")
         Log.e(TAG, someInt.toString())
+        initPlayer2()
      //   mService.queryWithPermissions(this)
     }
 
@@ -109,16 +143,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
         }
     }
 
-    fun saveThingy() {
-        var frag: Fragment? = null
-        Log.e(TAG, "Found fragment: " + supportFragmentManager.backStackEntryCount.toString())
-        for (entry: Int in 0 until supportFragmentManager.backStackEntryCount) {
-            val ff = supportFragmentManager.getBackStackEntryAt(entry)
-            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).id)
-            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).name)
-        }
-
-    }
 
 
     override fun onPause() {
@@ -146,6 +170,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
     override fun onDestroy() {
         super.onDestroy()
         Log.e(TAG,"DESTROY MainActivity")
+        releasePlayer2()
     }
 
     fun continueBuildApp() {
@@ -313,28 +338,33 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
 
     }
 
+
+    fun getPlayer(): SimpleExoPlayer? {
+        return mService.exoPlayer
+    }
+
     fun talkToMain(){
+        Log.e(TAG, "hi i'm in main")
+        Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
 
     }
 
 
 
-    private fun initPlayer2() {
-        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
-        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        this?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(this!!, intent)
+
+
+
+
+    fun saveThingy() {
+        var frag: Fragment? = null
+        Log.e(TAG, "Found fragment: " + supportFragmentManager.backStackEntryCount.toString())
+        for (entry: Int in 0 until supportFragmentManager.backStackEntryCount) {
+            val ff = supportFragmentManager.getBackStackEntryAt(entry)
+            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).id)
+            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).name)
+        }
 
     }
-
-    private fun releasePlayer2() {
-        Log.e(TAG, "Release called")
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        this.unbindService(connection)
-    }
-
-
 
     private fun initializePlayer() {
         player = SimpleExoPlayer.Builder(this).build()
@@ -357,7 +387,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
             player = null
         }
     }
-
 }
 
 

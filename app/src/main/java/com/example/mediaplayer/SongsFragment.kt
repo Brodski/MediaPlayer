@@ -1,6 +1,7 @@
 package com.example.mediaplayer
 
 import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Bundle
@@ -40,8 +41,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 //    private val binder: IBinder? = LocalBinder()
     private lateinit var mService: AudioPlayerService
 
-    // get() will be called everytime we access randomNumber
-
+    private var listener: SongsFragListener? = null
+    interface SongsFragListener {
+        fun onSongSelect(index: Int)
+    }
     companion object {
         const val TAG = "SongsFragment"
         @JvmStatic
@@ -58,9 +61,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     }
 
-    interface SongsFragListener {
-        fun onSongSelect()
-    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,15 +135,17 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onItemClick(postion: Int) {
 
-        //var fragment = PlayerFragment.newInstance("pp1", "pp2")
-//        for (i in 0 ..fragmentManager?.backStackEntryCount!!) {
-//            val f = fragmentManager?.getBackStackEntryAt(i)
-//        }
         Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
         var playerFragment = fragmentManager?.findFragmentByTag(getString(R.string.player_frag_tag))
         if (playerFragment == null) {
             playerFragment = PlayerFragment.newInstance("pp1", "pp2")
         }
+
+        listener?.onSongSelect(postion)
+
+        val intent = Intent("custom-event-name")
+        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
+        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
 
         var bundle  = Bundle()
         bundle.putString( "keyOther2", "message")
@@ -150,33 +153,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         bundle.putInt(getString(R.string.song_position), postion)
         playerFragment.arguments = bundle
 
-        mService.makeStuff(postion)
-
-        val intent = Intent("custom-event-name")
-        // You can also include some extra data.
-        // You can also include some extra data.
-//        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
-//        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
-
-
-//        mService.exoPlayer?.release()
-//        mService.exoPlayer?.stop(true)
-//
-//        mediaSession?.release()
-//        mediaSessionConnector?.setPlayer(null)
-//        playerNotificationManager?.setPlayer(null)
-//        exoPlayer!!.release()
-//        exoPlayer = null
-//
-//        mService.exoPlayer?.seekTo(postion, 0)
-//        mService.exoPlayer?.playWhenReady
-
-
-
-        Log.e(TAG, "mService.exoPlayer?.currentTrackSelections")
-        Log.e(TAG, mService.exoPlayer?.currentTrackSelections.toString())
-        Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
-        //mService.exoPlayer?.currentTrackSelections
 //        fragmentManager
 //            ?.beginTransaction()
 //            ?.replace(R.id.newmain_view, playerFragment)
@@ -193,6 +169,16 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         Toast.makeText(activity, "CLICKED! $postion", Toast.LENGTH_SHORT).show()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // other class must implement this
+        listener = context as SongsFragListener
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
 //    override fun onSaveInstanceState(outState: Bundle) {
 //        super.onSaveInstanceState(outState)
 //

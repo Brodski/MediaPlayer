@@ -52,6 +52,9 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
     private var restoredFragment: Fragment? = null
 
 
+    override fun onSongSelect(index: Int) {
+        playerFragment.playAtIndex(index)
+    }
     override fun onPlayerSent(num: Int) {
         Log.e(tag, "HEY!!! I'm in main")
         Log.e(tag, "HEY!!! I'm in main")
@@ -103,7 +106,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
 
-//        initPlayer2()
 
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment")) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
@@ -129,7 +131,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
 
         Log.e(TAG,"START 2 MainActivity")
         Log.e(TAG, someInt.toString())
-        initPlayer2()
+     //   initPlayer2()
      //   mService.queryWithPermissions(this)
     }
 
@@ -154,7 +156,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         //someInt = 666
         if (Util.SDK_INT < Build.VERSION_CODES.N) {
             Log.e(TAG, "PAUSE, int it")
-            //someInt = 666
+            someInt = 666
         }
         Log.e(TAG, "PAUSE, saving")
     }
@@ -322,9 +324,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
 
     }
 
-    override fun onSongSelect() {
-
-    }
 
     fun bottonRight(view: View) {
         Log.e(TAG, "clicked btton right")
@@ -348,8 +347,8 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
     fun talkToMain(){
         Log.e(TAG, "hi i'm in main")
         Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
-
     }
+
 
 
 

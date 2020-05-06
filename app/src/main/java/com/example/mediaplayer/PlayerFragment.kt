@@ -67,7 +67,7 @@ class PlayerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-       // initPlayer2()
+        initPlayer2()
         Log.e(tag, "onstart Player frag")
 //        playerView?.player = (activity as MainActivity).getPlayer()
 //        playerView?.showController()
@@ -75,8 +75,7 @@ class PlayerFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.e(tag, "onAttach Player frag")
-        // mainactivity class must implement this
+        // other class must implement this
         listener = context as PlayerFragListener
     }
 
@@ -87,7 +86,7 @@ class PlayerFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-    //    releasePlayer2()
+        releasePlayer2()
     }
 
     private fun releasePlayer2() {
@@ -114,9 +113,7 @@ class PlayerFragment : Fragment() {
 
         playerView = v.findViewById(R.id.main_view2)
         listener!!.onPlayerSent(420);
-//        if (mService?.exoPlayer != null){
-//            Log.e(tag,"SHIT IS NULL AF")
-//        }
+
         //playerView?.player = mService.exoPlayer
 //        playerView?.player = (activity as MainActivity).getPlayer()
 //        playerView?.showController()
@@ -166,6 +163,14 @@ class PlayerFragment : Fragment() {
         Log.e(tag, mPlayer.toString())
         playerView?.player = mPlayer
         playerView?.showController()
+    }
+
+    fun playAtIndex(index: Int) {
+        Log.e(TAG, "here in player fragment, playing at index $index")
+        Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
+        mService.exoPlayer?.seekTo(index,0)
+        mService.exoPlayer?.playWhenReady = true
+
     }
 
     fun talkService2() {

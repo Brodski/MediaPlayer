@@ -44,22 +44,18 @@ class PlayerFragment : Fragment() {
     private lateinit var mService: AudioPlayerService
     private var mBound: Boolean = false
 
-
-    //https://www.freeiconspng.com/downloadimg/34238
     private val connection = object : ServiceConnection {
-        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
             mBound = true
 
             playerView?.player = mService.exoPlayer
             playerView?.showController()
+            //Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
         }
-
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e(TAG, "DISCONNECTED SERVICE")
+            Log.e(TAG, "Disconnected Service :o")
             mBound = false
         }
     }
@@ -98,16 +94,21 @@ class PlayerFragment : Fragment() {
 
 
         var bundle: Bundle = this.arguments!!
-        val wtf= bundle?.getString("keyOther2")
-        if (wtf != null) {
-           Log.e(TAG, "found keyOther2 in bundle")
-           Log.e(TAG, bundle?.getString("keyOther2").toString())
-        } else {
-            Log.e(TAG, "found jack shit")
+        if (bundle.containsKey(getString(R.string.song_bundle))){
+            Log.e(TAG, "HAS SONG BUNDLE!!!")
+            val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
+            Log.e(TAG, s.toString())
         }
+//        val wtf= bundle?.getString("keyOther2")
+//        if (wtf != null) {
+//           Log.e(TAG, "found keyOther2 in bundle")
+//           Log.e(TAG, bundle?.getString("keyOther2").toString())
+//        } else {
+//            Log.e(TAG, "found jack shit")
+//        }
 
         val btn: Button = v.findViewById(R.id.btnB) as Button
-        btn.setOnClickListener { v -> doSomething(v) }
+        btn.setOnClickListener { v -> talkService(v) }
         return v
 
 //        var v2: View = inflater.inflate(R.layout.controls_playback, container, false)
@@ -128,7 +129,7 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    fun doSomething(v: View) {
+    fun talkService(v: View) {
         Log.e(TAG, "Clicked in Player Fragment")
         Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString())
         Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())

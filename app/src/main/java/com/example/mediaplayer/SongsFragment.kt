@@ -1,7 +1,10 @@
 package com.example.mediaplayer
 
-import android.content.Context
+import android.content.BroadcastReceiver
+import android.content.Intent
+import android.os.Binder
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +13,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -26,13 +30,17 @@ private const val ARG_PARAM2 = "param2"
 class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     private var counter: Int = 0
-    private lateinit var mService: AudioPlayerService
+
     private lateinit var textView: TextView
     private var songList: List<Song>? = null
     private lateinit var recycler_songs: RecyclerView
     private val MY_PERM_REQUEST = 1
     private var bottomNav: BottomNavigationView? = null
     private val mIMainActivity: IMainActivity? = null
+//    private val binder: IBinder? = LocalBinder()
+    private lateinit var mService: AudioPlayerService
+
+    // get() will be called everytime we access randomNumber
 
     companion object {
         const val TAG = "SongsFragment"
@@ -56,12 +64,17 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //mService = binder.getService()
         super.onCreate(savedInstanceState)
         mService = AudioPlayerService()
-        if (savedInstanceState?.containsKey("counter") == true) {
-            Log.e(TAG,"contains counter ^.^")
-            Log.e(TAG, savedInstanceState.getInt("counter").toString())
-        } else { Log.e(TAG,"does not countain :(") }
+        Log.e(TAG,"ON CREAST SONGS")
+        Log.e(TAG,"ON CREAST SONGS")
+        Log.e(TAG,"ON CREAST SONGS")
+        Log.e(TAG,"ON CREAST SONGS")
+//        if (savedInstanceState?.containsKey("counter") == true) {
+//            Log.e(TAG,"contains counter ^.^")
+//            Log.e(TAG, savedInstanceState.getInt("counter").toString())
+//        } else { Log.e(TAG,"does not countain :(") }
     }
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
@@ -121,19 +134,56 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onItemClick(postion: Int) {
 
-        var fragment = PlayerFragment.newInstance("pp1", "pp2")
+        //var fragment = PlayerFragment.newInstance("pp1", "pp2")
+//        for (i in 0 ..fragmentManager?.backStackEntryCount!!) {
+//            val f = fragmentManager?.getBackStackEntryAt(i)
+//        }
+        Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
+        var playerFragment = fragmentManager?.findFragmentByTag(getString(R.string.player_frag_tag))
+        if (playerFragment == null) {
+            playerFragment = PlayerFragment.newInstance("pp1", "pp2")
+        }
+
         var bundle  = Bundle()
         bundle.putString( "keyOther2", "message")
-        bundle.putParcelable("song", songList?.get(postion))
-        fragment.arguments = bundle
+        bundle.putParcelable(getString(R.string.song_bundle), songList?.get(postion))
+        bundle.putInt(getString(R.string.song_position), postion)
+        playerFragment.arguments = bundle
 
-        fragmentManager
-            ?.beginTransaction()
-            ?.replace(R.id.newmain_view, fragment)
-            ?.addToBackStack("From song")
-            ?.commit()
+        mService.makeStuff(postion)
 
-        bottomNav?.selectedItemId = R.id.nav_home
+        val intent = Intent("custom-event-name")
+        // You can also include some extra data.
+        // You can also include some extra data.
+//        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
+//        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
+
+
+//        mService.exoPlayer?.release()
+//        mService.exoPlayer?.stop(true)
+//
+//        mediaSession?.release()
+//        mediaSessionConnector?.setPlayer(null)
+//        playerNotificationManager?.setPlayer(null)
+//        exoPlayer!!.release()
+//        exoPlayer = null
+//
+//        mService.exoPlayer?.seekTo(postion, 0)
+//        mService.exoPlayer?.playWhenReady
+
+
+
+        Log.e(TAG, "mService.exoPlayer?.currentTrackSelections")
+        Log.e(TAG, mService.exoPlayer?.currentTrackSelections.toString())
+        Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
+        //mService.exoPlayer?.currentTrackSelections
+//        fragmentManager
+//            ?.beginTransaction()
+//            ?.replace(R.id.newmain_view, playerFragment)
+//            ?.addToBackStack("From song")
+//            ?.commit()
+
+    //    bottomNav?.selectedItemId = R.id.nav_home
 
         if (songList != null) {
             Log.e(TAG, songList!![postion]?.mainText)
@@ -143,12 +193,12 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         Toast.makeText(activity, "CLICKED! $postion", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        Log.e(TAG, "SAVING")
-        Log.e(TAG, "SAVING")
-        Log.e(TAG, "SAVING")
-        outState.putInt("counter", counter)
-    }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//
+//        Log.e(TAG, "SAVING")
+//        Log.e(TAG, "SAVING")
+//        Log.e(TAG, "SAVING")
+//        outState.putInt("counter", counter)
+//    }
 }

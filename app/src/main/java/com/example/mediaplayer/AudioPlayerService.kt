@@ -1,10 +1,10 @@
 package com.example.mediaplayer
 
 import android.Manifest
-import android.app.*
-import android.content.ContentUris
-import android.content.Context
-import android.content.Intent
+import android.app.Notification
+import android.app.PendingIntent
+import android.app.Service
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -23,20 +23,20 @@ import androidx.annotation.MainThread
 import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.util.Log
-import java.lang.Exception
-import java.util.*
+import com.google.android.exoplayer2.util.Util
 
 // Building feature-rich media apps with ExoPlayer (Google I/O '18)
 // https://www.youtube.com/watch?v=svdq1BWl4r8
@@ -51,6 +51,12 @@ class AudioPlayerService : Service() {
 
     private val binder: IBinder? = LocalBinder()
 
+    // get() will be called everytime we access randomNumber
+    inner class LocalBinder : Binder() {
+        fun getService(): AudioPlayerService = this@AudioPlayerService
+    }
+
+    //  val randomNumber: Int get() = Random().nextInt(100)
     public var exoPlayer: SimpleExoPlayer? = null
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var mediaSession: MediaSessionCompat? = null
@@ -66,29 +72,32 @@ class AudioPlayerService : Service() {
     private val ARG_START_POSITION = "start_position"
     private val MEDIA_SESSION_TAG = "hello-world-media"
     var songList: List<Song>? = null
+
     companion object {
         const val TAG = "AudioPlayerService"
-    }
-
-    // get() will be called everytime we access randomNumber
-    //  val randomNumber: Int get() = Random().nextInt(100)
-
-    inner class LocalBinder : Binder() {
-        fun getService(): AudioPlayerService = this@AudioPlayerService
     }
 
 
     override fun onCreate() {
         super.onCreate()
         val context: Context = this
+
+        //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("custom-event-name"));
+
+        //val ts = DefaultTrackSelector()
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
         var concatenatingMediaSource = buildMedia(context)
 
         // Setup notification and media session.
-        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(context) }
+        if (songList?.size!! < 1) {
+            concatenatingMediaSource = goofydebugging(context)
+        }
 
         exoPlayer!!.prepare(concatenatingMediaSource)
+        Log.e(TAG, "1 x x x ${exoPlayer?.currentWindowIndex.toString()}")
+        exoPlayer!!.seekTo(1, 0)
+        Log.e(TAG, "2x x x  ${exoPlayer?.currentWindowIndex.toString()}")
         exoPlayer!!.playWhenReady = false
 
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
@@ -105,7 +114,7 @@ class AudioPlayerService : Service() {
 
                 @Nullable
                 override fun getCurrentContentText(player: Player): String? {
-                    if (songList?.get(player.currentWindowIndex)?.subText == "<unknown>"){
+                    if (songList?.get(player.currentWindowIndex)?.subText == "<unknown>") {
                         return ""
                     } else {
                         return songList?.get(player.currentWindowIndex)?.subText
@@ -113,27 +122,37 @@ class AudioPlayerService : Service() {
                 }
 
                 @Nullable
-                override fun getCurrentLargeIcon(player: Player, callback: PlayerNotificationManager.BitmapCallback): Bitmap? {
+                override fun getCurrentLargeIcon(
+                    player: Player,
+                    callback: PlayerNotificationManager.BitmapCallback
+                ): Bitmap? {
 
                     return songList?.get(player.currentWindowIndex)?.art
                     //return getBitmapFromVectorDrawable(context, R.drawable.ic_queue_music)
                 }
 
                 @Nullable
-                override fun createCurrentContentIntent(player: Player): PendingIntent? = PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    Intent(applicationContext, MainActivity::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT)
+                override fun createCurrentContentIntent(player: Player): PendingIntent? =
+                    PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        Intent(applicationContext, MainActivity::class.java),
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
 
             },
             object : PlayerNotificationManager.NotificationListener {
 
                 override fun onNotificationCancelled(notificationId: Int) {
-                  //  _playerStatusLiveData.value = PlayerStatus.Cancelled(episodeId)
+                    //  _playerStatusLiveData.value = PlayerStatus.Cancelled(episodeId)
                     stopSelf()
                 }
-                override fun onNotificationPosted(notificationId: Int, notification: Notification, ongoing: Boolean) {
+
+                override fun onNotificationPosted(
+                    notificationId: Int,
+                    notification: Notification,
+                    ongoing: Boolean
+                ) {
                     if (ongoing) {
                         // Make sure the service will not get destroyed while playing media.
                         startForeground(notificationId, notification)
@@ -145,6 +164,7 @@ class AudioPlayerService : Service() {
             }
         )
         playerNotificationManager!!.setPlayer(exoPlayer)
+        Log.e(TAG, "3x x x ${exoPlayer?.currentWindowIndex.toString()}")
 
 
         // The below syncs the foreground player with the player
@@ -153,37 +173,56 @@ class AudioPlayerService : Service() {
 
         playerNotificationManager!!.setMediaSessionToken(mediaSession!!.sessionToken) // Lock screen
         mediaSessionConnector = MediaSessionConnector(mediaSession!!)
+        Log.e(TAG, "4x x x ${exoPlayer?.currentWindowIndex.toString()}")
+
 
         // Sync playlist with the queue
         mediaSessionConnector?.setQueueNavigator(object : TimelineQueueNavigator(mediaSession!!) {
-            override fun getMediaDescription(player: Player, windowIndex: Int ): MediaDescriptionCompat {
-                return mediaHelper(context, songList?.get(windowIndex) )
+            override fun getMediaDescription(
+                player: Player,
+                windowIndex: Int
+            ): MediaDescriptionCompat {
+
+                return mediaHelper(windowIndex, songList?.get(windowIndex))
             }
         })
+
+        Log.e(TAG, "5x x x ${exoPlayer?.currentWindowIndex.toString()}")
         mediaSessionConnector!!.setPlayer(exoPlayer)
+        Log.e(TAG, "6x x x ${exoPlayer?.currentWindowIndex.toString()}")
+
+
     }
 
-    fun buildMedia(context: Context ): ConcatenatingMediaSource {
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
+    fun buildMedia(context: Context): ConcatenatingMediaSource {
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
+            context,
+            Util.getUserAgent(context, this.getString(R.string.app_name))
+        )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
 
         songList = querySongs(context)
 
         songList?.forEach { it ->
-            var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(it.uri)
+            var media: MediaSource =
+                ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(it.uri)
             concatenatingMediaSource.addMediaSource(media)
         }
 
         return concatenatingMediaSource
     }
 
-    fun querySongs(context: Context):  MutableList<Song>? {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
-        //    recycler_songs.adapter = SongsAdaptor(songList, this)
+    fun querySongs(context: Context): MutableList<Song>? {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            //    recycler_songs.adapter = SongsAdaptor(songList, this)
             Log.e(TAG, "Permission already granted")
             return actualQuerySongs(context)
         } else {
-             Log.e(TAG, "Read Permission not granted")
+            Log.e(TAG, "Read Permission not granted")
             return null
         }
     }
@@ -206,7 +245,7 @@ class AudioPlayerService : Service() {
                 "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
                 "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
 
-        val query = context.contentResolver.query(songUri, projection, selection, null, null )
+        val query = context.contentResolver.query(songUri, projection, selection, null, null)
 
         query?.use { cursor ->
             //Log.e(TAG, "000000000000000000000000")
@@ -231,16 +270,17 @@ class AudioPlayerService : Service() {
                 var dateAdded = cursor.getString(dateAddedC)
                 var dur = cursor.getString(durationC)
 
-                val audioUri: Uri = ContentUris.withAppendedId( MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id )
+                val audioUri: Uri =
+                    ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
                 val mmr = MediaMetadataRetriever()
                 mmr.setDataSource(context, audioUri)
-        //        var rawArt: ByteArray? = mmr.embeddedPicture
+                //        var rawArt: ByteArray? = mmr.embeddedPicture
                 var rawArt: ByteArray? = null
 
                 val bfo = BitmapFactory.Options()
-                var art: Bitmap? = if ( rawArt != null ){
-                    BitmapFactory.decodeByteArray(rawArt,0, rawArt.size, bfo)
+                var art: Bitmap? = if (rawArt != null) {
+                    BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
                     //BitmapFactory.decodeResource(resources, R.drawable.music_note_icon)
                     getBitmapFromVectorDrawable(context, R.drawable.ic_music_note)
@@ -256,13 +296,16 @@ class AudioPlayerService : Service() {
 //                Log.e(TAG, "is isRing $isRing")
 //                Log.e(TAG, " dateAdded $dateAdded")
 //                Log.e(TAG, " duration $dur")
-                songList.add( Song(
-                    id = id.toInt(),
-                    uri = audioUri,
-                    mainText = title,
-                    subText = artist,
-                    imageResource = R.drawable.ic_rowing,
-                    art = art))
+                songList.add(
+                    Song(
+                        id = id.toInt(),
+                        uri = audioUri,
+                        mainText = title,
+                        subText = artist,
+                        imageResource = R.drawable.ic_rowing,
+                        art = art
+                    )
+                )
             }
         }
         //Log.e(TAG, "SongList")
@@ -272,7 +315,7 @@ class AudioPlayerService : Service() {
 
 
     //private fun mediaHelper(context: Context,  metaData: MediaMetadataCompat): MediaDescriptionCompat {
-    private fun mediaHelper(context: Context, song: Song?): MediaDescriptionCompat {
+    private fun mediaHelper(windowIndex: Int, song: Song?): MediaDescriptionCompat {
         var extras: Bundle = Bundle()
         //var bitmap: Bitmap? = getBitmapFromVectorDrawable(context, R.drawable.ic_queue_music)
         //var bitmap = metaData.description.iconBitmap
@@ -293,7 +336,11 @@ class AudioPlayerService : Service() {
     private fun getBitmapFromVectorDrawable(context: Context, @DrawableRes drawableId: Int): Bitmap? {
         return ContextCompat.getDrawable(context, drawableId)?.let {
             val drawable = DrawableCompat.wrap(it).mutate()
-            val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+            val bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
             val canvas = Canvas(bitmap)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
@@ -309,6 +356,8 @@ class AudioPlayerService : Service() {
         playerNotificationManager?.setPlayer(null)
         exoPlayer!!.release()
         exoPlayer = null
+
+       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
 
         super.onDestroy()
     }
@@ -329,33 +378,72 @@ class AudioPlayerService : Service() {
 
     fun goofydebugging(context: Context): ConcatenatingMediaSource {
         val concatenatingMediaSource = ConcatenatingMediaSource()
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
-        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
+            context,
+            Util.getUserAgent(context, this.getString(R.string.app_name))
+        )
+        val audioUri =
+            Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
         val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
         val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
         val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
         concatenatingMediaSource.addMediaSource(ms)
         concatenatingMediaSource.addMediaSource(ms2)
         val songList2 = mutableListOf<Song>()
-        songList2?.add( Song(
-            id = 123,
-            uri = audioUri,
-            mainText = "title",
-            subText = "artist",
-            art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
-            imageResource = R.drawable.ic_rowing))
-        if (songList2?.size == 1) {
-            songList2?.add( Song(
+        songList2?.add(
+            Song(
                 id = 123,
-                uri = mp4VideoUri,
-                mainText = "title vid",
-                subText = "artist vid",
+                uri = audioUri,
+                mainText = "title",
+                subText = "artist",
                 art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
-                imageResource = R.drawable.ic_rowing))
+                imageResource = R.drawable.ic_rowing
+            )
+        )
+        if (songList2?.size == 1) {
+            songList2?.add(
+                Song(
+                    id = 123,
+                    uri = mp4VideoUri,
+                    mainText = "title vid",
+                    subText = "artist vid",
+                    art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
+                    imageResource = R.drawable.ic_rowing
+                )
+            )
         }
         songList = songList2
         return concatenatingMediaSource
     }
+
+    // https://stackoverflow.com/questions/8802157/how-to-use-localbroadcastmanager
+//    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+//        override fun onReceive(context: Context?, intent: Intent) {
+//            // Get extra data included in the Intent
+//            val extras = intent.extras
+//            if (extras?.containsKey("message") == true){
+//                val message = extras.getString("message")
+//                Log.e("receiver", "Got message: $message")
+//            }
+//            else if (extras?.containsKey(getString(R.string.play_this_position)) == true) {
+//                val position = extras.getInt(getString(R.string.play_this_position))
+//
+//            }
+//            Log.e(TAG, "Leaving onReceiver broadcaster")
+//        }
+//    }
+
+    fun makeStuff(position: Int){
+        Log.e(TAG, "HI HI HI $position")
+        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
+        Log.e(TAG, "HI HI HI ${exoPlayer?.currentTimeline.toString()}")
+
+        exoPlayer?.seekTo(position, 0)
+
+        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
+    }
+
+
 }
 
 

@@ -12,6 +12,7 @@
 
     <FrameLayout
         android:id="@+id/newmain_view"
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigation"
@@ -19,10 +20,10 @@
 
     <Button
         android:id="@+id/buttonId"
+        android:text="Button Right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onButtonClick"
-        android:text="Button"
+        android:onClick="bottonRight"
         android:layout_alignParentRight="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

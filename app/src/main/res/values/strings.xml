@@ -4,6 +4,9 @@
     <string name="playback_channel_description">Cool MediaPlayer description</string>
     <string name="song_frag_tag">songsTag</string>
     <string name="player_frag_tag">playerTag</string>
+    <string name="song_bundle">song_bundle</string>
+    <string name="song_position">song_position</string>
+    <string name="play_this_position">R.string.play_this_position</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

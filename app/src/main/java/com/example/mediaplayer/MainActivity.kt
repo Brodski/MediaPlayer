@@ -1,21 +1,28 @@
 package com.example.mediaplayer
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
+
 
 // Media streaming with ExoPlayer
 // https://codelabs.developers.google.com/codelabs/exoplayer-intro/#2
@@ -42,6 +49,23 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
     private lateinit var playerFragment: PlayerFragment
 
     private var restoredFragment: Fragment? = null
+
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as AudioPlayerService.LocalBinder
+            mService = binder.getService()
+
+            playerView?.player = mService.exoPlayer
+            playerView?.showController()
+            //Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
+        }
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.e(TAG, "Disconnected Service :o")
+        }
+    }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,28 +222,38 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
         }
     }
 
+    fun findFrag(){
+        Log.e(TAG,"Finding frag")
+        Log.e(TAG, "size: ${supportFragmentManager.fragments.size}")
+        for (x in supportFragmentManager.fragments){
+            Log.e(TAG,"---All Frags---")
+            Log.e(TAG, x.toString())
+        }
+        Log.e(TAG,"---End Frags---")
+        Log.e(TAG,"findFrag(player_frag_tag")
+        var f = supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag))
+        Log.e(TAG, f.toString())
+        Log.e(TAG, f?.tag.toString())
+        Log.e(TAG,".........Exiting Finding frag")
+    }
 
     fun doFragmentTransaction(fragment: Fragment, tag: String){
-
-        var frag: Fragment? = null
+        findFrag()
+        var currentFrag: Fragment? = null
         for ( f in supportFragmentManager.fragments) {
-            frag = f
-//            Log.e(TAG, "Fragment :")
-//            Log.e(TAG, f.toString())
-//            Log.e(TAG, f.tag)
-//            Log.e(TAG, f.id.toString())
+            currentFrag = f
         }
-        Log.e(TAG, tag)
-        Log.e(TAG, frag?.tag.toString())
-        if (frag?.tag == tag) {
-            Log.e(TAG, "is equal")
+        if (currentFrag?.tag == tag) {
+            Log.e(TAG, "Current frag is already showing. No change")
             return
-        } else if ( frag == null ){
+        } else if ( currentFrag == null ){
+            Log.e(TAG, "Initial load to $tag")
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.newmain_view, fragment, tag)
                 .commit()
         } else {
+            Log.e(TAG, "Changing to $tag")
             supportFragmentManager
                 .beginTransaction()
                 .addToBackStack(tag)
@@ -265,9 +299,40 @@ class MainActivity : AppCompatActivity(), IMainActivity, SongsFragment.SongsFrag
 
     }
 
+    fun bottonRight(view: View) {
+        Log.e(TAG, "clicked btton right")
+        Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
+
+        Log.e(TAG,"Broadcasting message")
+        val intent = Intent("custom-event-name")
+        // You can also include some extra data.
+        // You can also include some extra data.
+        intent.putExtra("message", "This is my message!")
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+
+
+    }
+
+    fun talkToMain(){
+
+    }
 
 
 
+    private fun initPlayer2() {
+        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
+        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        this?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        Util.startForegroundService(this!!, intent)
+
+    }
+
+    private fun releasePlayer2() {
+        Log.e(TAG, "Release called")
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        this.unbindService(connection)
+    }
 
 
 

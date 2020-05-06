@@ -153,7 +153,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         super.onPause()
         Log.e(TAG,"PAUSE MainActivity")
 
-        //someInt = 666
         if (Util.SDK_INT < Build.VERSION_CODES.N) {
             Log.e(TAG, "PAUSE, int it")
             someInt = 666
@@ -166,7 +165,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         Log.e(TAG,"STOP MainActivity")
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
             Log.e(TAG,"STOP int int it")
-            //someInt = 666
         }
 
     }
@@ -336,12 +334,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         intent.putExtra("message", "This is my message!")
 //        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
 
-
-    }
-
-
-    fun getPlayer(): SimpleExoPlayer? {
-        return mService.exoPlayer
     }
 
     fun talkToMain(){

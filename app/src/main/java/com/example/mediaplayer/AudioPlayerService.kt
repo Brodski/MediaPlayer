@@ -83,20 +83,17 @@ class AudioPlayerService : Service() {
 
         //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("custom-event-name"));
 
-        //val ts = DefaultTrackSelector()
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
         var concatenatingMediaSource = buildMedia(context)
 
-        // Setup notification and media session.
         if (songList?.size!! < 1) {
             concatenatingMediaSource = goofydebugging(context)
         }
 
+        // Setup notification and media session.
         exoPlayer!!.prepare(concatenatingMediaSource)
-        Log.e(TAG, "1 x x x ${exoPlayer?.currentWindowIndex.toString()}")
         exoPlayer!!.seekTo(1, 0)
-        Log.e(TAG, "2x x x  ${exoPlayer?.currentWindowIndex.toString()}")
         exoPlayer!!.playWhenReady = false
 
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
@@ -108,7 +105,6 @@ class AudioPlayerService : Service() {
             object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun getCurrentContentTitle(player: Player): String {
                     return songList?.get(player.currentWindowIndex)?.mainText.toString()
-//                    return player.currentWindowIndex.toString()
                 }
 
                 @Nullable
@@ -163,8 +159,6 @@ class AudioPlayerService : Service() {
             }
         )
         playerNotificationManager!!.setPlayer(exoPlayer)
-        Log.e(TAG, "3x x x ${exoPlayer?.currentWindowIndex.toString()}")
-
 
         // The below syncs the foreground player with the player
         mediaSession = MediaSessionCompat(context, MEDIA_SESSION_TAG)
@@ -172,8 +166,6 @@ class AudioPlayerService : Service() {
 
         playerNotificationManager!!.setMediaSessionToken(mediaSession!!.sessionToken) // Lock screen
         mediaSessionConnector = MediaSessionConnector(mediaSession!!)
-        Log.e(TAG, "4x x x ${exoPlayer?.currentWindowIndex.toString()}")
-
 
         // Sync playlist with the queue
         mediaSessionConnector?.setQueueNavigator(object : TimelineQueueNavigator(mediaSession!!) {
@@ -186,9 +178,7 @@ class AudioPlayerService : Service() {
             }
         })
 
-        Log.e(TAG, "5x x x ${exoPlayer?.currentWindowIndex.toString()}")
         mediaSessionConnector!!.setPlayer(exoPlayer)
-        Log.e(TAG, "6x x x ${exoPlayer?.currentWindowIndex.toString()}")
 
 
     }
@@ -414,6 +404,17 @@ class AudioPlayerService : Service() {
         return concatenatingMediaSource
     }
 
+    fun makeStuff(position: Int){
+        Log.e(TAG, "HI HI HI $position")
+        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
+        Log.e(TAG, "HI HI HI ${exoPlayer?.currentTimeline.toString()}")
+
+        exoPlayer?.seekTo(position, 0)
+
+        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
+    }
+
+
     // https://stackoverflow.com/questions/8802157/how-to-use-localbroadcastmanager
 //    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
 //        override fun onReceive(context: Context?, intent: Intent) {
@@ -431,31 +432,4 @@ class AudioPlayerService : Service() {
 //        }
 //    }
 
-    fun makeStuff(position: Int){
-        Log.e(TAG, "HI HI HI $position")
-        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
-        Log.e(TAG, "HI HI HI ${exoPlayer?.currentTimeline.toString()}")
-
-        exoPlayer?.seekTo(position, 0)
-
-        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
-    }
-
-
 }
-
-
-
-//private fun buildMediaSource(uri: Uri): MediaSource {
-//    val dataSourceFactory: DataSource.Factory =
-//        DefaultDataSourceFactory(this, Util.getUserAgent(this, this.getString(R.string.app_name)) )
-//
-//    val videoSource: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(uri)
-//    val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
-//
-//    val mediaSource2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
-//    val cs = ConcatenatingMediaSource()
-//    cs.addMediaSource(videoSource)
-//    cs.addMediaSource(mediaSource2)
-//    return cs
-//}

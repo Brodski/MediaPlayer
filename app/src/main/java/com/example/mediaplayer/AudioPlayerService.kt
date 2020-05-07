@@ -109,11 +109,12 @@ class AudioPlayerService : Service() {
 
                 @Nullable
                 override fun getCurrentContentText(player: Player): String? {
-                    if (songList?.get(player.currentWindowIndex)?.subText == "<unknown>") {
-                        return ""
-                    } else {
-                        return songList?.get(player.currentWindowIndex)?.subText
-                    }
+//                    if (songList?.get(player.currentWindowIndex)?.subText == "<unknown>") {
+//                        return ""
+//                    } else {
+//                        return songList?.get(player.currentWindowIndex)?.subText
+//                    }
+                    return songList?.get(player.currentWindowIndex)?.subText
                 }
 
                 @Nullable
@@ -194,7 +195,9 @@ class AudioPlayerService : Service() {
 
         songList?.forEach { it ->
             var media: MediaSource =
-                ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(it.uri)
+                ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .setTag(it.uri.toString())
+                    .createMediaSource(it.uri)
             concatenatingMediaSource.addMediaSource(media)
         }
 
@@ -252,7 +255,12 @@ class AudioPlayerService : Service() {
                 //Log.e(TAG, "+++++++++++++++++++++++++++")
                 val id = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
-                val artist = cursor.getString(artistColumn)
+//                var artist = cursor.getString(artistColumn)
+                val artist = if (cursor.getString(artistColumn) == "<unknown>"){
+                    ""
+                } else {
+                    cursor.getString(artistColumn)
+                }
                 val isAlarmC = cursor.getString(isAlarmC)
                 val isNotif = cursor.getString(isNotifC)
                 val isRing = cursor.getString(isRingC)
@@ -265,7 +273,6 @@ class AudioPlayerService : Service() {
                 mmr.setDataSource(context, audioUri)
                 var rawArt: ByteArray? = mmr.embeddedPicture
                 //var rawArt: ByteArray? = null
-
                 val bfo = BitmapFactory.Options()
                 var art: Bitmap? = if (rawArt != null) {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
@@ -296,8 +303,8 @@ class AudioPlayerService : Service() {
                 )
             }
         }
-        //Log.e(TAG, "SongList")
-        //songList.forEach { Log.e(TAG, it.toString()) }
+        Log.e(TAG, "SongList")
+        songList.forEach { Log.e(TAG, it.toString()) }
         return songList
     }
 

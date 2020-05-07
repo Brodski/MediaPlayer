@@ -11,8 +11,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,6 +24,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
 // Media streaming with ExoPlayer
@@ -52,8 +56,9 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
     private var restoredFragment: Fragment? = null
 
 
-    override fun onSongSelect(index: Int) {
-        playerFragment.playAtIndex(index)
+    override fun onSongSelect(index: Int, text: String) {
+        Log.e(TAG, "onSongSelect: recived $text")
+        playerFragment.playAtIndex(index, text)
     }
     override fun onPlayerSent(num: Int) {
         Log.e(tag, "HEY!!! I'm in main")
@@ -116,12 +121,20 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
 
         songsFragment = SongsFragment.newInstance("pp1", "pp2")
         playerFragment = PlayerFragment.newInstance("pp1", "pp2")
-//        Log.e(TAG, "++++OnCreate mService before")
-//        mService = AudioPlayerService()
-//        Log.e(TAG, "++++OnCreate mService after")
 
-        var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigationId)
         bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
+
+        KeyboardVisibilityEvent.setEventListener( this, object : KeyboardVisibilityEventListener {
+            override fun onVisibilityChanged(isOpen: Boolean) {
+                if (isOpen) {
+                    bottomNav.visibility = View.GONE
+                } else {
+                    bottomNav.visibility = View.VISIBLE
+                }
+            }
+        })
+
     }
 
     override fun onStart() {
@@ -340,13 +353,6 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         Log.e(TAG, "hi i'm in main")
         Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
     }
-
-
-
-
-
-
-
 
     fun saveThingy() {
         var frag: Fragment? = null

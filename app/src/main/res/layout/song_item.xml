@@ -45,6 +45,16 @@
             android:layout_toEndOf="@id/imageId"
             android:layout_toRightOf="@id/imageId"
             android:textSize="15sp" />
+        <TextView
+            android:id="@+id/songUriId"
+            android:text="uriTextHidden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/songMainTextId"
+            android:layout_toRightOf="@id/songMainTextId"
+            android:textSize="15sp"
+            android:visibility="gone"
+            />
     </RelativeLayout>
 
 

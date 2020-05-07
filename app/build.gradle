@@ -47,4 +47,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2"
+
 }

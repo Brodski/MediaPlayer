@@ -9,6 +9,10 @@
     android:orientation="vertical"
     tools:context=".SongsFragment">
 
+    <include
+        layout="@layout/toolbar"
+    />
+
     <TextView
         android:id="@+id/fragTextId"
         android:layout_width="match_parent"

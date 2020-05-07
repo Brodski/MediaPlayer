@@ -15,7 +15,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_navigation"
+        android:layout_above="@+id/bottom_navigationId"
     />
 
     <Button
@@ -26,20 +26,21 @@
         android:onClick="bottonRight"
         android:layout_alignParentRight="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="100dp"
+        />
 
     <Button
         android:id="@+id/buttonId2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="myGoToFragment"
         android:layout_alignParentRight="true"
         android:text="goToF (does nothing)"
         android:layout_below="@+id/buttonId"
         />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+        android:id="@+id/bottom_navigationId"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"

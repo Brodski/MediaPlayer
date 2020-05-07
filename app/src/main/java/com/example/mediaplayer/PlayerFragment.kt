@@ -11,14 +11,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+//import android.widget.Toolbar
+import androidx.appcompat.widget.Toolbar
 import androidx.annotation.RequiresApi
-import androidx.core.graphics.drawable.toBitmap
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
@@ -44,6 +44,7 @@ class PlayerFragment : Fragment() {
     private lateinit var mService: AudioPlayerService
     private var mBound: Boolean = false
     private var listener: PlayerFragListener? = null
+    private lateinit var correctMenu: Menu
 
     interface PlayerFragListener {
         fun onPlayerSent(num: Int)
@@ -106,16 +107,28 @@ class PlayerFragment : Fragment() {
 
     }
 
-    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        Log.e(TAG, "onCreate: Created!!")
+//        setHasOptionsMenu(true)
+//    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
 
         Log.e(TAG, "onCreateView Player Frag")
+   //     setHasOptionsMenu(true)
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
 
         playerView = v.findViewById(R.id.main_view2)
         listener!!.onPlayerSent(420);
 
-        //playerView?.player = mService.exoPlayer
-//        playerView?.player = (activity as MainActivity).getPlayer()
+        val toolbar: Toolbar = v.findViewById(R.id.toolbar)
+        setHasOptionsMenu(true)
+        toolbar.title = "Cool Player"
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+
+
 //        playerView?.showController()
 
         var bundle: Bundle = this.arguments!!
@@ -124,13 +137,6 @@ class PlayerFragment : Fragment() {
             val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
             Log.e(TAG, s.toString())
         }
-//        val wtf= bundle?.getString("keyOther2")
-//        if (wtf != null) {
-//           Log.e(TAG, "found keyOther2 in bundle")
-//           Log.e(TAG, bundle?.getString("keyOther2").toString())
-//        } else {
-//            Log.e(TAG, "found jack shit")
-//        }
 
         val btn: Button = v.findViewById(R.id.btnB) as Button
         btn.setOnClickListener { v -> talkService(v) }
@@ -165,9 +171,12 @@ class PlayerFragment : Fragment() {
         playerView?.showController()
     }
 
-    fun playAtIndex(index: Int) {
+    fun playAtIndex(index: Int, uri: String) {
         Log.e(TAG, "here in player fragment, playing at index $index")
+        Log.e(TAG, "here in player fragment, playing at index $uri")
         Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
+        //val wtf = mService.exoPlayer.contentPosition
+        //val wtf2 = mService.exoPlayer
         mService.exoPlayer?.seekTo(index,0)
         mService.exoPlayer?.playWhenReady = true
 
@@ -185,4 +194,44 @@ class PlayerFragment : Fragment() {
 //        Log.e(TAG, mService.exoPlayer!!.toString())
 
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        //return super.onCreateOptionsMenu(menu)
+        Log.e(TAG, "+++ onCreateOptionsMenu +++")
+        val frags = fragmentManager!!.fragments
+        frags?.forEach {
+            Log.e(TAG, "onCreateOptionsMenu: ${it.tag}")
+            Log.e(TAG, "onCreateOptionsMenu: ${it.toString()}")
+        }
+        //val menu: Menu =
+        inflater.inflate(R.menu.menu_player, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            R.id.item1 -> {
+                Log.e(TAG, "item 1")
+                return false
+            }
+            R.id.item2 -> {
+                Log.e(TAG, "item 2")
+                return false
+            }
+            R.id.item3 -> {
+                Log.e(TAG, "item 3")
+                return false
+            }
+            R.id.sub1 -> {
+                Log.e(TAG, "sub 1")
+                return false
+            }
+        }
+        return false
+        //return super.onOptionsItemSelected(item)
+    }
+
+
 }

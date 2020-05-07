@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <item
+        android:id="@+id/search_bar_songs"
+        android:icon="@drawable/ic_search"
+        android:title="search"
+        app:showAsAction="ifRoom|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+    />
+    <item
+    android:id="@+id/item1"
+    android:icon="@drawable/sound_speaker"
+    android:title="Item 1"
+    app:showAsAction="ifRoom"
+    />
+
+    <item
+        android:id="@+id/item2"
+        android:icon="@drawable/music_note_icon"
+        android:title="Item 2"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/item3"
+        android:icon="@drawable/abc_vector_test"
+        android:title="Item 3"
+        app:showAsAction="never" >
+        <menu>
+            <item
+                android:id="@+id/sub1"
+                android:title="Sub 1"
+                />
+            <item
+                android:id="@+id/sub2"
+                android:title="Sub 2"
+                />
+            </menu>
+    </item>
+
+
+</menu>

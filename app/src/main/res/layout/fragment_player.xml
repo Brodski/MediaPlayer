@@ -3,27 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
+    style="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/holo_blue_dark"
     android:orientation="vertical"
-    tools:context=".PlayerFragment"
+    tools:context=".PlayerFragment">
 
-    >
+    <include
+        layout="@layout/toolbar"
+    />
+
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/main_view2"
         android:layout_width="match_parent"
         android:layout_height="500dp"
-        app:hide_on_touch="false"
+        app:controller_layout_id="@layout/controls_playback"
 
+        app:default_artwork="@drawable/ic_music_noteinv"
+        app:fastforward_increment="30000"
+        app:hide_on_touch="false"
+        app:rewind_increment="30000"
         app:show_shuffle_button="true"
         app:show_timeout="0"
-        app:fastforward_increment="30000"
-        app:rewind_increment="30000"
-        app:controller_layout_id="@layout/controls_playback"
-        app:use_sensor_rotation="true"
-        app:default_artwork="@drawable/ic_music_noteinv"
-        />
+        app:use_sensor_rotation="true" />
 
     <TextView
         android:id="@+id/fragTextIdB"

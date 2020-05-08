@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <PreferenceCategory
+        app:title="Learning Preferences">
+
+    <Preference
+        android:key="preference_key"
+        android:title="preference_title"
+        android:summary="preference_summary"
+        android:icon="@drawable/ic_date"
+    />
+    <CheckBoxPreference
+        android:key="checkbox"
+        android:title="Title_checkbox_preference"
+        android:summary="Summary_checkbox_preference"
+    />
+    <SwitchPreferenceCompat
+        android:key="switch"
+        android:title="title_switch_preference"
+        android:summary="Summary_switch_preference"
+    />
+    <DropDownPreference
+        android:key="dropdown"
+        android:title="dropdown_preference"
+        android:entries="@array/entries"
+        app:useSimpleSummaryProvider="true"
+        android:entryValues="@array/entry_values"/>
+    <ListPreference
+        app:key="list_example"
+        app:title="title_preference"
+        app:useSimpleSummaryProvider="true"
+        app:entries="@array/entries"
+        app:entryValues="@array/entry_values"
+        app:dialogTitle="dialog_title_preference"/>
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -23,6 +23,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.lang.RuntimeException
 
@@ -103,7 +104,8 @@ class PlayerFragment : Fragment() {
         var intent: Intent = Intent(activity, AudioPlayerService::class.java)
         //startService(intent)
         activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(activity!!, intent)
+        Util.startForegroundService(requireActivity(), intent)
+        //Util.startForegroundService(activity!!, intent)
 
     }
 
@@ -117,8 +119,11 @@ class PlayerFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
 
         Log.e(TAG, "onCreateView Player Frag")
-   //     setHasOptionsMenu(true)
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
+
+        var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
+        var homeIcon: MenuItem =  nav.menu.findItem(R.id.nav_home)
+        homeIcon.setChecked(true)
 
         playerView = v.findViewById(R.id.main_view2)
         listener!!.onPlayerSent(420);
@@ -131,8 +136,8 @@ class PlayerFragment : Fragment() {
 
 //        playerView?.showController()
 
-        var bundle: Bundle = this.arguments!!
-        if (bundle.containsKey(getString(R.string.song_bundle))){
+        var bundle: Bundle? = this!!.arguments
+        if (bundle!!.containsKey(getString(R.string.song_bundle))){
             Log.e(TAG, "HAS SONG BUNDLE!!!")
             val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
             Log.e(TAG, s.toString())

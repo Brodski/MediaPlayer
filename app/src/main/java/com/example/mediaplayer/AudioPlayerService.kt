@@ -87,9 +87,7 @@ class AudioPlayerService : Service() {
 
         var concatenatingMediaSource = buildMedia(context)
 
-        if (songList?.size!! < 1) {
-            concatenatingMediaSource = goofydebugging(context)
-        }
+        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(context) }
 
         // Setup notification and media session.
         exoPlayer!!.prepare(concatenatingMediaSource)
@@ -170,34 +168,21 @@ class AudioPlayerService : Service() {
 
         // Sync playlist with the queue
         mediaSessionConnector?.setQueueNavigator(object : TimelineQueueNavigator(mediaSession!!) {
-            override fun getMediaDescription(
-                player: Player,
-                windowIndex: Int
-            ): MediaDescriptionCompat {
-
+            override fun getMediaDescription( player: Player, windowIndex: Int ): MediaDescriptionCompat {
                 return mediaHelper(windowIndex, songList?.get(windowIndex))
             }
         })
-
         mediaSessionConnector!!.setPlayer(exoPlayer)
-
-
     }
 
     fun buildMedia(context: Context): ConcatenatingMediaSource {
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
-            context,
-            Util.getUserAgent(context, this.getString(R.string.app_name))
-        )
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
 
         songList = querySongs(context)
 
         songList?.forEach { it ->
-            var media: MediaSource =
-                ProgressiveMediaSource.Factory(dataSourceFactory)
-                    .setTag(it.uri.toString())
-                    .createMediaSource(it.uri)
+            var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
             concatenatingMediaSource.addMediaSource(media)
         }
 

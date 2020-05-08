@@ -49,5 +49,6 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2"
+    implementation "androidx.preference:preference-ktx:1.1.1"
 
 }

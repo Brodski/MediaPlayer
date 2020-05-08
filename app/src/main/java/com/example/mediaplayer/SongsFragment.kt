@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+//import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -63,11 +64,14 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         mService = AudioPlayerService()
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
         Log.e(TAG,"onCreateView Items")
         var view: View = inflater.inflate(R.layout.fragment_items, container, false)
-        bottomNav = activity?.findViewById(R.id.bottom_navigationId)
+        //bottomNav = activity?.findViewById(R.id.bottom_navigationId)
+        var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
+        var songsIcon: MenuItem =  nav.menu.findItem(R.id.nav_favorites)
+        songsIcon.isChecked = true
 
         var bundle: Bundle? = this.arguments
 
@@ -80,7 +84,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
 
         //private val songListFull: ArrayList<Song> = ArrayList(songList)
-        songList = mService.querySongs(activity!!)
+        songList = mService.querySongs(requireActivity())
         songListFull = songList?.map{ it.copy() }
 
         adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
@@ -139,35 +143,33 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 return@forEachIndexed
             }
         }
-
         //listener?.onSongSelect(position, text)
 
+//        val intent = Intent("custom-event-name")
+//        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
+//        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
 
-        val intent = Intent("custom-event-name")
-        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
-        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
-
-        var bundle  = Bundle()
-        bundle.putString( "keyOther2", "message")
-        bundle.putParcelable(getString(R.string.song_bundle), songList?.get(position))
-        bundle.putInt(getString(R.string.song_position), position)
-        playerFragment.arguments = bundle
-
+//        var bundle  = Bundle()
+//        bundle.putString( "keyOther2", "message")
+//        bundle.putParcelable(getString(R.string.song_bundle), songList?.get(position))
+//        bundle.putInt(getString(R.string.song_position), position)
+//        playerFragment.arguments = bundle
 //        fragmentManager
 //            ?.beginTransaction()
 //            ?.replace(R.id.newmain_view, playerFragment)
 //            ?.addToBackStack("From song")
 //            ?.commit()
 
-    //    bottomNav?.selectedItemId = R.id.nav_home
+    //    bottomNav?.selectedItemId = R.id.nav_home //Go to media player
 
         if (songList != null) {
-            Log.e(TAG, songList!![position]?.mainText)
-            Log.e(TAG, songList!![position]?.subText)
+            Log.e(TAG, songList!![position].mainText.toString())
+            Log.e(TAG, songList!![position].subText.toString())
+            Log.e(TAG, songList!![position].uri.toString())
         }
 
         Toast.makeText(activity, "CLICKED! $position", Toast.LENGTH_SHORT).show()
-        UIUtil.hideKeyboard(activity!!)
+        UIUtil.hideKeyboard(requireActivity())
     }
 
     override fun onAttach(context: Context) {
@@ -184,11 +186,11 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         //return super.onCreateOptionsMenu(menu)
         Log.e(TAG, "+++ onCreateOptionsMenu +++")
-        val frags = fragmentManager!!.fragments
-        frags?.forEach {
-            Log.e(TAG, "onCreateOptionsMenu: ${it.tag}")
-            Log.e(TAG, "onCreateOptionsMenu: ${it.toString()}")
-        }
+//        val frags = fragmentManager!!.fragments
+//        frags?.forEach {
+//            Log.e(TAG, "onCreateOptionsMenu: ${it.tag}")
+//            Log.e(TAG, "onCreateOptionsMenu: ${it.toString()}")
+//        }
 
         inflater.inflate(R.menu.menu_songs, menu)
         val searchItem = menu.findItem(R.id.search_bar_songs)
@@ -210,28 +212,32 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Log.e(TAG, "clicked id: ${item.itemId}")
+        Log.e(TAG, "clicke title: ${item.title}")
         when (item.itemId){
-            R.id.item1 -> {
-                Log.e(TAG, "item 1")
+            R.id.sortAlphAscId -> {
+                item.isChecked = true
+                Log.e(TAG, "sortAlphAscId")
                 return false
             }
-            R.id.item2 -> {
-                Log.e(TAG, "item 2")
+            R.id.sortAlphDescId -> {
+                item.isChecked = true
+                Log.e(TAG, "sortAlphDescId")
+                return false}
+            R.id.sortDateRecentId -> {
+                item.isChecked = true
+                Log.e(TAG, "sortDateRecentId")
                 return false
             }
-            R.id.item3 -> {
-                Log.e(TAG, "item 3")
+            R.id.sortDateOldId -> {
+                item.isChecked = true
+                Log.e(TAG, "sortDateOldId")
                 return false
             }
-            R.id.sub1 -> {
-                Log.e(TAG, "sub 1")
-                return false
-            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return false
+        return true
         //return super.onOptionsItemSelected(item)
     }
 

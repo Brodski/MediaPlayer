@@ -12,33 +12,43 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
     />
     <item
-    android:id="@+id/item1"
-    android:icon="@drawable/sound_speaker"
-    android:title="Item 1"
-    app:showAsAction="ifRoom"
-    />
-
-    <item
         android:id="@+id/item2"
-        android:icon="@drawable/music_note_icon"
-        android:title="Item 2"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/item3"
-        android:icon="@drawable/abc_vector_test"
-        android:title="Item 3"
-        app:showAsAction="never" >
+        android:icon="@drawable/ic_alpha"
+        android:title="Sort"
+        app:showAsAction="never"
+    >
         <menu>
+            <group android:checkableBehavior="single" >
             <item
-                android:id="@+id/sub1"
-                android:title="Sub 1"
-                />
-            <item
-                android:id="@+id/sub2"
-                android:title="Sub 2"
-                />
-            </menu>
-    </item>
+                android:id="@+id/sortAlphAscId"
+                android:title="Ascending"
 
+            />
+            <item
+                android:id="@+id/sortAlphDescId"
+                android:title="Descending"
+            />
+
+            <item
+                android:id="@+id/sortDateRecentId"
+                android:title="Most Recent"
+                />
+            <item
+                android:id="@+id/sortDateOldId"
+                android:title="Least Recent"
+                />
+            </group>
+        </menu>
+        </item>
+    <item
+        android:id="@+id/optionsId"
+        android:title="Options"
+        app:showAsAction="never" >
+    </item>
+    <item
+        android:id="@+id/supportId"
+        android:title="Donate"
+        app:showAsAction="never" >
+    </item>
 
 </menu>

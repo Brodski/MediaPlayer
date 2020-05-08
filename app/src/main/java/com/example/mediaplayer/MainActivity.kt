@@ -20,6 +20,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
 
     private lateinit var songsFragment: SongsFragment
     private lateinit var playerFragment: PlayerFragment
+    private lateinit var preferenceFragment: PreferenceFragment
 
     private var restoredFragment: Fragment? = null
 
@@ -121,6 +124,7 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
 
         songsFragment = SongsFragment.newInstance("pp1", "pp2")
         playerFragment = PlayerFragment.newInstance("pp1", "pp2")
+        preferenceFragment = PreferenceFragment.newInstance("pp1", "pp2")
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigationId)
         bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
@@ -244,7 +248,8 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
                 bool = true
             }
             R.id.nav_search -> {
-                inflateFragment("fragment_songs")
+                Log.e(TAG, "onNavClick: search")
+                inflateFragment("fragment_preference")
                 bool = true
             }
             else -> bool = false
@@ -259,22 +264,9 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         }
         else if (nameFrag == "fragment_player") {
             doFragmentTransaction(playerFragment, getString(R.string.player_frag_tag))
+        } else if (nameFrag == "fragment_preference") {
+            doFragmentTransaction(preferenceFragment, getString(R.string.pref_frag_tag))
         }
-    }
-
-    fun findFrag(){
-        Log.e(TAG,"Finding frag")
-        Log.e(TAG, "size: ${supportFragmentManager.fragments.size}")
-        for (x in supportFragmentManager.fragments){
-            Log.e(TAG,"---All Frags---")
-            Log.e(TAG, x.toString())
-        }
-        Log.e(TAG,"---End Frags---")
-        Log.e(TAG,"findFrag(player_frag_tag")
-        var f = supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag))
-        Log.e(TAG, f.toString())
-        Log.e(TAG, f?.tag.toString())
-        Log.e(TAG,".........Exiting Finding frag")
     }
 
     fun doFragmentTransaction(fragment: Fragment, tag: String){
@@ -283,6 +275,10 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         for ( f in supportFragmentManager.fragments) {
             currentFrag = f
         }
+        Log.e(TAG, "doFragmentTransaction: clicked soemthing")
+        Log.e(TAG, "doFragmentTransaction: ${fragment}")
+        Log.e(TAG, "doFragmentTransaction: ${fragment.tag}")
+        Log.e(TAG, "doFragmentTransaction: ${tag}")
         if (currentFrag?.tag == tag) {
             Log.e(TAG, "Current frag is already showing. No change")
             return
@@ -335,6 +331,25 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
 
     }
 
+    fun editSettings(view: View){
+        Log.e(TAG, "editSettings: editting")
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = sharedpreferences.edit()
+        editor.putString("dropdown", "1")
+        editor.putString("list_example", "")
+        editor.commit()
+    }
+
+    fun getSettings(view: View) {
+        Log.e(TAG, "getSettings: getting")
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val z1 = sharedpreferences.getBoolean("checkbox", true)
+        val z2 = sharedpreferences.getString("dropdown","")
+        val z3 = sharedpreferences.getString("list_example","")
+        Log.e(TAG, "getSettings: $z1")
+        Log.e(TAG, "getSettings: $z2")
+        Log.e(TAG, "getSettings: $z3")
+    }
 
     fun bottonRight(view: View) {
         Log.e(TAG, "clicked btton right")
@@ -364,6 +379,24 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         }
 
     }
+
+
+
+    fun findFrag(){
+        Log.e(TAG,"Finding frag")
+        Log.e(TAG, "size: ${supportFragmentManager.fragments.size}")
+        for (x in supportFragmentManager.fragments){
+            Log.e(TAG,"---All Frags---")
+            Log.e(TAG, x.toString())
+        }
+        Log.e(TAG,"---End Frags---")
+        Log.e(TAG,"findFrag(player_frag_tag")
+        var f = supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag))
+        Log.e(TAG, f.toString())
+        Log.e(TAG, f?.tag.toString())
+        Log.e(TAG,".........Exiting Finding frag")
+    }
+
 
     private fun initializePlayer() {
         player = SimpleExoPlayer.Builder(this).build()

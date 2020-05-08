@@ -6,7 +6,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="#FFF"
 
     tools:context=".MainActivity">
 
@@ -34,9 +34,19 @@
         android:id="@+id/buttonId2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="getSettings"
         android:layout_alignParentRight="true"
-        android:text="goToF (does nothing)"
+        android:text="get settings data"
         android:layout_below="@+id/buttonId"
+        />
+    <Button
+        android:id="@+id/buttonId3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="editSettings"
+        android:layout_alignParentRight="true"
+        android:text="edit settings"
+        android:layout_below="@+id/buttonId2"
         />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -9,4 +9,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+<!--    <style name="MyActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">-->
+<!--        <item name="android:textColorPrimary">#fa0</item>-->
+<!--    </style>-->
+
 </resources>

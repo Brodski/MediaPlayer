@@ -72,6 +72,8 @@ class AudioPlayerService : Service() {
     private val MEDIA_SESSION_TAG = "hello-world-media"
     var songList: List<Song>? = null
 
+    private lateinit var mContext: Context
+
     companion object {
         const val TAG = "AudioPlayerService"
     }
@@ -79,15 +81,17 @@ class AudioPlayerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val context: Context = this
-
+       // val context: Context = this
+        mContext = this
         //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("custom-event-name"));
 
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
-        var concatenatingMediaSource = buildMedia(context)
+//        var concatenatingMediaSource = buildMedia(context)
+        var concatenatingMediaSource = buildMedia()
 
-        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(context) }
+//        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(context) }
+        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(mContext) }
 
         // Setup notification and media session.
         exoPlayer!!.prepare(concatenatingMediaSource)
@@ -95,7 +99,8 @@ class AudioPlayerService : Service() {
         exoPlayer!!.playWhenReady = false
 
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
-            context,
+//            context,
+            mContext,
             PLAYBACK_CHANNEL_ID,
             R.string.playback_channel_name, //local name in settings dialog for the user
             R.string.playback_channel_description,
@@ -160,7 +165,8 @@ class AudioPlayerService : Service() {
         playerNotificationManager!!.setPlayer(exoPlayer)
 
         // The below syncs the foreground player with the player
-        mediaSession = MediaSessionCompat(context, MEDIA_SESSION_TAG)
+//        mediaSession = MediaSessionCompat(context, MEDIA_SESSION_TAG)
+        mediaSession = MediaSessionCompat(mContext, MEDIA_SESSION_TAG)
         mediaSession!!.isActive = true
 
         playerNotificationManager!!.setMediaSessionToken(mediaSession!!.sessionToken) // Lock screen
@@ -175,11 +181,22 @@ class AudioPlayerService : Service() {
         mediaSessionConnector!!.setPlayer(exoPlayer)
     }
 
-    fun buildMedia(context: Context): ConcatenatingMediaSource {
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
+    //fun buildMedia(context: Context, sortBy: Int? = null): ConcatenatingMediaSource {
+    fun buildMedia(sortBy: Int? = null): ConcatenatingMediaSource {
+
+//        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( mContext, Util.getUserAgent(mContext, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
 
-        songList = querySongs(context)
+//        songList = querySongs(context)
+        songList = querySongs(mContext)
+
+        sortBy?.let {
+            songList = sortSongs(sortBy)
+            songList?.forEach { android.util.Log.e(TAG, "buildMedia: $it") }
+        }
+
+
 
         songList?.forEach { it ->
             var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
@@ -189,12 +206,25 @@ class AudioPlayerService : Service() {
         return concatenatingMediaSource
     }
 
+    fun sortSongs(sortBy: Int?): MutableList<Song>? {
+        android.util.Log.e(TAG, "sortSongs: going in")
+        android.util.Log.e(TAG, "$sortBy")
+//        android.util.Log.e(TAG, sortBy?.let { getString(it) })
+        return when (sortBy) {
+            R.string.sort_alpha_asc -> {
+                val x = songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
+                x?.forEach { android.util.Log.e(TAG, "sortSongs: ${it.subText} - ${it.mainText}") }
+                return x
+            }
+            R.string.sort_alpha_des -> songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
+            R.string.sort_created_recently -> songList?.sortedWith(comparator = SongArtistComparable()) as MutableList<Song>?
+            R.string.sort_created_oldest -> songList?.sortedWith(comparator = SongArtistComparable()) as MutableList<Song>?
+            else ->  songList?.sortedWith(comparator = SongArtistComparable()) as MutableList<Song>?
+        }
+    }
+
     fun querySongs(context: Context): MutableList<Song>? {
-        if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED) {
             //    recycler_songs.adapter = SongsAdaptor(songList, this)
             Log.e(TAG, "Permission already granted")
             return actualQuerySongs(context)
@@ -249,8 +279,8 @@ class AudioPlayerService : Service() {
                 val isAlarmC = cursor.getString(isAlarmC)
                 val isNotif = cursor.getString(isNotifC)
                 val isRing = cursor.getString(isRingC)
-                var dateAdded = cursor.getString(dateAddedC)
-                var dur = cursor.getString(durationC)
+                var dateAdded = cursor.getInt(dateAddedC)
+                var dur = cursor.getInt(durationC)
 
                 val audioUri: Uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
@@ -267,21 +297,23 @@ class AudioPlayerService : Service() {
                 }
 
 
-//                Log.e(TAG, "id $id")
-//                Log.e(TAG, "audioUri $audioUri")
-//                Log.e(TAG, "title $title")
-//                Log.e(TAG, "artist $artist")
+                Log.e(TAG, "id $id")
+                Log.e(TAG, "audioUri $audioUri")
+                Log.e(TAG, "title $title")
+                Log.e(TAG, "artist $artist")
 //                Log.e(TAG, "is isAlarmC $isAlarmC")
 //                Log.e(TAG, "is isNotif $isNotif")
 //                Log.e(TAG, "is isRing $isRing")
-//                Log.e(TAG, " dateAdded $dateAdded")
-//                Log.e(TAG, " duration $dur")
+                Log.e(TAG, " dateAdded $dateAdded")
+                Log.e(TAG, " duration $dur")
                 songList.add(
                     Song(
                         id = id.toInt(),
                         uri = audioUri,
                         mainText = title,
                         subText = artist,
+                        duration = dur,
+                        dateCreate = dateAdded,
                         imageResource = R.drawable.ic_rowing,
                         art = art
                     )
@@ -376,6 +408,8 @@ class AudioPlayerService : Service() {
                 uri = audioUri,
                 mainText = "title",
                 subText = "artist",
+                duration = 10,
+                dateCreate = 100,
                 art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
                 imageResource = R.drawable.ic_rowing
             )
@@ -387,6 +421,8 @@ class AudioPlayerService : Service() {
                     uri = mp4VideoUri,
                     mainText = "title vid",
                     subText = "artist vid",
+                    duration = 11,
+                    dateCreate = 101,
                     art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
                     imageResource = R.drawable.ic_rowing
                 )

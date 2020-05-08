@@ -8,17 +8,20 @@ import android.os.Parcelable
 data class Song(
     var id: Int = -1,
     var imageResource: Int,
-    var mainText: String?,
-    var subText:String?,
+    var mainText: String = "",
+    var subText:String = "",
+    var dateCreate: Int = 0,
+    var duration: Int = 0,
     var uri: Uri? = null,
     var art: Bitmap? = null
     ) : Parcelable {
-
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readInt(),
-        parcel.readString(),
-        parcel.readString(),
+        parcel.readString().toString(),
+        parcel.readString().toString(),
+        parcel.readInt(),
+        parcel.readInt(),
         parcel.readParcelable(Uri::class.java.classLoader),
         parcel.readParcelable(Bitmap::class.java.classLoader)
     ) {
@@ -29,6 +32,8 @@ data class Song(
         parcel.writeInt(imageResource)
         parcel.writeString(mainText)
         parcel.writeString(subText)
+        parcel.writeInt(dateCreate)
+        parcel.writeInt(duration)
         parcel.writeParcelable(uri, flags)
         parcel.writeParcelable(art, flags)
     }

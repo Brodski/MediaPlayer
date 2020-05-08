@@ -40,15 +40,6 @@ class PreferenceFragment : PreferenceFragmentCompat() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    //    override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-//        // Inflate the layout for this fragment
-////        return inflater.inflate(R.xml.preferences, container, false)
-//
-//        var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
-//        var settingsIcon: MenuItem =  nav.menu.findItem(R.id.nav_search)
-//        settingsIcon.isChecked = true
-//    }
-
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) : PreferenceFragment {

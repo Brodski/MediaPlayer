@@ -3,14 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <PreferenceCategory
-        app:title="Learning Preferences">
+        app:title="Preferences">
 
-    <Preference
-        android:key="preference_key"
-        android:title="preference_title"
-        android:summary="preference_summary"
-        android:icon="@drawable/ic_date"
-    />
     <CheckBoxPreference
         android:key="checkbox"
         android:title="Title_checkbox_preference"
@@ -30,6 +24,14 @@
     <ListPreference
         app:key="list_example"
         app:title="title_preference"
+        app:useSimpleSummaryProvider="true"
+        app:entries="@array/entries"
+        app:entryValues="@array/entry_values"
+        app:dialogTitle="dialog_title_preference"/>
+
+    <ListPreference
+        app:key="sort_audio_pref"
+        app:title="Sort Audio By"
         app:useSimpleSummaryProvider="true"
         app:entries="@array/entries"
         app:entryValues="@array/entry_values"

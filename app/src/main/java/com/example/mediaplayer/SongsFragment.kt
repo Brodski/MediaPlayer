@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-//import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,6 +43,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     private var listener: SongsFragListener? = null
     interface SongsFragListener {
         fun onSongSelect(index: Int, text: String)
+        fun onOptionsSort(sortBy: Int)
     }
     companion object {
         const val TAG = "SongsFragment"
@@ -110,10 +110,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         Log.e(TAG, "Clicked Button A")
 
         if ( fragmentManager != null) {
-            Log.e(TAG, "Found fragment: " + fragmentManager!!.backStackEntryCount.toString())
-            for (entry in 0 until fragmentManager!!.backStackEntryCount) {
-                Log.e(TAG, "Found fragment: " + fragmentManager!!.getBackStackEntryAt(entry).id)
-                Log.e(TAG, "Found fragment: " + fragmentManager!!.getBackStackEntryAt(entry).name)
+            Log.e(TAG, "Found fragment: " + requireFragmentManager().backStackEntryCount.toString())
+            for (entry in 0 until requireFragmentManager().backStackEntryCount) {
+                Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).id)
+                Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).name)
             }
         }
     }
@@ -219,20 +219,24 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
             R.id.sortAlphAscId -> {
                 item.isChecked = true
                 Log.e(TAG, "sortAlphAscId")
+                listener?.onOptionsSort(R.string.sort_alpha_asc)
                 return false
             }
             R.id.sortAlphDescId -> {
                 item.isChecked = true
                 Log.e(TAG, "sortAlphDescId")
+                listener?.onOptionsSort(R.string.sort_alpha_des)
                 return false}
             R.id.sortDateRecentId -> {
                 item.isChecked = true
                 Log.e(TAG, "sortDateRecentId")
+                listener?.onOptionsSort(R.string.sort_created_recently)
                 return false
             }
             R.id.sortDateOldId -> {
                 item.isChecked = true
                 Log.e(TAG, "sortDateOldId")
+                listener?.onOptionsSort(R.string.sort_created_oldest)
                 return false
             }
             else -> super.onOptionsItemSelected(item)
@@ -240,6 +244,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         return true
         //return super.onOptionsItemSelected(item)
     }
+
 
     //    override fun onSaveInstanceState(outState: Bundle) {
 //        super.onSaveInstanceState(outState)

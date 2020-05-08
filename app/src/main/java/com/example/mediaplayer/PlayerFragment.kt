@@ -12,13 +12,14 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.Button
 import android.widget.TextView
+//import androidx.fragment.app.FragmentManager
 //import android.widget.Toolbar
 import androidx.appcompat.widget.Toolbar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
@@ -184,7 +185,10 @@ class PlayerFragment : Fragment() {
         //val wtf2 = mService.exoPlayer
         mService.exoPlayer?.seekTo(index,0)
         mService.exoPlayer?.playWhenReady = true
+    }
 
+    fun sortItemsBy(sortBy: Int) {
+        mService.buildMedia(sortBy)
     }
 
     fun talkService2() {
@@ -203,7 +207,7 @@ class PlayerFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         //return super.onCreateOptionsMenu(menu)
         Log.e(TAG, "+++ onCreateOptionsMenu +++")
-        val frags = fragmentManager!!.fragments
+        val frags = requireFragmentManager().fragments
         frags?.forEach {
             Log.e(TAG, "onCreateOptionsMenu: ${it.tag}")
             Log.e(TAG, "onCreateOptionsMenu: ${it.toString()}")

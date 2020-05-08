@@ -63,6 +63,12 @@ class MainActivity : AppCompatActivity(), IMainActivity, PlayerFragment.PlayerFr
         Log.e(TAG, "onSongSelect: recived $text")
         playerFragment.playAtIndex(index, text)
     }
+
+    override fun onOptionsSort(sortBy: Int) {
+        Log.e(TAG, "onOptionsSort: got something $sortBy")
+        playerFragment.sortItemsBy(sortBy)
+    }
+
     override fun onPlayerSent(num: Int) {
         Log.e(tag, "HEY!!! I'm in main")
         Log.e(tag, "HEY!!! I'm in main")

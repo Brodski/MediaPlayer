@@ -7,7 +7,12 @@
     <string name="pref_frag_tag">preferenceTag</string>
     <string name="song_bundle">song_bundle</string>
     <string name="song_position">song_position</string>
-    <string name="play_this_position">R.string.play_this_position</string>
+    <string name="play_this_position">play_this_position</string>
+
+    <string name="sort_alpha_asc">sort_alpha_asc</string>
+    <string name="sort_alpha_des">sort_alpha_des</string>
+    <string name="sort_created_recently">sort_created_recently</string>
+    <string name="sort_created_oldest">sort_created_oldest</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="entries">

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceActivity
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
@@ -16,11 +17,15 @@ import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.ListPreference
+import androidx.preference.PreferenceGroupAdapter
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil
 import javax.security.auth.login.LoginException
+import kotlin.reflect.typeOf
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -43,7 +48,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     private var listener: SongsFragListener? = null
     interface SongsFragListener {
         fun onSongSelect(index: Int, text: String)
-        fun onOptionsSort(sortBy: Int)
+        fun onOptionsSort()
     }
     companion object {
         const val TAG = "SongsFragment"
@@ -64,11 +69,16 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         mService = AudioPlayerService()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        //preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        Log.e(TAG,"onCreateView Items")
+        Log.e(TAG,"onCreateView SongsFragment")
         var view: View = inflater.inflate(R.layout.fragment_items, container, false)
-        //bottomNav = activity?.findViewById(R.id.bottom_navigationId)
+
         var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
         var songsIcon: MenuItem =  nav.menu.findItem(R.id.nav_favorites)
         songsIcon.isChecked = true
@@ -85,6 +95,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
         //private val songListFull: ArrayList<Song> = ArrayList(songList)
         songList = mService.querySongs(requireActivity())
+//        songList = mService.songList
         songListFull = songList?.map{ it.copy() }
 
         adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
@@ -129,10 +140,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
         Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
         Log.e(TAG, "onItemClick text/uri: $text")
-        var playerFragment = fragmentManager?.findFragmentByTag(getString(R.string.player_frag_tag))
-        if (playerFragment == null) {
-            playerFragment = PlayerFragment.newInstance("pp1", "pp2")
-        }
 
         songListFull?.forEachIndexed { idx, element ->
             if (element.uri.toString() == text) {
@@ -143,7 +150,8 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 return@forEachIndexed
             }
         }
-        //listener?.onSongSelect(position, text)
+        listener?.onSongSelect(position, text)
+        UIUtil.hideKeyboard(requireActivity())
 
 //        val intent = Intent("custom-event-name")
 //        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
@@ -162,14 +170,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     //    bottomNav?.selectedItemId = R.id.nav_home //Go to media player
 
-        if (songList != null) {
-            Log.e(TAG, songList!![position].mainText.toString())
-            Log.e(TAG, songList!![position].subText.toString())
-            Log.e(TAG, songList!![position].uri.toString())
-        }
-
-        Toast.makeText(activity, "CLICKED! $position", Toast.LENGTH_SHORT).show()
-        UIUtil.hideKeyboard(requireActivity())
     }
 
     override fun onAttach(context: Context) {
@@ -184,20 +184,12 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        //return super.onCreateOptionsMenu(menu)
-        Log.e(TAG, "+++ onCreateOptionsMenu +++")
-//        val frags = fragmentManager!!.fragments
-//        frags?.forEach {
-//            Log.e(TAG, "onCreateOptionsMenu: ${it.tag}")
-//            Log.e(TAG, "onCreateOptionsMenu: ${it.toString()}")
-//        }
-
+        Log.e(TAG, "onCreateOptionsMenu: SongFragment")
         inflater.inflate(R.menu.menu_songs, menu)
+
         val searchItem = menu.findItem(R.id.search_bar_songs)
         val searchView = searchItem.actionView as SearchView
-
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
-
         searchView.setOnQueryTextListener( object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -208,35 +200,79 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 return false
             }
         })
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val sortBy = sharedpreferences.getString(resources.getString(R.string.sort_keys),"")
 
+        //TODO - the below is just stupid.
+        if ( sortBy == getString(R.string.sort_artist_asc) ){
+            menu.findItem(R.id.sortArtistAscId).isChecked = true
+        }
+        else if ( sortBy == getString(R.string.sort_artist_desc) ){
+            menu.findItem(R.id.sortArtistDescId).isChecked = true
+        }
+        else if ( sortBy == getString(R.string.sort_title_asc) ){
+            menu.findItem(R.id.sortTitleAscId).isChecked = true
+        }
+        else if ( sortBy == getString(R.string.sort_title_desc) ){
+            menu.findItem(R.id.sortTitleDescId).isChecked = true
+        }
+        else if ( sortBy == getString(R.string.sort_recent_most) ){
+            menu.findItem(R.id.sortDateRecentId).isChecked = true
+        }
+        else {
+            menu.findItem(R.id.sortDateOldestId).isChecked = true
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    fun handleSortClick(sortBy: String){
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val editor = sharedpreferences.edit()
+        Log.e(TAG, "handleSortClick: sortby $sortBy")
+        editor.putString(resources.getString(R.string.sort_keys), sortBy)
+        editor.commit()
+        listener?.onOptionsSort()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.e(TAG, "clicked id: ${item.itemId}")
-        Log.e(TAG, "clicke title: ${item.title}")
+        Log.e(TAG, "onOptionsItemSelected clicked id: ${item.itemId}")
+        Log.e(TAG, "onOptionsItemSelected clicked title: ${item.title}")
+
         when (item.itemId){
-            R.id.sortAlphAscId -> {
+            R.id.sortArtistAscId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortAlphAscId")
-                listener?.onOptionsSort(R.string.sort_alpha_asc)
+                Log.e(TAG, "sortArtistAscId")
+                handleSortClick(resources.getString(R.string.sort_artist_asc))
                 return false
             }
-            R.id.sortAlphDescId -> {
+            R.id.sortArtistDescId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortAlphDescId")
-                listener?.onOptionsSort(R.string.sort_alpha_des)
-                return false}
+                Log.e(TAG, "sortArtistDescId")
+                handleSortClick(resources.getString(R.string.sort_artist_desc))
+                return false
+            }
+            R.id.sortTitleAscId -> {
+                item.isChecked = true
+                Log.e(TAG, "sortTitleAscId")
+                handleSortClick(resources.getString(R.string.sort_title_asc))
+                return false
+            }
+            R.id.sortTitleDescId -> {
+                item.isChecked = true
+                Log.e(TAG, "sortTitleDescId")
+                handleSortClick(resources.getString(R.string.sort_title_desc))
+                return false
+            }
             R.id.sortDateRecentId -> {
                 item.isChecked = true
                 Log.e(TAG, "sortDateRecentId")
-                listener?.onOptionsSort(R.string.sort_created_recently)
+                handleSortClick(resources.getString(R.string.sort_recent_most))
                 return false
             }
-            R.id.sortDateOldId -> {
+            R.id.sortDateOldestId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortDateOldId")
-                listener?.onOptionsSort(R.string.sort_created_oldest)
+                Log.e(TAG, "sortDateOldestId")
+                handleSortClick(resources.getString(R.string.sort_recent_least))
                 return false
             }
             else -> super.onOptionsItemSelected(item)

@@ -18,24 +18,34 @@
         app:showAsAction="never"
     >
         <menu>
-            <group android:checkableBehavior="single" >
-            <item
-                android:id="@+id/sortAlphAscId"
-                android:title="Ascending"
+            <group android:checkableBehavior="single"
+                android:id="@+id/sortGroup"
+                >
+                <item
+                    android:id="@+id/sortArtistAscId"
+                    android:title="Artist Ascending"
 
-            />
-            <item
-                android:id="@+id/sortAlphDescId"
-                android:title="Descending"
-            />
-
-            <item
-                android:id="@+id/sortDateRecentId"
-                android:title="Most Recent"
                 />
-            <item
-                android:id="@+id/sortDateOldId"
-                android:title="Least Recent"
+                <item
+                    android:id="@+id/sortArtistDescId"
+                    android:title="Artist Descending"
+                />
+                <item
+                    android:id="@+id/sortTitleAscId"
+                    android:title="Title Ascending"
+                />
+                <item
+                    android:id="@+id/sortTitleDescId"
+                    android:title="Title Descending"
+                />
+
+                <item
+                    android:id="@+id/sortDateRecentId"
+                    android:title="Most Recent"
+                    />
+                <item
+                    android:id="@+id/sortDateOldestId"
+                    android:title="Least Recent"
                 />
             </group>
         </menu>

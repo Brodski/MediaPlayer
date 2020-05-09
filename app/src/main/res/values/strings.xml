@@ -9,12 +9,42 @@
     <string name="song_position">song_position</string>
     <string name="play_this_position">play_this_position</string>
 
-    <string name="sort_alpha_asc">sort_alpha_asc</string>
-    <string name="sort_alpha_des">sort_alpha_des</string>
-    <string name="sort_created_recently">sort_created_recently</string>
-    <string name="sort_created_oldest">sort_created_oldest</string>
+<!--    <string name="sort_alpha_asc">sort_alpha_asc</string>-->
+<!--    <string name="sort_alpha_des">sort_alpha_des</string>-->
+<!--    <string name="sort_created_recently">sort_created_recently</string>-->
+<!--    <string name="sort_created_oldest">sort_created_oldest</string>-->
+
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="sort_artist_asc">sort_artist_asc</string>
+    <string name="sort_artist_desc">sort_artist_desc</string>
+    <string name="sort_title_asc">sort_title_asc</string>
+    <string name="sort_title_desc">sort_title_desc</string>
+    <string name="sort_recent_most">sort_recent_most</string>
+    <string name="sort_recent_least">sort_recent_least</string>
+
+
+
+    <string name="sort_keys">sort_keys_array</string>
+    <string-array name="sort_keys_array">
+        <item>Artist Ascending</item>
+        <item>Artist Descending</item>
+        <item>Title Ascending</item>
+        <item>Title Descending</item>
+        <item>Most Recent</item>
+        <item>Least Recent</item>
+    </string-array>
+
+    <string-array name="sort_values">
+        <item>@string/sort_artist_asc</item>
+        <item>@string/sort_artist_desc</item>
+        <item>@string/sort_title_asc</item>
+        <item>@string/sort_title_desc</item>
+        <item>@string/sort_recent_most</item>
+        <item>@string/sort_recent_least</item>
+    </string-array>
+
     <string-array name="entries">
         <item>First Value</item>
         <item>Second Value</item>

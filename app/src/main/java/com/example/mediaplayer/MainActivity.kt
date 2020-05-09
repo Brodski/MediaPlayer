@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.ListPreference
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
-
+    private var mBound = false
     private  var someInt: Int = 0
 
 //    private lateinit var mService: AudioPlayerService
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
-
+            mBound = true
 
             Log.e(TAG, "``````onServiceConnected: setting``````")
             Log.e(TAG, "``````onServiceConnected: setting``````")
@@ -86,6 +87,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e(TAG, "Disconnected Service :o")
+            mService = null
+            mBound = false
         }
     }
 
@@ -112,20 +115,15 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         mService?.exoPlayer?.playWhenReady = true
     }
 
-    override fun onOptionsSort(sortBy: Int) {
-        Log.e(TAG, "onOptionsSort: sortBy $sortBy")
+    override fun onOptionsSort() {
+        Log.e(TAG, "onOptionsSort: sortBy ")
         if (mService == null) {
             Log.e(TAG, "onOptionsSort: mService is null as shit")
             Log.e(TAG, "onOptionsSort: mService is null as shit")
             Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
+        } else{
+            mService?.build2()
         }
-//        playerFragment.sortItemsBy(sortBy)
-        mService?.buildMedia(sortBy)
     }
 
     override fun getPlayer(): SimpleExoPlayer? {
@@ -152,8 +150,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     private fun releasePlayer2() {
         Log.e(TAG, "releasePlayer2: Releasing some shit")
         if (mService != null) {
-            var intent: Intent = Intent(this, AudioPlayerService::class.java)
+//            var intent: Intent = Intent(this, AudioPlayerService::class.java)
             this.unbindService(connection)
+            mBound = false
         }
     }
 
@@ -162,7 +161,12 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.e(TAG,"CREATED MainActivity")
-
+        if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
+            restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
+            Log.e(TAG, ">>>>>>>>>>>>>>>>>>> onCreate bundle Frag $restoredFragment <<<<<<<<<<<<<<<<<")
+        } else {
+            Log.e(TAG, ">>>>>>>>>>>>>>>>>>>> onCreate no bundlde<<<<<<<<<<<<<<<<<}")
+        }
         initPlayer2()
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigationId)
@@ -191,15 +195,15 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onResume() {
         super.onResume()
         Log.e(TAG,"RESUME MainActivity")
-
         // onRestoreInstanceState() is called after onStart() & before onResume()
         // restoreFragment is assigned in onRestoreInstanceState()
-        if (restoredFragment != null) {
+
+        if (restoredFragment != null ) {
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
                 .commit()
-        } else {
+        } else if (supportFragmentManager.fragments.size == 0) {
             askPermissions()
         }
 
@@ -220,6 +224,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onStop() {
         super.onStop()
         Log.e(TAG,"STOP MainActivity")
+        releasePlayer2()
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
 //            Log.e(TAG,"STOP int int it")
         }
@@ -229,7 +234,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onDestroy() {
         super.onDestroy()
         Log.e(TAG,"DESTROY MainActivity")
-        releasePlayer2()
+//        releasePlayer2()
     }
 
     fun continueBuildApp() {
@@ -407,12 +412,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         Log.e(TAG,"onRestoreInstanceState")
 
 
-        if (savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
-            restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
-            Log.e(TAG, ">>>>>>>>>>>>>>>>>>> onCreate bundle Frag $restoredFragment <<<<<<<<<<<<<<<<<")
-        } else {
-            Log.e(TAG, ">>>>>>>>>>>>>>>>>>>> onCreate no bundlde<<<<<<<<<<<<<<<<<}")
-        }
 //        if (savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
 //            restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
 //            Log.e(TAG, ">>>>>>>>>>>>>>>>>>> onCreate bundle Frag $restoredFragment <<<<<<<<<<<<<<<<<")
@@ -425,7 +424,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = sharedpreferences.edit()
         editor.putString("dropdown", "1")
-        editor.putString("list_example", "")
+        editor.putString("list_example", "2")
+        editor.putString("sort_keys", "")
         editor.commit()
     }
 
@@ -435,9 +435,15 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         val z1 = sharedpreferences.getBoolean("checkbox", true)
         val z2 = sharedpreferences.getString("dropdown","")
         val z3 = sharedpreferences.getString("list_example","")
+        val sort_keys = sharedpreferences.getString(resources.getString(R.string.sort_keys),"")
         Log.e(TAG, "getSettings: $z1")
         Log.e(TAG, "getSettings: $z2")
         Log.e(TAG, "getSettings: $z3")
+        Log.e(TAG, "sort_keys: $sort_keys")
+
+
+
+
     }
 
     fun bottonRight(view: View) {

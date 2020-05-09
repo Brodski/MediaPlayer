@@ -30,11 +30,12 @@
         app:dialogTitle="dialog_title_preference"/>
 
     <ListPreference
-        app:key="sort_audio_pref"
+        app:key="sort_keys"
         app:title="Sort Audio By"
         app:useSimpleSummaryProvider="true"
-        app:entries="@array/entries"
-        app:entryValues="@array/entry_values"
-        app:dialogTitle="dialog_title_preference"/>
+        app:entries="@array/sort_keys_array"
+        app:entryValues="@array/sort_values"
+        app:dialogTitle="Sort Audio By"/>
+
     </PreferenceCategory>
 </PreferenceScreen>

@@ -149,9 +149,6 @@ class PlayerFragment : Fragment() {
         mService.exoPlayer?.playWhenReady = true
     }
 
-    fun sortItemsBy(sortBy: Int) {
-        mService.buildMedia(sortBy)
-    }
 
     fun talkService2() {
         Log.e(TAG, "were takling and i'm in player")

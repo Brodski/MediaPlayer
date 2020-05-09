@@ -33,8 +33,8 @@ class SongsAdaptor( private val songList: MutableList<Song>, private val onItemL
     override fun onBindViewHolder( holder: SongsViewHolder, position: Int ) {
 
         holder.imageView.setImageBitmap(songList[position].art)
-        holder.songMainText.text = songList[position].mainText
-        holder.songSubText.text = songList[position].subText
+        holder.songMainText.text = songList[position].title
+        holder.songSubText.text = songList[position].artist
         holder.uriText.text = songList[position].uri.toString()
         //if (position == 0) { holder.tv1.setBackgroundColor(Color.YELLOW) }
 
@@ -77,11 +77,11 @@ class SongsAdaptor( private val songList: MutableList<Song>, private val onItemL
                 val filterPattern = constraint.toString().toLowerCase().replace(Regex(pattern),"").trim()
 //                Log.e("BAM", "filterPattern: $filterPattern")
                 songListFull.forEach {
-//                    Log.e("BAM", it.subText!!.toLowerCase().replace(Regex(pattern),"").trim())
-                    if (it.mainText != null && it.mainText != "") {
-                        if (it.mainText!!.toLowerCase().replace(Regex(pattern),"") .trim().contains(filterPattern)) {
+//                    Log.e("BAM", it.artist!!.toLowerCase().replace(Regex(pattern),"").trim())
+                    if (it.title != null && it.title != "") {
+                        if (it.title!!.toLowerCase().replace(Regex(pattern),"") .trim().contains(filterPattern)) {
                             filteredList.add(it)
-                        } else if (it.subText!!.toLowerCase().replace(Regex(pattern),"") .trim().contains(filterPattern)) {
+                        } else if (it.artist!!.toLowerCase().replace(Regex(pattern),"") .trim().contains(filterPattern)) {
                             filteredList.add(it)
                         }
                     }

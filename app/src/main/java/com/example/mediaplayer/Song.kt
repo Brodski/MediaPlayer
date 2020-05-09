@@ -8,9 +8,9 @@ import android.os.Parcelable
 data class Song(
     var id: Int = -1,
     var imageResource: Int,
-    var mainText: String = "",
-    var subText:String = "",
-    var dateCreate: Int = 0,
+    var title: String = "",
+    var artist: String = "",
+    var dateCreated: Int = 0,
     var duration: Int = 0,
     var uri: Uri? = null,
     var art: Bitmap? = null
@@ -30,9 +30,9 @@ data class Song(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
         parcel.writeInt(imageResource)
-        parcel.writeString(mainText)
-        parcel.writeString(subText)
-        parcel.writeInt(dateCreate)
+        parcel.writeString(title)
+        parcel.writeString(artist)
+        parcel.writeInt(dateCreated)
         parcel.writeInt(duration)
         parcel.writeParcelable(uri, flags)
         parcel.writeParcelable(art, flags)

@@ -24,6 +24,7 @@ import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -108,17 +109,12 @@ class AudioPlayerService : Service() {
             PLAYBACK_NOTIFICATION_ID,
             object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun getCurrentContentTitle(player: Player): String {
-                    return songList?.get(player.currentWindowIndex)?.mainText.toString()
+                    return songList?.get(player.currentWindowIndex)?.title.toString()
                 }
 
                 @Nullable
                 override fun getCurrentContentText(player: Player): String? {
-//                    if (songList?.get(player.currentWindowIndex)?.subText == "<unknown>") {
-//                        return ""
-//                    } else {
-//                        return songList?.get(player.currentWindowIndex)?.subText
-//                    }
-                    return songList?.get(player.currentWindowIndex)?.subText
+                    return songList?.get(player.currentWindowIndex)?.artist
                 }
 
                 @Nullable
@@ -183,21 +179,17 @@ class AudioPlayerService : Service() {
     }
 
     //fun buildMedia(context: Context, sortBy: Int? = null): ConcatenatingMediaSource {
-    fun buildMedia(sortBy: Int? = null): ConcatenatingMediaSource {
+    fun buildMedia(sortBy: String? = null): ConcatenatingMediaSource {
 
-//        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( context, Util.getUserAgent(context, this.getString(R.string.app_name)) )
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( mContext, Util.getUserAgent(mContext, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
 
-//        songList = querySongs(context)
         songList = querySongs(mContext)
 
         sortBy?.let {
             songList = sortSongs(sortBy)
 //            songList?.forEach { android.util.Log.e(TAG, "buildMedia: $it") }
         }
-
-
 
         songList?.forEach { it ->
             var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
@@ -207,21 +199,33 @@ class AudioPlayerService : Service() {
         return concatenatingMediaSource
     }
 
-    fun sortSongs(sortBy: Int?): MutableList<Song>? {
-//        android.util.Log.e(TAG, "sortSongs: going in")
-//        android.util.Log.e(TAG, "$sortBy")
-//        android.util.Log.e(TAG, sortBy?.let { getString(it) })
-        return when (sortBy) {
-            R.string.sort_alpha_asc -> {
-                val x = songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
-                x?.forEach { android.util.Log.e(TAG, "sortSongs: ${it.subText} - ${it.mainText}") }
-                return x
-            }
-            R.string.sort_alpha_des -> songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
-            R.string.sort_created_recently -> songList?.sortedWith(comparator = SongArtistComparable()) as MutableList<Song>?
-            R.string.sort_created_oldest -> songList?.sortedWith(comparator = SongArtistComparable()) as MutableList<Song>?
-            else ->  songList?.sortedWith(comparator = SongArtistComparable()) as MutableList<Song>?
+    fun build2(){
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sortBy = sharedpreferences.getString(getString(R.string.sort_keys),"")
+        var concatenatingMediaSource = buildMedia(sortBy)
+
+        // Setup notification and media session.
+        exoPlayer!!.prepare(concatenatingMediaSource)
+        exoPlayer!!.seekTo(1, 0)
+        exoPlayer!!.playWhenReady = false
+    }
+
+    fun sortSongs(sortBy: String?): MutableList<Song>? {
+        Log.e(TAG, "sortSongs: going in")
+        Log.e(TAG, "sortby $sortBy")
+
+       val sortedList = when (sortBy) {
+            getString(R.string.sort_artist_asc) ->  (songList?.sortedWith(SongArtistComparable()))?.reversed()  as MutableList<Song>?
+            getString(R.string.sort_artist_desc) -> songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
+            getString(R.string.sort_title_asc) -> (songList?.sortedWith(SongTitleComparable()) )?.reversed() as MutableList<Song>?
+            getString(R.string.sort_title_desc) -> songList?.sortedWith(SongTitleComparable()) as MutableList<Song>?
+            getString(R.string.sort_recent_most) -> songList?.sortedWith(SongCreatedComparable() ) as MutableList<Song>?
+            getString(R.string.sort_recent_least) -> (songList?.sortedWith(SongCreatedComparable()) )?.reversed() as MutableList<Song>?
+            else ->  songList?.sortedWith(comparator = SongCreatedComparable() ) as MutableList<Song>?
         }
+        sortedList?.forEach { android.util.Log.e(TAG, "sortSongs: ${it.title} -- ${it.dateCreated} - ${it.artist}") }
+        return sortedList
+
     }
 
     fun querySongs(context: Context): MutableList<Song>? {
@@ -272,16 +276,16 @@ class AudioPlayerService : Service() {
                 val id = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
 //                var artist = cursor.getString(artistColumn)
-                val artist = if (cursor.getString(artistColumn) == "<unknown>"){
-                    ""
-                } else {
-                    cursor.getString(artistColumn)
-                }
                 val isAlarmC = cursor.getString(isAlarmC)
                 val isNotif = cursor.getString(isNotifC)
                 val isRing = cursor.getString(isRingC)
                 var dateAdded = cursor.getInt(dateAddedC)
                 var dur = cursor.getInt(durationC)
+                val artist = if (cursor.getString(artistColumn) == "<unknown>"){
+                    ""
+                } else {
+                    cursor.getString(artistColumn)
+                }
 
                 val audioUri: Uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
@@ -311,10 +315,10 @@ class AudioPlayerService : Service() {
                     Song(
                         id = id.toInt(),
                         uri = audioUri,
-                        mainText = title,
-                        subText = artist,
+                        title = title,
+                        artist = artist,
                         duration = dur,
-                        dateCreate = dateAdded,
+                        dateCreated = dateAdded,
                         imageResource = R.drawable.ic_rowing,
                         art = art
                     )
@@ -338,8 +342,8 @@ class AudioPlayerService : Service() {
         return MediaDescriptionCompat.Builder()
             .setMediaId(song?.id.toString())
             .setIconBitmap(song?.art)
-            .setTitle(song?.mainText)
-            .setDescription(song?.mainText)
+            .setTitle(song?.title)
+            .setDescription(song?.title)
             .setExtras(extras)
             .build()
     }
@@ -407,10 +411,10 @@ class AudioPlayerService : Service() {
             Song(
                 id = 123,
                 uri = audioUri,
-                mainText = "title",
-                subText = "artist",
+                title = "title",
+                artist = "artist",
                 duration = 10,
-                dateCreate = 100,
+                dateCreated = 100,
                 art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
                 imageResource = R.drawable.ic_rowing
             )
@@ -420,10 +424,10 @@ class AudioPlayerService : Service() {
                 Song(
                     id = 123,
                     uri = mp4VideoUri,
-                    mainText = "title vid",
-                    subText = "artist vid",
+                    title = "title vid",
+                    artist = "artist vid",
                     duration = 11,
-                    dateCreate = 101,
+                    dateCreated = 101,
                     art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
                     imageResource = R.drawable.ic_rowing
                 )

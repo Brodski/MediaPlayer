@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.lang.RuntimeException
+import kotlin.math.log
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -39,49 +40,55 @@ private const val ARG_PARAM2 = "param2"
  */
 class PlayerFragment : Fragment() {
 
-    private lateinit var playerControls: PlayerControlView
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
-    private lateinit var textView: TextView
     private lateinit var mService: AudioPlayerService
-    private var mBound: Boolean = false
     private var listener: PlayerFragListener? = null
-    private lateinit var correctMenu: Menu
+    private var listener2: PlayerFragListener? = null
 
     interface PlayerFragListener {
         fun onPlayerSent(num: Int)
+        fun getPlayer(): SimpleExoPlayer?
     }
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
-            mBound = true
-
             playerView?.player = mService.exoPlayer
             playerView?.showController()
-            //Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
         }
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.e(TAG, "Disconnected Service :o")
-            mBound = false
         }
     }
 
     override fun onStart() {
+        Log.e(TAG, "onStart: PlayerFragment")
         super.onStart()
-        initPlayer2()
-        Log.e(tag, "onstart Player frag")
-//        playerView?.player = (activity as MainActivity).getPlayer()
-//        playerView?.showController()
+        //initPlayer2()
+
+        setPlayer()
+        playerView?.showController()
     }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.e(TAG, "onAttach: PlayerFragment")
         // other class must implement this
+        Log.e(TAG, "onAttach: $context")
+        Log.e(TAG, "onAttach: $activity")
         listener = context as PlayerFragListener
+//        listener = activity as PlayerFragListener
+        Log.e(TAG, "onAttach: $listener")
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.e(TAG, "onResume: PlayerFragment")
+    }
+    
     override fun onDetach() {
         super.onDetach()
         listener = null
@@ -89,32 +96,15 @@ class PlayerFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        releasePlayer2()
+        Log.e(TAG, "onStop: stopping player")
+//        releasePlayer2()
     }
 
-    private fun releasePlayer2() {
-        Log.e(TAG, "Release called")
-//        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-        activity?.unbindService(connection)
-        mBound = false
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.e(TAG, "onDestroyView: destroying view Player")
     }
 
-    private fun initPlayer2() {
-        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
-        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-        //startService(intent)
-        activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(requireActivity(), intent)
-        //Util.startForegroundService(activity!!, intent)
-
-    }
-
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        Log.e(TAG, "onCreate: Created!!")
-//        setHasOptionsMenu(true)
-//    }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
@@ -127,18 +117,18 @@ class PlayerFragment : Fragment() {
         homeIcon.setChecked(true)
 
         playerView = v.findViewById(R.id.main_view2)
-        listener!!.onPlayerSent(420);
+//        playerView?.player = listener?.getPlayer()
+//        listener!!.onPlayerSent(420);
 
         val toolbar: Toolbar = v.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
         toolbar.title = "Cool Player"
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
-
 //        playerView?.showController()
-
+        
         var bundle: Bundle? = this!!.arguments
-        if (bundle!!.containsKey(getString(R.string.song_bundle))){
+        if (bundle!!.containsKey(getString(R.string.song_bundle))) {
             Log.e(TAG, "HAS SONG BUNDLE!!!")
             val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
             Log.e(TAG, s.toString())
@@ -147,34 +137,6 @@ class PlayerFragment : Fragment() {
         val btn: Button = v.findViewById(R.id.btnB) as Button
         btn.setOnClickListener { v -> talkService(v) }
         return v
-
-//        var v2: View = inflater.inflate(R.layout.controls_playback, container, false)
-//        var cnt = v2.findViewById(R.id.controllerId)
-
-    }
-
-    companion object {
-        const val TAG = "PlayerFragment"
-        @JvmStatic
-        fun newInstance(param1: String, param2: String): PlayerFragment {
-            val playerFragment = PlayerFragment()
-            val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
-            playerFragment.arguments = args
-            return playerFragment
-        }
-    }
-
-    fun configPlayer(mPlayer: SimpleExoPlayer?){
-        Log.e(tag,"configPlayer")
-
-        Log.e(tag, mPlayer.toString())
-        Log.e(tag, playerView?.player.toString())
-        Log.e(tag, mPlayer.toString())
-        Log.e(tag, mPlayer.toString())
-        playerView?.player = mPlayer
-        playerView?.showController()
     }
 
     fun playAtIndex(index: Int, uri: String) {
@@ -196,29 +158,30 @@ class PlayerFragment : Fragment() {
     }
 
     fun talkService(v: View) {
-        Log.e(TAG, "Clicked in Player Fragment")
-        (activity as MainActivity).talkToMain()
+        //Log.e(TAG, "Clicked in Player Fragment")
+        //(activity as MainActivity).talkToMain()
 //        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString())
 //        Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
 //        Log.e(TAG, mService.exoPlayer!!.toString())
-
+    }
+    
+    fun setPlayer(){
+        Log.e(TAG, "setPlayer: now setting")
+        val x = listener?.getPlayer()
+        if ( listener?.getPlayer() != null ){
+            playerView?.player = listener?.getPlayer()
+        }
+//        playerView?.player = x
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         //return super.onCreateOptionsMenu(menu)
-        Log.e(TAG, "+++ onCreateOptionsMenu +++")
         val frags = requireFragmentManager().fragments
-        frags?.forEach {
-            Log.e(TAG, "onCreateOptionsMenu: ${it.tag}")
-            Log.e(TAG, "onCreateOptionsMenu: ${it.toString()}")
-        }
-        //val menu: Menu =
+
         inflater.inflate(R.menu.menu_player, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
-
-
-
+    
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
             R.id.item1 -> {
@@ -241,6 +204,34 @@ class PlayerFragment : Fragment() {
         return false
         //return super.onOptionsItemSelected(item)
     }
+    companion object {
+        const val TAG = "PlayerFragment"
+        @JvmStatic
+        fun newInstance(param1: String, param2: String): PlayerFragment {
+            val playerFragment = PlayerFragment()
+            val args = Bundle()
+            args.putString(ARG_PARAM1, param1)
+            args.putString(ARG_PARAM2, param2)
+            playerFragment.arguments = args
+            return playerFragment
+        }
+    }
 
+
+    private fun releasePlayer2() {
+        Log.e(TAG, "Release called")
+//        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
+        activity?.unbindService(connection)
+    }
+
+    private fun initPlayer2() {
+        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
+        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
+        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
+        //startService(intent)
+        activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        Util.startForegroundService(requireActivity(), intent)
+        //Util.startForegroundService(activity!!, intent)
+    }
 
 }

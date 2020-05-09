@@ -59,8 +59,8 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //mService = binder.getService()
         super.onCreate(savedInstanceState)
+        //mService = binder.getService()
         mService = AudioPlayerService()
     }
 
@@ -244,14 +244,4 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         return true
         //return super.onOptionsItemSelected(item)
     }
-
-
-    //    override fun onSaveInstanceState(outState: Bundle) {
-//        super.onSaveInstanceState(outState)
-//
-//        Log.e(TAG, "SAVING")
-//        Log.e(TAG, "SAVING")
-//        Log.e(TAG, "SAVING")
-//        outState.putInt("counter", counter)
-//    }
 }

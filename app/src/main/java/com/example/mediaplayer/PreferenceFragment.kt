@@ -26,10 +26,6 @@ class PreferenceFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.preferences, rootKey)
     }
 
-    //    override fun onCreate(savedInstanceState: Bundle?){
-//        super.onCreate(savedInstanceState)
-//        addPreferencesFromResource(R.xml.preferences);
-//    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             // Inflate the layout for this fragment
 //        return inflater.inflate(R.xml.preferences, container, false)

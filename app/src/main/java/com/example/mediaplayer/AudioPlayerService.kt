@@ -37,6 +37,7 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.Util
+import kotlin.math.log
 
 // Building feature-rich media apps with ExoPlayer (Google I/O '18)
 // https://www.youtube.com/watch?v=svdq1BWl4r8
@@ -193,7 +194,7 @@ class AudioPlayerService : Service() {
 
         sortBy?.let {
             songList = sortSongs(sortBy)
-            songList?.forEach { android.util.Log.e(TAG, "buildMedia: $it") }
+//            songList?.forEach { android.util.Log.e(TAG, "buildMedia: $it") }
         }
 
 
@@ -207,8 +208,8 @@ class AudioPlayerService : Service() {
     }
 
     fun sortSongs(sortBy: Int?): MutableList<Song>? {
-        android.util.Log.e(TAG, "sortSongs: going in")
-        android.util.Log.e(TAG, "$sortBy")
+//        android.util.Log.e(TAG, "sortSongs: going in")
+//        android.util.Log.e(TAG, "$sortBy")
 //        android.util.Log.e(TAG, sortBy?.let { getString(it) })
         return when (sortBy) {
             R.string.sort_alpha_asc -> {
@@ -226,10 +227,10 @@ class AudioPlayerService : Service() {
     fun querySongs(context: Context): MutableList<Song>? {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED) {
             //    recycler_songs.adapter = SongsAdaptor(songList, this)
-            Log.e(TAG, "Permission already granted")
+//            Log.e(TAG, "Permission already granted")
             return actualQuerySongs(context)
         } else {
-            Log.e(TAG, "Read Permission not granted")
+//            Log.e(TAG, "Read Permission not granted")
             return null
         }
     }
@@ -297,15 +298,15 @@ class AudioPlayerService : Service() {
                 }
 
 
-                Log.e(TAG, "id $id")
-                Log.e(TAG, "audioUri $audioUri")
-                Log.e(TAG, "title $title")
-                Log.e(TAG, "artist $artist")
-//                Log.e(TAG, "is isAlarmC $isAlarmC")
-//                Log.e(TAG, "is isNotif $isNotif")
-//                Log.e(TAG, "is isRing $isRing")
-                Log.e(TAG, " dateAdded $dateAdded")
-                Log.e(TAG, " duration $dur")
+//                Log.e(TAG, "id $id")
+//                Log.e(TAG, "audioUri $audioUri")
+//                Log.e(TAG, "title $title")
+//                Log.e(TAG, "artist $artist")
+////                Log.e(TAG, "is isAlarmC $isAlarmC")
+////                Log.e(TAG, "is isNotif $isNotif")
+////                Log.e(TAG, "is isRing $isRing")
+//                Log.e(TAG, " dateAdded $dateAdded")
+//                Log.e(TAG, " duration $dur")
                 songList.add(
                     Song(
                         id = id.toInt(),
@@ -320,8 +321,8 @@ class AudioPlayerService : Service() {
                 )
             }
         }
-        Log.e(TAG, "SongList")
-        songList.forEach { Log.e(TAG, it.toString()) }
+//        Log.e(TAG, "SongList")
+//        songList.forEach { Log.e(TAG, it.toString()) }
         return songList
     }
 

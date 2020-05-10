@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     private var mBound = false
     private  var someInt: Int = 0
 
-//    private lateinit var mService: AudioPlayerService
     private var mService: AudioPlayerService? = null
 
     private var playWhenReady = true
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
        //     playerFragment.setPlayer()
             val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
             if (pFrag is PlayerFragment) {
-                Log.e(TAG, "onServiceConnected: PlayerFrag Currenlty")
+                Log.e(TAG, "onServiceConnected: PlayerFrag Currenlty showing $pFrag")
                 pFrag.setPlayer()
             } else {
                 Log.e(TAG, "onServiceConnected: some other fragmetn")
@@ -93,48 +92,44 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     override fun onSongSelect(index: Int, uri: String) {
+        Log.e(TAG, mService?.exoPlayer?.currentWindowIndex.toString())
         Log.e(TAG, "onSongSelect: recived uri $uri index: $index" )
 //        val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
 //        playerFragment.playAtIndex(index, text)
-
-        if (mService == null ) {
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-            Log.e(TAG, "onSongSelect: we aint find shit, mService is null")
-        }
-        Log.e(TAG, "here in player fragment, playing at index $index")
-        Log.e(TAG, "here in player fragment, playing at index $uri")
-        Log.e(TAG, mService?.exoPlayer?.currentWindowIndex.toString())
-        //val wtf = mService.exoPlayer.contentPosition
-        //val wtf2 = mService.exoPlayer
         mService?.exoPlayer?.seekTo(index,0)
         mService?.exoPlayer?.playWhenReady = true
     }
 
+    fun preserveCurrentSelection(view: View) {
+        val mAny = mService?.preserveCurrentSelection()
+        Log.e(TAG, "preserveCurrentSelection: ${mAny?.get(0)}")
+        Log.e(TAG, "preserveCurrentSelection: ${mAny?.get(1)}")
+        Log.e(TAG, "preserveCurrentSelection: ${mAny?.get(2)}")
+
+    }
+
+    fun getPlayWhenReady(): Boolean? {
+        return mService?.exoPlayer?.playWhenReady
+    }
+
+    fun getCurrentWindow(): Int? {
+        return mService?.exoPlayer?.currentWindowIndex
+    }
+
+    fun getCurrentSongTime(): Long? {
+        return mService?.exoPlayer?.currentPosition
+
+    }
     override fun onOptionsSort() {
-        Log.e(TAG, "onOptionsSort: sortBy ")
-        if (mService == null) {
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-            Log.e(TAG, "onOptionsSort: mService is null as shit")
-        } else{
-            mService?.build2()
-        }
+        mService?.build2()
     }
 
     override fun getPlayer(): SimpleExoPlayer? {
         return mService?.exoPlayer
     }
 
-    override fun onPlayerSent(num: Int) {
-        Log.e(tag, "$num")
-//        playerFragment.talkService2()
-        //mService.makeStuff(65)
-
+    override fun getPlaylist(): MutableList<Song>? {
+        return mService?.songList?.toMutableList()
     }
 
 
@@ -514,6 +509,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             player = null
         }
     }
+
+
 }
 
 

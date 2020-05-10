@@ -49,6 +49,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     interface SongsFragListener {
         fun onSongSelect(index: Int, text: String)
         fun onOptionsSort()
+        fun getPlaylist(): MutableList<Song>?
     }
     companion object {
         const val TAG = "SongsFragment"
@@ -92,16 +93,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
         recycler_songs = view.findViewById(R.id.recycler_songs)
 
-
-        //private val songListFull: ArrayList<Song> = ArrayList(songList)
-        songList = mService.querySongs(requireActivity())
-//        songList = mService.songList
-        songListFull = songList?.map{ it.copy() }
-
-        adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
-        recycler_songs.adapter = adaptor
-        recycler_songs.layoutManager = LinearLayoutManager(context)
-        recycler_songs.setHasFixedSize(true)
+        updateRecViewer()
 
 //        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
 //        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
@@ -114,6 +106,18 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         val btnB: Button = view.findViewById(R.id.btnB) as Button
         btnB.setOnClickListener { v -> doButtonB(v)  }
         return view
+    }
+
+    fun updateRecViewer() {
+//        songList = mService.querySongs(requireActivity())
+        songList = listener?.getPlaylist()
+        songListFull = songList?.map{ it.copy() }
+
+        adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
+        recycler_songs.adapter = adaptor
+        recycler_songs.layoutManager = LinearLayoutManager(context)
+        recycler_songs.setHasFixedSize(true)
+
     }
 
     // BUTTON a
@@ -152,23 +156,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         }
         listener?.onSongSelect(position, text)
         UIUtil.hideKeyboard(requireActivity())
-
-//        val intent = Intent("custom-event-name")
-//        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
-//        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
-
-//        var bundle  = Bundle()
-//        bundle.putString( "keyOther2", "message")
-//        bundle.putParcelable(getString(R.string.song_bundle), songList?.get(position))
-//        bundle.putInt(getString(R.string.song_position), position)
-//        playerFragment.arguments = bundle
-//        fragmentManager
-//            ?.beginTransaction()
-//            ?.replace(R.id.newmain_view, playerFragment)
-//            ?.addToBackStack("From song")
-//            ?.commit()
-
-    //    bottomNav?.selectedItemId = R.id.nav_home //Go to media player
 
     }
 
@@ -232,6 +219,9 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         editor.putString(resources.getString(R.string.sort_keys), sortBy)
         editor.commit()
         listener?.onOptionsSort()
+
+        updateRecViewer()
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -241,37 +231,31 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         when (item.itemId){
             R.id.sortArtistAscId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortArtistAscId")
                 handleSortClick(resources.getString(R.string.sort_artist_asc))
                 return false
             }
             R.id.sortArtistDescId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortArtistDescId")
                 handleSortClick(resources.getString(R.string.sort_artist_desc))
                 return false
             }
             R.id.sortTitleAscId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortTitleAscId")
                 handleSortClick(resources.getString(R.string.sort_title_asc))
                 return false
             }
             R.id.sortTitleDescId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortTitleDescId")
                 handleSortClick(resources.getString(R.string.sort_title_desc))
                 return false
             }
             R.id.sortDateRecentId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortDateRecentId")
                 handleSortClick(resources.getString(R.string.sort_recent_most))
                 return false
             }
             R.id.sortDateOldestId -> {
                 item.isChecked = true
-                Log.e(TAG, "sortDateOldestId")
                 handleSortClick(resources.getString(R.string.sort_recent_least))
                 return false
             }
@@ -281,3 +265,22 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         //return super.onOptionsItemSelected(item)
     }
 }
+
+
+
+//        val intent = Intent("custom-event-name")
+//        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
+//        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
+
+//        var bundle  = Bundle()
+//        bundle.putString( "keyOther2", "message")
+//        bundle.putParcelable(getString(R.string.song_bundle), songList?.get(position))
+//        bundle.putInt(getString(R.string.song_position), position)
+//        playerFragment.arguments = bundle
+//        fragmentManager
+//            ?.beginTransaction()
+//            ?.replace(R.id.newmain_view, playerFragment)
+//            ?.addToBackStack("From song")
+//            ?.commit()
+
+//    bottomNav?.selectedItemId = R.id.nav_home //Go to media player

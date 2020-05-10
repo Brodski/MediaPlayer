@@ -89,14 +89,12 @@ class AudioPlayerService : Service() {
 
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
-//        var concatenatingMediaSource = buildMedia(context)
         var concatenatingMediaSource = buildMedia()
-
-//        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(context) }
-        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(mContext) }
+//        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(mContext) }
 
         // Setup notification and media session.
         exoPlayer!!.prepare(concatenatingMediaSource)
+        preserveCurrentSelection()
         exoPlayer!!.seekTo(1, 0)
         exoPlayer!!.playWhenReady = false
 
@@ -162,7 +160,6 @@ class AudioPlayerService : Service() {
         playerNotificationManager!!.setPlayer(exoPlayer)
 
         // The below syncs the foreground player with the player
-//        mediaSession = MediaSessionCompat(context, MEDIA_SESSION_TAG)
         mediaSession = MediaSessionCompat(mContext, MEDIA_SESSION_TAG)
         mediaSession!!.isActive = true
 
@@ -178,7 +175,29 @@ class AudioPlayerService : Service() {
         mediaSessionConnector!!.setPlayer(exoPlayer)
     }
 
-    //fun buildMedia(context: Context, sortBy: Int? = null): ConcatenatingMediaSource {
+
+    fun preserveCurrentSelection(): MutableList<Any> {
+
+        var playWhenReady = exoPlayer!!.playWhenReady
+        var  playBackPosition = exoPlayer!!.currentPosition
+        var currentWindow = exoPlayer!!.currentWindowIndex
+        android.util.Log.e(TAG, "preserveCurrentSelection: playWhenReady $playWhenReady")
+        android.util.Log.e(TAG, "preserveCurrentSelection: playBackPosition $playBackPosition")
+        android.util.Log.e(TAG, "preserveCurrentSelection: currentWindow $currentWindow")
+        val koolObject = object {
+            val playWhenReady = playWhenReady
+            val playBackPosition = playBackPosition
+            val curentWindow = currentWindow
+        }
+        val mList = mutableListOf<Any>()
+        mList.add(playWhenReady)
+        mList.add(playBackPosition)
+        mList.add(currentWindow)
+
+        return mList
+    }
+
+
     fun buildMedia(sortBy: String? = null): ConcatenatingMediaSource {
 
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( mContext, Util.getUserAgent(mContext, this.getString(R.string.app_name)) )
@@ -195,7 +214,6 @@ class AudioPlayerService : Service() {
             var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
             concatenatingMediaSource.addMediaSource(media)
         }
-
         return concatenatingMediaSource
     }
 
@@ -205,6 +223,7 @@ class AudioPlayerService : Service() {
         var concatenatingMediaSource = buildMedia(sortBy)
 
         // Setup notification and media session.
+        preserveCurrentSelection()
         exoPlayer!!.prepare(concatenatingMediaSource)
         exoPlayer!!.seekTo(1, 0)
         exoPlayer!!.playWhenReady = false
@@ -286,7 +305,6 @@ class AudioPlayerService : Service() {
                 } else {
                     cursor.getString(artistColumn)
                 }
-
                 val audioUri: Uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
 
                 val mmr = MediaMetadataRetriever()
@@ -300,8 +318,6 @@ class AudioPlayerService : Service() {
                     //BitmapFactory.decodeResource(resources, R.drawable.music_note_icon)
                     getBitmapFromVectorDrawable(context, R.drawable.ic_music_note)
                 }
-
-
 //                Log.e(TAG, "id $id")
 //                Log.e(TAG, "audioUri $audioUri")
 //                Log.e(TAG, "title $title")
@@ -324,9 +340,12 @@ class AudioPlayerService : Service() {
                     )
                 )
             }
+            //https://stackoverflow.com/questions/12931876/uncaught-exception-thrown-by-finalizer-when-opening-mapactivity
+            query.close()
         }
 //        Log.e(TAG, "SongList")
 //        songList.forEach { Log.e(TAG, it.toString()) }
+
         return songList
     }
 

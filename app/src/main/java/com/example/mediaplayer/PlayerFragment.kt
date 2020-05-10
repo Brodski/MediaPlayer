@@ -47,7 +47,6 @@ class PlayerFragment : Fragment() {
     private var listener2: PlayerFragListener? = null
 
     interface PlayerFragListener {
-        fun onPlayerSent(num: Int)
         fun getPlayer(): SimpleExoPlayer?
     }
 
@@ -118,7 +117,6 @@ class PlayerFragment : Fragment() {
 
         playerView = v.findViewById(R.id.main_view2)
 //        playerView?.player = listener?.getPlayer()
-//        listener!!.onPlayerSent(420);
 
         val toolbar: Toolbar = v.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
@@ -161,7 +159,7 @@ class PlayerFragment : Fragment() {
 //        Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
 //        Log.e(TAG, mService.exoPlayer!!.toString())
     }
-    
+
     fun setPlayer(){
         Log.e(TAG, "setPlayer: now setting")
         val x = listener?.getPlayer()

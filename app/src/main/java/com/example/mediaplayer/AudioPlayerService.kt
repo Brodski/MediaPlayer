@@ -80,7 +80,6 @@ class AudioPlayerService : Service() {
         const val TAG = "AudioPlayerService"
     }
 
-
     override fun onCreate() {
         super.onCreate()
        // val context: Context = this
@@ -89,13 +88,12 @@ class AudioPlayerService : Service() {
 
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
-        var concatenatingMediaSource = buildMedia()
+        buildMedia()
 //        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(mContext) }
 
         // Setup notification and media session.
-        exoPlayer!!.prepare(concatenatingMediaSource)
-        preserveCurrentSelection()
-        exoPlayer!!.seekTo(1, 0)
+//        exoPlayer!!.prepare(concatenatingMediaSource)
+//        exoPlayer!!.seekTo(0, 0)
         exoPlayer!!.playWhenReady = false
 
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
@@ -159,7 +157,7 @@ class AudioPlayerService : Service() {
         )
         playerNotificationManager!!.setPlayer(exoPlayer)
 
-        // The below syncs the foreground player with the player
+        // The below syncs the foreground player with t he player
         mediaSession = MediaSessionCompat(mContext, MEDIA_SESSION_TAG)
         mediaSession!!.isActive = true
 
@@ -176,57 +174,97 @@ class AudioPlayerService : Service() {
     }
 
 
-    fun preserveCurrentSelection(): MutableList<Any> {
-
-        var playWhenReady = exoPlayer!!.playWhenReady
-        var  playBackPosition = exoPlayer!!.currentPosition
-        var currentWindow = exoPlayer!!.currentWindowIndex
-        android.util.Log.e(TAG, "preserveCurrentSelection: playWhenReady $playWhenReady")
-        android.util.Log.e(TAG, "preserveCurrentSelection: playBackPosition $playBackPosition")
-        android.util.Log.e(TAG, "preserveCurrentSelection: currentWindow $currentWindow")
-        val koolObject = object {
-            val playWhenReady = playWhenReady
-            val playBackPosition = playBackPosition
-            val curentWindow = currentWindow
-        }
-        val mList = mutableListOf<Any>()
-        mList.add(playWhenReady)
-        mList.add(playBackPosition)
-        mList.add(currentWindow)
-
-        return mList
-    }
-
-
-    fun buildMedia(sortBy: String? = null): ConcatenatingMediaSource {
-
+    fun buildMedia() {
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( mContext, Util.getUserAgent(mContext, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sortBy = sharedpreferences.getString(resources.getString(R.string.sort_keys), resources.getString(R.string.sort_recent_most))
 
-        songList = querySongs(mContext)
-
-        sortBy?.let {
-            songList = sortSongs(sortBy)
-//            songList?.forEach { android.util.Log.e(TAG, "buildMedia: $it") }
+        //Sync playing item with updated list
+        var prevPlayingIndex = exoPlayer?.currentWindowIndex ?: 0
+        var playTime = exoPlayer?.currentPosition ?: 0
+        var isPlaying = exoPlayer?.playWhenReady ?: false
+        var prevSong: String = ""
+        var prevUri: Uri? = null
+        Log.e(TAG, "build2: ------------------ 1  ----------------------")
+        Log.e(TAG, "buildMedia: ${exoPlayer?.currentWindowIndex}")
+        Log.e(TAG, "buildMedia: playTime ${playTime}")
+        Log.e(TAG, "buildMedia: isPlaying ${isPlaying}")
+        if (exoPlayer != null && !songList.isNullOrEmpty() ) {
+            prevUri = songList!![prevPlayingIndex].uri
+            prevSong = songList!![prevPlayingIndex].title
         }
 
+        songList = querySongs(mContext)
+        sortBy?.let {songList = sortSongs(sortBy) }
         songList?.forEach { it ->
             var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
             concatenatingMediaSource.addMediaSource(media)
         }
-        return concatenatingMediaSource
+
+        exoPlayer?.prepare(concatenatingMediaSource)
+        var updatedIndex = 0
+        prevUri?.let { updatedIndex = updateCurrentIndex(prevUri)}
+
+        exoPlayer?.seekTo(updatedIndex, playTime)
+        exoPlayer?.playWhenReady = isPlaying
+        return
+    }
+
+    fun updateCurrentIndex(prevUri: Uri): Int {
+        var updatedIndex = 0
+        run loop@ {
+            songList?.forEachIndexed { index, song ->
+                Log.e(TAG, "build2: song.uri ${song.uri}")
+                if (song.uri == prevUri) {
+                    updatedIndex = index
+                    Log.e(TAG, "build2: FOUND!")
+                    Log.e(TAG, "build2: updatedIndex $updatedIndex")
+                    return@loop
+                }
+            }
+        }
+        return updatedIndex
+
     }
 
     fun build2(){
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
         val sortBy = sharedpreferences.getString(getString(R.string.sort_keys),"")
-        var concatenatingMediaSource = buildMedia(sortBy)
 
+        var prevWindowIndex = exoPlayer?.currentWindowIndex ?: 0
+        var prevSong: String = ""
+        var prevUri: Uri? = null
+
+        Log.e(TAG, "build2: ------------------ 1  ----------------------")
+        if (exoPlayer != null && !songList.isNullOrEmpty() ) {
+            prevUri = songList!![prevWindowIndex].uri
+            prevSong = songList!![prevWindowIndex].title
+        }
         // Setup notification and media session.
-        preserveCurrentSelection()
-        exoPlayer!!.prepare(concatenatingMediaSource)
-        exoPlayer!!.seekTo(1, 0)
-        exoPlayer!!.playWhenReady = false
+        Log.e(TAG, "build2: prev Idx $prevWindowIndex")
+        Log.e(TAG, "build2: prevSong $prevSong")
+        Log.e(TAG, "build2: prevUri $prevUri")
+
+//        var concatenatingMediaSource = buildMedia()
+//        exoPlayer!!.prepare(concatenatingMediaSource)
+        Log.e(TAG, "build2: ------------------ 2 ----------------------")
+        var updatedIndex = 0
+        run loop@ {
+            songList?.forEachIndexed { index, song ->
+                Log.e(TAG, "build2: song.uri ${song.uri}")
+                if (song.uri == prevUri) {
+                    updatedIndex = index
+                    Log.e(TAG, "build2: FOUND!")
+                    Log.e(TAG, "build2: updatedIndex $updatedIndex")
+                    return@loop
+                }
+            }
+        }
+
+        Log.e(TAG, "build2: updatedIndex $updatedIndex")
+        exoPlayer!!.seekTo(updatedIndex, 0)
+        exoPlayer!!.playWhenReady = true
     }
 
     fun sortSongs(sortBy: String?): MutableList<Song>? {
@@ -249,7 +287,6 @@ class AudioPlayerService : Service() {
 
     fun querySongs(context: Context): MutableList<Song>? {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED) {
-            //    recycler_songs.adapter = SongsAdaptor(songList, this)
 //            Log.e(TAG, "Permission already granted")
             return actualQuerySongs(context)
         } else {

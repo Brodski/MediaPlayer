@@ -92,36 +92,20 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     override fun onSongSelect(index: Int, uri: String) {
-        Log.e(TAG, mService?.exoPlayer?.currentWindowIndex.toString())
+        Log.e(TAG, "currenlty playing " + mService?.exoPlayer?.currentWindowIndex.toString())
         Log.e(TAG, "onSongSelect: recived uri $uri index: $index" )
-//        val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
-//        playerFragment.playAtIndex(index, text)
-        mService?.exoPlayer?.seekTo(index,0)
-        mService?.exoPlayer?.playWhenReady = true
+
+        // If we tapped a new item then go to it, else nothing
+        if (mService?.exoPlayer?.currentWindowIndex != index) {
+            Log.e(TAG, "onSongSelect: Chaning song")
+            mService?.exoPlayer?.seekTo(index,0)
+            mService?.exoPlayer?.playWhenReady = true
+        }
     }
 
-    fun preserveCurrentSelection(view: View) {
-        val mAny = mService?.preserveCurrentSelection()
-        Log.e(TAG, "preserveCurrentSelection: ${mAny?.get(0)}")
-        Log.e(TAG, "preserveCurrentSelection: ${mAny?.get(1)}")
-        Log.e(TAG, "preserveCurrentSelection: ${mAny?.get(2)}")
-
-    }
-
-    fun getPlayWhenReady(): Boolean? {
-        return mService?.exoPlayer?.playWhenReady
-    }
-
-    fun getCurrentWindow(): Int? {
-        return mService?.exoPlayer?.currentWindowIndex
-    }
-
-    fun getCurrentSongTime(): Long? {
-        return mService?.exoPlayer?.currentPosition
-
-    }
     override fun onOptionsSort() {
-        mService?.build2()
+//        mService?.build2()
+        mService?.buildMedia()
     }
 
     override fun getPlayer(): SimpleExoPlayer? {

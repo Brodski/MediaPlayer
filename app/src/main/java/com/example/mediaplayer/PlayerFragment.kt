@@ -50,17 +50,6 @@ class PlayerFragment : Fragment() {
         fun getPlayer(): SimpleExoPlayer?
     }
 
-    private val connection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as AudioPlayerService.LocalBinder
-            mService = binder.getService()
-            playerView?.player = mService.exoPlayer
-            playerView?.showController()
-        }
-        override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e(TAG, "Disconnected Service :o")
-        }
-    }
 
     override fun onStart() {
         Log.e(TAG, "onStart: PlayerFragment")
@@ -133,40 +122,15 @@ class PlayerFragment : Fragment() {
         }
 
         val btn: Button = v.findViewById(R.id.btnB) as Button
-        btn.setOnClickListener { v -> talkService(v) }
+        btn.setOnClickListener { v -> Log.e(TAG, "onCreateView: Clicked me!") }
         return v
-    }
-
-    fun playAtIndex(index: Int, uri: String) {
-        Log.e(TAG, "here in player fragment, playing at index $index")
-        Log.e(TAG, "here in player fragment, playing at index $uri")
-        Log.e(TAG, mService.exoPlayer?.currentWindowIndex.toString())
-        //val wtf = mService.exoPlayer.contentPosition
-        //val wtf2 = mService.exoPlayer
-        mService.exoPlayer?.seekTo(index,0)
-        mService.exoPlayer?.playWhenReady = true
-    }
-
-
-    fun talkService2() {
-        Log.e(TAG, "were takling and i'm in player")
-    }
-
-    fun talkService(v: View) {
-        //Log.e(TAG, "Clicked in Player Fragment")
-        //(activity as MainActivity).talkToMain()
-//        Log.e(TAG, mService.exoPlayer!!.currentWindowIndex.toString())
-//        Log.e(TAG, mService.exoPlayer!!.currentPeriodIndex.toString())
-//        Log.e(TAG, mService.exoPlayer!!.toString())
     }
 
     fun setPlayer(){
         Log.e(TAG, "setPlayer: now setting")
-        val x = listener?.getPlayer()
         if ( listener?.getPlayer() != null ){
             playerView?.player = listener?.getPlayer()
         }
-//        playerView?.player = x
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -213,20 +177,31 @@ class PlayerFragment : Fragment() {
     }
 
 
-    private fun releasePlayer2() {
-        Log.e(TAG, "Release called")
+//    private fun releasePlayer2() {
+//        Log.e(TAG, "Release called")
+////        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
+//        activity?.unbindService(connection)
+//    }
+//
+//    private fun initPlayer2() {
+//        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
+//        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
 //        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-        activity?.unbindService(connection)
-    }
-
-    private fun initPlayer2() {
-        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
-        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-        //startService(intent)
-        activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(requireActivity(), intent)
-        //Util.startForegroundService(activity!!, intent)
-    }
+//        //startService(intent)
+//        activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//        Util.startForegroundService(requireActivity(), intent)
+//        //Util.startForegroundService(activity!!, intent)
+//    }
+//    private val connection = object : ServiceConnection {
+//        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+//            val binder = service as AudioPlayerService.LocalBinder
+//            mService = binder.getService()
+//            playerView?.player = mService.exoPlayer
+//            playerView?.showController()
+//        }
+//        override fun onServiceDisconnected(name: ComponentName?) {
+//            Log.e(TAG, "Disconnected Service :o")
+//        }
+//    }
 
 }

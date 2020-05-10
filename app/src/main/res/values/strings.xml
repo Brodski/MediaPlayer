@@ -24,9 +24,13 @@
     <string name="sort_recent_most">sort_recent_most</string>
     <string name="sort_recent_least">sort_recent_least</string>
 
+    <string name="save_state_song_index_key">save_state_song_index_key</string>
+    <string name="save_state_song_playtime">save_state_song_playtime</string>
 
 
-    <string name="sort_keys">sort_keys_array</string>
+
+    <string name="save_state_sort_key">save_state_sort_key</string>
+<!--    <string name="sort_keys">sort_keys_array</string>-->
     <string-array name="sort_keys_array">
         <item>Artist Ascending</item>
         <item>Artist Descending</item>

@@ -62,16 +62,17 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             Log.e(TAG, "``````onServiceConnected: setting``````")
             Log.e(TAG, "``````onServiceConnected: setting``````")
             Log.e(TAG, "``````onServiceConnected: setting``````")
-       //     playerFragment.setPlayer()
             val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
+            Log.e(TAG, "onServiceConnected: $pFrag")
+
             if (pFrag is PlayerFragment) {
                 Log.e(TAG, "onServiceConnected: PlayerFrag Currenlty showing $pFrag")
                 pFrag.setPlayer()
+            } else if (pFrag is SongsFragment) {
+                pFrag.updateRecViewer()
             } else {
                 Log.e(TAG, "onServiceConnected: some other fragmetn")
-                
             }
-            Log.e(TAG, "onServiceConnected: $pFrag")
             when {
                 pFrag is PlayerFragment -> Log.e(TAG, "onServiceConnected: playerfrag")
                 pFrag is PreferenceFragment -> Log.e(TAG, "onServiceConnected: preferencefrag")
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onOptionsSort() {
 //        mService?.build2()
-        mService?.buildMedia()
+        mService?.buildMediaAgain()
     }
 
     override fun getPlayer(): SimpleExoPlayer? {
@@ -116,9 +117,23 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         return mService?.songList?.toMutableList()
     }
 
+    override fun isService(): Boolean {
+        if (mService != null) {
+            return true
+        }
+        return false
+//        mService?.let {
+//            return true
+//        }
+//        return false
+    }
+
 
     private fun initPlayer2() {
         Log.e(TAG, "initPlayer2: init player")
+        Log.e(TAG, "initPlayer2: mbound $mBound")
+        Log.e(TAG, "initPlayer2: service !null ${(mService != null)}")
+        Log.e(TAG, "initPlayer2: mService $mService")
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
         var intent: Intent = Intent(this, AudioPlayerService::class.java)
@@ -142,9 +157,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         Log.e(TAG,"CREATED MainActivity")
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
-            Log.e(TAG, ">>>>>>>>>>>>>>>>>>> onCreate bundle Frag $restoredFragment <<<<<<<<<<<<<<<<<")
-        } else {
-            Log.e(TAG, ">>>>>>>>>>>>>>>>>>>> onCreate no bundlde<<<<<<<<<<<<<<<<<}")
+            Log.e(TAG, "found some fragment $restoredFragment")
         }
         initPlayer2()
 
@@ -203,7 +216,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onStop() {
         super.onStop()
         Log.e(TAG,"STOP MainActivity")
-        releasePlayer2()
         if (Util.SDK_INT >= Build.VERSION_CODES.N) {
 //            Log.e(TAG,"STOP int int it")
         }
@@ -213,7 +225,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onDestroy() {
         super.onDestroy()
         Log.e(TAG,"DESTROY MainActivity")
-//        releasePlayer2()
+        releasePlayer2()
     }
 
     fun continueBuildApp() {
@@ -297,10 +309,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     fun inflateFragment(nameFrag: Int) {
-    //    saveStatePro(nameFrag)
-        var songsFragment: SongsFragment
-        val playerFragment :PlayerFragment
-        var preferenceFragment: PreferenceFragment
         var frag: Fragment? = null
 
         if (nameFrag == R.string.song_frag_tag) {
@@ -341,9 +349,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         for ( f in supportFragmentManager.fragments) {
             currentFrag = f
         }
-        Log.e(TAG, "doFragmentTransaction: ${fragment}")
-        Log.e(TAG, "doFragmentTransaction: ${fragment.tag}")
-        Log.e(TAG, "doFragmentTransaction: ${tag}")
         if (currentFrag?.tag == tag) {
             Log.e(TAG, "Current frag is already showing. No change")
             return
@@ -375,10 +380,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         for ( f in supportFragmentManager.fragments) {
 
             Log.e(TAG,"XXXXXXXXXXXXXXXX onSaveInstanceState XXXXXXXXXXXXXXXX")
-            Log.e(TAG,"XXXXXXXXXXXXXXXX onSaveInstanceState XXXXXXXXXXXXXXXX")
-            Log.e(TAG,"XXXXXXXXXXXXXXXX onSaveInstanceState XXXXXXXXXXXXXXXX")
-            Log.e(TAG,"XXXXXXXXXXXXXXXX onSaveInstanceState XXXXXXXXXXXXXXXX")
-            Log.e(TAG,"XXXXXXXXXXXXXXXX onSaveInstanceState XXXXXXXXXXXXXXXX")
             frag = f
         }
         if (frag != null) {
@@ -404,7 +405,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         val editor = sharedpreferences.edit()
         editor.putString("dropdown", "1")
         editor.putString("list_example", "2")
-        editor.putString("sort_keys", "")
+        editor.putString("save_state_sort_key", "")
         editor.commit()
     }
 
@@ -414,43 +415,11 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         val z1 = sharedpreferences.getBoolean("checkbox", true)
         val z2 = sharedpreferences.getString("dropdown","")
         val z3 = sharedpreferences.getString("list_example","")
-        val sort_keys = sharedpreferences.getString(resources.getString(R.string.sort_keys),"")
+        val save_state_sort_key = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key),"")
         Log.e(TAG, "getSettings: $z1")
         Log.e(TAG, "getSettings: $z2")
         Log.e(TAG, "getSettings: $z3")
-        Log.e(TAG, "sort_keys: $sort_keys")
-
-
-
-
-    }
-
-    fun bottonRight(view: View) {
-        Log.e(TAG, "clicked btton right")
-        Log.e(TAG, mService?.exoPlayer?.currentWindowIndex.toString())
-
-        Log.e(TAG,"Broadcasting message")
-        val intent = Intent("custom-event-name")
-        // You can also include some extra data.
-        // You can also include some extra data.
-        intent.putExtra("message", "This is my message!")
-//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
-
-    }
-
-    fun talkToMain(){
-        Log.e(TAG, "hi i'm in main")
-        Log.e(TAG, mService?.exoPlayer?.currentWindowIndex.toString())
-    }
-
-    fun saveThingy() {
-        var frag: Fragment? = null
-        Log.e(TAG, "Found fragment: " + supportFragmentManager.backStackEntryCount.toString())
-        for (entry: Int in 0 until supportFragmentManager.backStackEntryCount) {
-            val ff = supportFragmentManager.getBackStackEntryAt(entry)
-            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).id)
-            Log.e(TAG, "Found fragment: " + supportFragmentManager.getBackStackEntryAt(entry).name)
-        }
+        Log.e(TAG, "save_state_sort_key: $save_state_sort_key")
 
     }
 

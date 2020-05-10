@@ -30,7 +30,7 @@
         app:dialogTitle="dialog_title_preference"/>
 
     <ListPreference
-        app:key="sort_keys"
+        app:key="save_state_sort_key"
         app:title="Sort Audio By"
         app:useSimpleSummaryProvider="true"
         app:entries="@array/sort_keys_array"

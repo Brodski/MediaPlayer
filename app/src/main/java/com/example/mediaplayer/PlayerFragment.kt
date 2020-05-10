@@ -46,7 +46,7 @@ class PlayerFragment : Fragment() {
     private var listener: PlayerFragListener? = null
     private var listener2: PlayerFragListener? = null
 
-    interface PlayerFragListener {
+    interface PlayerFragListener: IMainActivity {
         fun getPlayer(): SimpleExoPlayer?
     }
 
@@ -128,7 +128,8 @@ class PlayerFragment : Fragment() {
 
     fun setPlayer(){
         Log.e(TAG, "setPlayer: now setting")
-        if ( listener?.getPlayer() != null ){
+//        if ( listener?.getPlayer() != null ){
+        if ( listener?.isService() == true ){
             playerView?.player = listener?.getPlayer()
         }
     }

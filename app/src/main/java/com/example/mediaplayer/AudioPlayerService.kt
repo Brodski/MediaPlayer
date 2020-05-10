@@ -83,17 +83,15 @@ class AudioPlayerService : Service() {
     override fun onCreate() {
         super.onCreate()
        // val context: Context = this
+
+        // Save media state
+
         mContext = this
         //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("custom-event-name"));
 
         exoPlayer = SimpleExoPlayer.Builder(this).build()
 
-        buildMedia()
-//        if (songList?.size!! < 1) { concatenatingMediaSource = goofydebugging(mContext) }
-
-        // Setup notification and media session.
-//        exoPlayer!!.prepare(concatenatingMediaSource)
-//        exoPlayer!!.seekTo(0, 0)
+        buildMediaStartUp()
         exoPlayer!!.playWhenReady = false
 
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
@@ -173,37 +171,61 @@ class AudioPlayerService : Service() {
         mediaSessionConnector!!.setPlayer(exoPlayer)
     }
 
+    private fun buildMediaStartUp() {
 
-    fun buildMedia() {
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( mContext, Util.getUserAgent(mContext, this.getString(R.string.app_name)) )
         var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
-        val sortBy = sharedpreferences.getString(resources.getString(R.string.sort_keys), resources.getString(R.string.sort_recent_most))
-
-        //Sync playing item with updated list
-        var prevPlayingIndex = exoPlayer?.currentWindowIndex ?: 0
-        var playTime = exoPlayer?.currentPosition ?: 0
-        var isPlaying = exoPlayer?.playWhenReady ?: false
-        var prevSong: String = ""
-        var prevUri: Uri? = null
-        Log.e(TAG, "build2: ------------------ 1  ----------------------")
-        Log.e(TAG, "buildMedia: ${exoPlayer?.currentWindowIndex}")
-        Log.e(TAG, "buildMedia: playTime ${playTime}")
-        Log.e(TAG, "buildMedia: isPlaying ${isPlaying}")
-        if (exoPlayer != null && !songList.isNullOrEmpty() ) {
-            prevUri = songList!![prevPlayingIndex].uri
-            prevSong = songList!![prevPlayingIndex].title
-        }
-
+        val sortBy = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key), resources.getString(R.string.sort_recent_most))
+        val idxWhenStopped= sharedpreferences.getInt(resources.getString(R.string.save_state_song_index_key), 0)
+        val playPosition = sharedpreferences.getLong(resources.getString(R.string.save_state_song_playtime), 0)
+        Log.e(TAG, "buildMediaStartUp: ==========================================")
+        Log.e(TAG, "buildMediaStartUp: building at sortBy $sortBy")
+        Log.e(TAG, "buildMediaStartUp: building at idx $idxWhenStopped")
+        Log.e(TAG, "buildMediaStartUp: building at playPosition $playPosition")
+        Log.e(TAG, "buildMediaStartUp: ==========================================")
+        // Get songs/media on phone, sort, and set
         songList = querySongs(mContext)
-        sortBy?.let {songList = sortSongs(sortBy) }
+        songList = sortSongs(sortBy)
         songList?.forEach { it ->
             var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
             concatenatingMediaSource.addMediaSource(media)
         }
 
         exoPlayer?.prepare(concatenatingMediaSource)
+        exoPlayer?.seekTo(idxWhenStopped, playPosition)
+        exoPlayer?.playWhenReady = false
+        return
+    }
+
+    fun buildMediaAgain() {
+        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory( mContext, Util.getUserAgent(mContext, this.getString(R.string.app_name)) )
+        var concatenatingMediaSource: ConcatenatingMediaSource = ConcatenatingMediaSource()
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sortBy = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key), resources.getString(R.string.sort_recent_most))
+
+        //Sync playing item with updated list
+        var prevPlayingIndex = exoPlayer?.currentWindowIndex ?: 0
+        var playTime = exoPlayer?.currentPosition ?: 0
+        var isPlaying = exoPlayer?.playWhenReady ?: false
         var updatedIndex = 0
+        var prevSong: String = ""
+        var prevUri: Uri? = null
+
+        if (exoPlayer != null && !songList.isNullOrEmpty() ) {
+            prevUri = songList!![prevPlayingIndex].uri
+            prevSong = songList!![prevPlayingIndex].title
+        }
+
+        // Get songs/media on phone, sort, and set
+        songList = querySongs(mContext)  //Optional. Maybe I remove??
+        songList = sortSongs(sortBy)
+        songList?.forEach { it ->
+            var media: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).setTag(it.uri.toString()).createMediaSource(it.uri)
+            concatenatingMediaSource.addMediaSource(media)
+        }
+
+        exoPlayer?.prepare(concatenatingMediaSource)
         prevUri?.let { updatedIndex = updateCurrentIndex(prevUri)}
 
         exoPlayer?.seekTo(updatedIndex, playTime)
@@ -225,46 +247,6 @@ class AudioPlayerService : Service() {
             }
         }
         return updatedIndex
-
-    }
-
-    fun build2(){
-        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
-        val sortBy = sharedpreferences.getString(getString(R.string.sort_keys),"")
-
-        var prevWindowIndex = exoPlayer?.currentWindowIndex ?: 0
-        var prevSong: String = ""
-        var prevUri: Uri? = null
-
-        Log.e(TAG, "build2: ------------------ 1  ----------------------")
-        if (exoPlayer != null && !songList.isNullOrEmpty() ) {
-            prevUri = songList!![prevWindowIndex].uri
-            prevSong = songList!![prevWindowIndex].title
-        }
-        // Setup notification and media session.
-        Log.e(TAG, "build2: prev Idx $prevWindowIndex")
-        Log.e(TAG, "build2: prevSong $prevSong")
-        Log.e(TAG, "build2: prevUri $prevUri")
-
-//        var concatenatingMediaSource = buildMedia()
-//        exoPlayer!!.prepare(concatenatingMediaSource)
-        Log.e(TAG, "build2: ------------------ 2 ----------------------")
-        var updatedIndex = 0
-        run loop@ {
-            songList?.forEachIndexed { index, song ->
-                Log.e(TAG, "build2: song.uri ${song.uri}")
-                if (song.uri == prevUri) {
-                    updatedIndex = index
-                    Log.e(TAG, "build2: FOUND!")
-                    Log.e(TAG, "build2: updatedIndex $updatedIndex")
-                    return@loop
-                }
-            }
-        }
-
-        Log.e(TAG, "build2: updatedIndex $updatedIndex")
-        exoPlayer!!.seekTo(updatedIndex, 0)
-        exoPlayer!!.playWhenReady = true
     }
 
     fun sortSongs(sortBy: String?): MutableList<Song>? {
@@ -423,16 +405,44 @@ class AudioPlayerService : Service() {
     }
 
 
+    fun releasePlayer() {
+        if (exoPlayer != null) {
+            mediaSession?.release()
+            mediaSessionConnector?.setPlayer(null)
+            playerNotificationManager?.setPlayer(null)
+            exoPlayer!!.release()
+            exoPlayer = null
+        }
+    }
+
+    fun saveState() {
+
+        // Save Media State
+        var playingIndex = exoPlayer?.currentWindowIndex ?: 0
+        var playTime = exoPlayer?.currentPosition ?: 0
+        Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
+        Log.e(TAG, "saveState: Saving index at $playingIndex")
+        Log.e(TAG, "saveState: Saving playTime at $playTime")
+        Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val editor = sharedpreferences.edit()
+
+        //song Index
+        editor.putInt(resources.getString(R.string.save_state_song_index_key), playingIndex)
+        //playtime
+        editor.putLong(resources.getString(R.string.save_state_song_playtime), playTime)
+        editor.commit()
+    }
+
     override fun onDestroy() {
-        mediaSession?.release()
-        mediaSessionConnector?.setPlayer(null)
-        playerNotificationManager?.setPlayer(null)
-        exoPlayer!!.release()
-        exoPlayer = null
+        Log.e(TAG, "onDestroy: Player Service, destroying")
 
-       // LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver)
+        saveState()
+        releasePlayer()
 
+        Log.e(TAG, "onDestroy: Player Service, destroyed 1/2")
         super.onDestroy()
+        Log.e(TAG, "onDestroy: Player Service, destroyed 2/2")
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -449,61 +459,6 @@ class AudioPlayerService : Service() {
         return START_STICKY
     }
 
-    fun goofydebugging(context: Context): ConcatenatingMediaSource {
-        val concatenatingMediaSource = ConcatenatingMediaSource()
-        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
-            context,
-            Util.getUserAgent(context, this.getString(R.string.app_name))
-        )
-        val audioUri =
-            Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
-        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-        val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
-        val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
-        concatenatingMediaSource.addMediaSource(ms)
-        concatenatingMediaSource.addMediaSource(ms2)
-        val songList2 = mutableListOf<Song>()
-        songList2?.add(
-            Song(
-                id = 123,
-                uri = audioUri,
-                title = "title",
-                artist = "artist",
-                duration = 10,
-                dateCreated = 100,
-                art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
-                imageResource = R.drawable.ic_rowing
-            )
-        )
-        if (songList2?.size == 1) {
-            songList2?.add(
-                Song(
-                    id = 123,
-                    uri = mp4VideoUri,
-                    title = "title vid",
-                    artist = "artist vid",
-                    duration = 11,
-                    dateCreated = 101,
-                    art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
-                    imageResource = R.drawable.ic_rowing
-                )
-            )
-        }
-        songList = songList2
-        return concatenatingMediaSource
-    }
-
-    fun makeStuff(position: Int){
-        Log.e(TAG, "HI HI HI $position")
-        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
-        Log.e(TAG, "HI HI HI ${exoPlayer?.currentTimeline.toString()}")
-
-        exoPlayer?.seekTo(position, 0)
-
-        Log.e(TAG, "HI HI HI ${exoPlayer?.currentWindowIndex.toString()}")
-    }
-
-
     // https://stackoverflow.com/questions/8802157/how-to-use-localbroadcastmanager
 //    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
 //        override fun onReceive(context: Context?, intent: Intent) {
@@ -519,6 +474,50 @@ class AudioPlayerService : Service() {
 //            }
 //            Log.e(TAG, "Leaving onReceiver broadcaster")
 //        }
+//    }
+//
+//    fun goofydebugging(context: Context): ConcatenatingMediaSource {
+//        val concatenatingMediaSource = ConcatenatingMediaSource()
+//        val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
+//            context,
+//            Util.getUserAgent(context, this.getString(R.string.app_name))
+//        )
+//        val audioUri =
+//            Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
+//        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+//        val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
+//        val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
+//        concatenatingMediaSource.addMediaSource(ms)
+//        concatenatingMediaSource.addMediaSource(ms2)
+//        val songList2 = mutableListOf<Song>()
+//        songList2?.add(
+//            Song(
+//                id = 123,
+//                uri = audioUri,
+//                title = "title",
+//                artist = "artist",
+//                duration = 10,
+//                dateCreated = 100,
+//                art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
+//                imageResource = R.drawable.ic_rowing
+//            )
+//        )
+//        if (songList2?.size == 1) {
+//            songList2?.add(
+//                Song(
+//                    id = 123,
+//                    uri = mp4VideoUri,
+//                    title = "title vid",
+//                    artist = "artist vid",
+//                    duration = 11,
+//                    dateCreated = 101,
+//                    art = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note),
+//                    imageResource = R.drawable.ic_rowing
+//                )
+//            )
+//        }
+//        songList = songList2
+//        return concatenatingMediaSource
 //    }
 
 }

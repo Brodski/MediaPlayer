@@ -46,10 +46,12 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     private lateinit var mService: AudioPlayerService
 
     private var listener: SongsFragListener? = null
-    interface SongsFragListener {
+    interface SongsFragListener: IMainActivity {
         fun onSongSelect(index: Int, text: String)
         fun onOptionsSort()
         fun getPlaylist(): MutableList<Song>?
+
+
     }
     companion object {
         const val TAG = "SongsFragment"
@@ -110,14 +112,15 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     fun updateRecViewer() {
 //        songList = mService.querySongs(requireActivity())
-        songList = listener?.getPlaylist()
-        songListFull = songList?.map{ it.copy() }
+        if (listener?.isService() == true) {
+            songList = listener?.getPlaylist()
+            songListFull = songList?.map { it.copy() }
 
-        adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
-        recycler_songs.adapter = adaptor
-        recycler_songs.layoutManager = LinearLayoutManager(context)
-        recycler_songs.setHasFixedSize(true)
-
+            adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
+            recycler_songs.adapter = adaptor
+            recycler_songs.layoutManager = LinearLayoutManager(context)
+            recycler_songs.setHasFixedSize(true)
+        }
     }
 
     // BUTTON a
@@ -188,7 +191,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
             }
         })
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        val sortBy = sharedpreferences.getString(resources.getString(R.string.sort_keys),"")
+        val sortBy = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key),"")
 
         //TODO - the below is just stupid.
         if ( sortBy == getString(R.string.sort_artist_asc) ){
@@ -216,7 +219,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val editor = sharedpreferences.edit()
         Log.e(TAG, "handleSortClick: sortby $sortBy")
-        editor.putString(resources.getString(R.string.sort_keys), sortBy)
+        editor.putString(resources.getString(R.string.save_state_sort_key), sortBy)
         editor.commit()
         listener?.onOptionsSort()
 

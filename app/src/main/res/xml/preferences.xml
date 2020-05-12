@@ -5,12 +5,6 @@
     <PreferenceCategory
         app:title="Preferences">
 
-        <Preference
-            android:key="single_line_title"
-            android:title="this is a item that does nothing at all"
-            android:summary="This is a summary"
-            app:singleLineTitle="true" />
-
         <ListPreference
             app:key="save_state_increment"
             app:title="Rewind &amp; Forward Increment"
@@ -26,17 +20,15 @@
             android:key="@string/save_state_slop"
             android:title="Play &amp; Pause sensitivity"
             android:max="@string/slop_max"
-            android:summary="Higher = Easier to activate play/pause \nAllows for sloppy taps to play/pause"
+            android:summary="Higher = Easier to activate play/pause \nAllows for sloppy taps"
         />
 
         <SeekBarPreference
             android:key="@string/save_state_skip_zone"
-            android:title="Rewind &amp; Forward Skip Sensitivity"
+            android:title="Rewind &amp; Forward Zone Size"
             android:max="60"
-            app:min="10"
-            android:defaultValue="55"
-            app:defaultValue="15"
-            android:summary="Higher = Harder to activate a skip but easier to activate a volume change. \nValue is the angle that divides volume from skip"
+            app:min="15"
+            android:summary="Higher = Easier to activate a skip but easier to activate a volume change. \nIs the angle that seperates volume from skip"
         />
 
 

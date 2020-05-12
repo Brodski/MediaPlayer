@@ -249,7 +249,6 @@ class PlayerFragment : Fragment() {
         }
         else if (distanceY > slop_prevention ) {
             Log.e(TAG, "processSwipe: VOLUME DOWN ")
-//            volumeDown()
             Log.e(TAG, "processSwipe: ${listener?.isPlaying()}")
             if (listener?.isPlaying() == true) {
                 audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
@@ -259,32 +258,7 @@ class PlayerFragment : Fragment() {
             Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000  ")
         }
 
-        // absDiff = diagonal detection (if we run diagonally, then abs diff will be small. If x = y, then perfect 45 diagonal
-        val absDiff = if (abs(distanceX) > abs(distanceY)) abs(distanceX) - abs(distanceY) else abs(distanceY) - abs(distanceX) // I'm tired, dont judge me
-  //      Log.e(TAG, "processSwipe: abs(distanceX - distanceY) xxxxxxxxxxxxxx $absDiff")
 
-//        if (absDiff < 50) {
-//            Log.e(TAG, "processSwipe: NOPE-NOPE-NOPE-NOPE-")
-//            return
-//        }
-//        if (distanceX > 100) {
-//            Log.e(TAG, " >>>>>>>>>>>>>>> processSwipe: fast forward")
-//            skipForward()
-//        } else if (distanceX < -100) {
-//            Log.e(TAG, " <<<<<<<<<<< processSwipe: rewind")
-//            skipRewind()
-//        } else if (distanceY > 100) {
-//            Log.e(TAG, " ------------- processSwipe: turn up volue")
-//
-//            audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
-//
-//        } else if (distanceY < -100) {
-//            Log.e(TAG, " ++++++++++++ processSwipe: turn up volue")
-//            audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
-//
-//        } else {
-//            Log.e(TAG, "processSwipe: Not today + Not today + Not today ")
-//        }
         Log.e(TAG, "processSwipe: ==========================================")
     }
 

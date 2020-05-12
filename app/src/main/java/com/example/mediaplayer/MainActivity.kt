@@ -146,10 +146,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             return true
         }
         return false
-//        mService?.let {
-//            return true
-//        }
-//        return false
     }
 
     override fun handleSettingsClick() {
@@ -446,13 +442,17 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         Log.e(TAG, "getSettings: getting")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val save_state_sort_key = sharedPreferences.getString(resources.getString(R.string.save_state_sort_key),"")
+        val save_state_slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop),0)
+        val save_state_increment = sharedPreferences.getString(resources.getString(R.string.save_state_increment),"0")
+        val save_state_skip_zone = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone),0)
         val slopMax = resources.getString(R.string.slop_max).toInt()
         val default_slop = resources.getString(R.string.default_slop).toInt()
-        val save_state_slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop),0)
         Log.e(TAG, "slopMax: $slopMax")
         Log.e(TAG, "default_slop: $default_slop")
         Log.e(TAG, "save_state_slop: $save_state_slop")
-        Log.e(TAG, "save_state_sort_key: $save_state_sort_key")
+        Log.e(TAG, "save_state_increment: $save_state_increment")
+        Log.e(TAG, "save_state_skip_zone: $save_state_skip_zone")
+//        Log.e(TAG, "save_state_sort_key: $save_state_sort_key")
 
     }
 

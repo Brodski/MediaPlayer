@@ -50,15 +50,16 @@ class PreferenceFragment : PreferenceFragmentCompat(), SharedPreferences.OnShare
             // Inflate the layout for this fragment
 //        return inflater.inflate(R.xml.preferences, container, false)
 
-        var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
-        var settingsIcon: MenuItem =  nav.menu.findItem(R.id.nav_search)
-        settingsIcon.isChecked = true
-
-        val poopy = ListPreference.SimpleSummaryProvider.getInstance()
+//        var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
+//        var settingsIcon: MenuItem =  nav.menu.findItem(R.id.nav_search)
+//        settingsIcon.isChecked = true
+//        val poopy = ListPreference.SimpleSummaryProvider.getInstance()
 
 
         return super.onCreateView(inflater, container, savedInstanceState)
     }
+
+
     override fun onResume() {
         super.onResume()
         preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)

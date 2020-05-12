@@ -1,5 +1,6 @@
 package com.example.mediaplayer
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -7,6 +8,7 @@ import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -19,7 +21,11 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.MotionEventCompat
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
@@ -27,6 +33,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.lang.RuntimeException
+import kotlin.math.abs
 import kotlin.math.log
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -44,10 +51,11 @@ class PlayerFragment : Fragment() {
     private var player: SimpleExoPlayer? = null
     private lateinit var mService: AudioPlayerService
     private var listener: PlayerFragListener? = null
-    private var listener2: PlayerFragListener? = null
 
     interface PlayerFragListener: IMainActivity {
         fun getPlayer(): SimpleExoPlayer?
+        fun skipForward(rewind: Boolean = false)
+        fun skipRewind()
     }
 
 
@@ -93,9 +101,12 @@ class PlayerFragment : Fragment() {
         Log.e(TAG, "onDestroyView: destroying view Player")
     }
 
-
+    private lateinit var audioManager: AudioManager
+    private lateinit var mDetector: GestureDetector
+    @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
+        audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         Log.e(TAG, "onCreateView Player Frag")
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
@@ -104,8 +115,12 @@ class PlayerFragment : Fragment() {
         var homeIcon: MenuItem =  nav.menu.findItem(R.id.nav_home)
         homeIcon.setChecked(true)
 
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment),resources.getString(R.string.default_increment))?.toInt() ?: 15000
         playerView = v.findViewById(R.id.main_view2)
-//        playerView?.player = listener?.getPlayer()
+        playerView?.setRewindIncrementMs(skipIncrement)
+        playerView?.setFastForwardIncrementMs(skipIncrement)
 
         val toolbar: Toolbar = v.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
@@ -114,16 +129,106 @@ class PlayerFragment : Fragment() {
 
 //        playerView?.showController()
         
-        var bundle: Bundle? = this!!.arguments
-        if (bundle!!.containsKey(getString(R.string.song_bundle))) {
-            Log.e(TAG, "HAS SONG BUNDLE!!!")
-            val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
-            Log.e(TAG, s.toString())
-        }
+//        var bundle: Bundle? = this!!.arguments
+//        if (bundle!!.containsKey(getString(R.string.song_bundle))) {
+//            Log.e(TAG, "HAS SONG BUNDLE!!!")
+//            val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
+//            Log.e(TAG, s.toString())
+//        }
 
-        val btn: Button = v.findViewById(R.id.btnB) as Button
-        btn.setOnClickListener { v -> Log.e(TAG, "onCreateView: Clicked me!") }
+        mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
+            override fun onShowPress(e: MotionEvent?) {
+                Log.e(TAG, "onShowPress: ")
+            }
+
+            override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000 ")
+                return true
+            }
+
+            override fun onDown(e: MotionEvent?): Boolean {
+                Log.e(TAG, "onDown: ")
+                return true
+            }
+
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
+//                Log.e(TAG, "onFling: ")
+//                Log.e(TAG, "onFling: e1: ${e1?.x}, ${e1?.y}")
+//                Log.e(TAG, "onFling: e2: ${e2?.x}, ${e2?.y}")
+
+                processSwipe(e1?.x, e1?.y, e2?.x, e2?.y)
+
+                return true
+            }
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+//                Log.e(TAG, "onScroll: ")
+//                // downtime
+//                Log.e(TAG, "onScroll: e1: ${e1?.x}, ${e1?.y}")
+//                Log.e(TAG, "onScroll: e2: ${e2?.x}, ${e2?.y}")
+                return true
+            }
+
+            override fun onLongPress(e: MotionEvent?) {
+                Log.e(TAG, "onLongPress: ")
+            }
+        })
+
+        playerView?.setOnTouchListener(object: View.OnTouchListener {
+            @SuppressLint("ClickableViewAccessibility")
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+//                Log.e(TAG, "Top of it all: mActivePointerId ------ $mActivePointerId")
+                mDetector.onTouchEvent(event)
+                return true;
+            }
+        })
         return v
+    }
+
+
+    private fun processSwipe(x1: Float?, y1: Float?, x2: Float?, y2: Float?) {
+        if (arrayOf(x1, y1, x2, y2).contains(null)) {
+            return
+        }
+        Log.e(TAG, "processSwipe: ==========================================")
+        val distanceX = x2!! - x1!!
+        val distanceY = y2!! - y1!!
+        Log.e(TAG, "processSwipe: distanceX $distanceX")
+        Log.e(TAG, "processSwipe: distanceY $distanceY ")
+
+        // absDiff = diagonal detection (if we run diagonally, then abs diff will be small. If x = y, then perfect 45 diagonal
+        val absDiff = if (abs(distanceX) > abs(distanceY)) abs(distanceX) - abs(distanceY) else abs(distanceY) - abs(distanceX) // I'm tired, dont judge me
+        Log.e(TAG, "processSwipe: abs(distanceX - distanceY) xxxxxxxxxxxxxx $absDiff")
+
+        if (absDiff < 50) {
+            Log.e(TAG, "processSwipe: NOPE-NOPE-NOPE-NOPE-")
+            return
+        } else if (distanceX > 100) {
+            Log.e(TAG, " >>>>>>>>>>>>>>> processSwipe: fast forward")
+            skipForward()
+        } else if (distanceX < -100) {
+            Log.e(TAG, " <<<<<<<<<<< processSwipe: rewind")
+            skipRewind()
+        } else if (distanceY > 100) {
+            Log.e(TAG, " ------------- processSwipe: turn up volue")
+
+            audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+            //fun atan2(y: Float, x: Float): Float
+//            var xx: Douq:qble = 50.toDouble()
+//            var yy: Double = -50.toDouble()
+//            var tt = atan2(yy,xx)
+//            val dd =Math.toDegrees(tt)
+//            println(tt)
+//            println(dd)
+
+        } else if (distanceY < -100) {
+            Log.e(TAG, " ++++++++++++ processSwipe: turn up volue")
+            audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+
+        } else {
+            Log.e(TAG, "processSwipe: Not today + Not today + Not today ")
+        }
+        Log.e(TAG, "processSwipe: ==========================================")
     }
 
     fun setPlayer(){
@@ -132,6 +237,14 @@ class PlayerFragment : Fragment() {
         if ( listener?.isService() == true ){
             playerView?.player = listener?.getPlayer()
         }
+    }
+
+    fun skipForward() {
+        listener?.skipForward()
+    }
+
+    fun skipRewind() {
+        listener?.skipRewind()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -144,25 +257,22 @@ class PlayerFragment : Fragment() {
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.item1 -> {
-                Log.e(TAG, "item 1")
-                return false
-            }
             R.id.item2 -> {
                 Log.e(TAG, "item 2")
                 return false
             }
-            R.id.item3 -> {
-                Log.e(TAG, "item 3")
+            R.id.settingsId -> {
+                Log.e(TAG, "baby: settings click")
+                listener?.handleSettingsClick()
                 return false
             }
-            R.id.sub1 -> {
-                Log.e(TAG, "sub 1")
+            R.id.supportId -> {
+                Log.e(TAG, "baby: supportId click")
+
                 return false
             }
         }
         return false
-        //return super.onOptionsItemSelected(item)
     }
     companion object {
         const val TAG = "PlayerFragment"
@@ -177,32 +287,51 @@ class PlayerFragment : Fragment() {
         }
     }
 
-
-//    private fun releasePlayer2() {
-//        Log.e(TAG, "Release called")
-////        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-//        activity?.unbindService(connection)
-//    }
-//
-//    private fun initPlayer2() {
-//        // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
-//        // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-//        var intent: Intent = Intent(activity, AudioPlayerService::class.java)
-//        //startService(intent)
-//        activity?.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-//        Util.startForegroundService(requireActivity(), intent)
-//        //Util.startForegroundService(activity!!, intent)
-//    }
-//    private val connection = object : ServiceConnection {
-//        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-//            val binder = service as AudioPlayerService.LocalBinder
-//            mService = binder.getService()
-//            playerView?.player = mService.exoPlayer
-//            playerView?.showController()
-//        }
-//        override fun onServiceDisconnected(name: ComponentName?) {
-//            Log.e(TAG, "Disconnected Service :o")
-//        }
-//    }
-
 }
+
+///////////////////////////////////////////////////////////////////////
+
+
+//                when (action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        Log.e(TAG, "onTouch: ------------- ACTION_DOWN")
+//                        val pointerIndex = event.actionIndex
+//
+//                        mLastTouchX = event.getX(pointerIndex)
+//                        mLastTouchY = event.getY(pointerIndex)
+//
+//                        mActivePointerId = event.getPointerId(0)
+//                        Log.e(TAG, "onTouch: mlast $mLastTouchX")
+//                        Log.e(TAG, "onTouch: mlast $mLastTouchY")
+//                        Log.e(TAG, "onTouch: mActivePointerId $mActivePointerId")
+//                    }
+//                    MotionEvent.ACTION_UP -> {
+//                        Log.e(TAG, "onTouch: --------------- ACTION_UP")
+//                        mActivePointerId = 999
+//                    }
+//                    MotionEvent.ACTION_CANCEL -> {
+//                        Log.e(TAG, "onTouch: --------------- ACTION_CANCEL")
+//                        mActivePointerId = 999
+//                    }
+//                    MotionEvent.ACTION_POINTER_UP -> {
+//                        Log.e(TAG, "onTouch: --------------- ACTION_POINTER_UP")
+//                        mActivePointerId = 999
+//                        val pointerIndex = event.actionIndex
+//                        val pointerId = event.getPointerId(pointerIndex)
+//                      //  if (pointerId == mActivePointerId) {
+//
+//                            val newPointerIdex = if (pointerIndex == 0) 1 else 0
+//                            mLastTouchX = event.getX(newPointerIdex)
+//                            mLastTouchY = event.getY(newPointerIdex)
+//                            mActivePointerId = event.getPointerId(newPointerIdex)
+//                            Log.e(TAG, "onTouch: mlast $mLastTouchX")
+//                            Log.e(TAG, "onTouch: mlast $mLastTouchY")
+//                            Log.e(TAG, "onTouch: mActivePointerId $mActivePointerId")
+//                        //}
+//                    }
+//                }
+
+//                if (mDetector.onTouchEvent(event) ) {
+//                    Log.e(TAG, "o?????nTouch: mDetector activiated")
+//                    return true
+//                }

@@ -48,23 +48,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     private var listener: SongsFragListener? = null
     interface SongsFragListener: IMainActivity {
         fun onSongSelect(index: Int, text: String)
-        fun onOptionsSort()
+        fun onSettingsSort()
         fun getPlaylist(): MutableList<Song>?
-
-
     }
-    companion object {
-        const val TAG = "SongsFragment"
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) : SongsFragment {
-            val songsFragment = SongsFragment()
-            val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
-            songsFragment.arguments = args
-            return songsFragment
-        }
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +62,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     override fun onResume() {
         super.onResume()
 
-        //preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
@@ -101,12 +87,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 //        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
 //        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
 
-
-        val btn: Button = view.findViewById(R.id.btnA) as Button
-        btn.setOnClickListener { doButtonA(it) }
-
-        val btnB: Button = view.findViewById(R.id.btnB) as Button
-        btnB.setOnClickListener { v -> doButtonB(v)  }
         return view
     }
 
@@ -123,41 +103,21 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         }
     }
 
-    // BUTTON a
-    fun doButtonA(v: View) {
-        Log.e(TAG, "Clicked Button A")
 
-        if ( fragmentManager != null) {
-            Log.e(TAG, "Found fragment: " + requireFragmentManager().backStackEntryCount.toString())
-            for (entry in 0 until requireFragmentManager().backStackEntryCount) {
-                Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).id)
-                Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).name)
-            }
-        }
-    }
-
-    fun doButtonB(v: View) {
-    //    Log.e(TAG, mService.randomNumber.toString())
-        Log.e(TAG, "Clicked Button B")
-
-    }
-
-
-    override fun onItemClick(position: Int, text: String) {
+    override fun onItemClick(position: Int, uri: String) {
 
         Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
-        Log.e(TAG, "onItemClick text/uri: $text")
-
+        Log.e(TAG, "onItemClick text/uri: $uri")
+        val x = songList
         songListFull?.forEachIndexed { idx, element ->
-            if (element.uri.toString() == text) {
-                listener?.onSongSelect(idx, text)
+            if (element.uri.toString() == uri) {
+                listener?.onSongSelect(idx, uri)
                 Log.e(TAG, "onItemClick: FOUND IT ${element.uri.toString()}")
-                Log.e(TAG, "onItemClick: FOUND IT $text")
+                Log.e(TAG, "onItemClick: FOUND IT $uri")
                 Log.e(TAG, "onItemClick: FOUND IT $idx")
                 return@forEachIndexed
             }
         }
-        listener?.onSongSelect(position, text)
         UIUtil.hideKeyboard(requireActivity())
 
     }
@@ -193,7 +153,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val sortBy = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key),"")
 
-        //TODO - the below is just stupid.
+        //TODO - the below seems stupid.
         if ( sortBy == getString(R.string.sort_artist_asc) ){
             menu.findItem(R.id.sortArtistAscId).isChecked = true
         }
@@ -221,7 +181,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         Log.e(TAG, "handleSortClick: sortby $sortBy")
         editor.putString(resources.getString(R.string.save_state_sort_key), sortBy)
         editor.commit()
-        listener?.onOptionsSort()
+        listener?.onSettingsSort()
 
         updateRecViewer()
 
@@ -262,14 +222,49 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 handleSortClick(resources.getString(R.string.sort_recent_least))
                 return false
             }
+            R.id.settingsId -> {
+                Log.e(TAG, "onOptionsItemSelected: options click")
+                listener?.handleSettingsClick()
+                return false
+            }
+            R.id.supportId -> {
+                Log.e(TAG, "onOptionsItemSelected: support click")
+
+                return false
+            }
             else -> super.onOptionsItemSelected(item)
         }
         return true
         //return super.onOptionsItemSelected(item)
     }
+
+    companion object {
+        const val TAG = "SongsFragment"
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) : SongsFragment {
+            val songsFragment = SongsFragment()
+            val args = Bundle()
+            args.putString(ARG_PARAM1, param1)
+            args.putString(ARG_PARAM2, param2)
+            songsFragment.arguments = args
+            return songsFragment
+        }
+    }
 }
 
 
+//// BUTTON a
+//fun doButtonA(v: View) {
+//    Log.e(TAG, "Clicked Button A")
+//
+//    if ( fragmentManager != null) {
+//        Log.e(TAG, "Found fragment: " + requireFragmentManager().backStackEntryCount.toString())
+//        for (entry in 0 until requireFragmentManager().backStackEntryCount) {
+//            Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).id)
+//            Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).name)
+//        }
+//    }
+//}
 
 //        val intent = Intent("custom-event-name")
 //        intent.putExtra("message", "This is SONGSONGSONGSONG message!")

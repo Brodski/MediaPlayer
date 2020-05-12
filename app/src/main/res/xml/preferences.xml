@@ -5,37 +5,51 @@
     <PreferenceCategory
         app:title="Preferences">
 
-    <CheckBoxPreference
-        android:key="checkbox"
-        android:title="Title_checkbox_preference"
-        android:summary="Summary_checkbox_preference"
-    />
-    <SwitchPreferenceCompat
-        android:key="switch"
-        android:title="title_switch_preference"
-        android:summary="Summary_switch_preference"
-    />
-    <DropDownPreference
-        android:key="dropdown"
-        android:title="dropdown_preference"
-        android:entries="@array/entries"
-        app:useSimpleSummaryProvider="true"
-        android:entryValues="@array/entry_values"/>
-    <ListPreference
-        app:key="list_example"
-        app:title="title_preference"
-        app:useSimpleSummaryProvider="true"
-        app:entries="@array/entries"
-        app:entryValues="@array/entry_values"
-        app:dialogTitle="dialog_title_preference"/>
+        <Preference
+            android:key="single_line_title"
+            android:title="this is a item that does nothing at all"
+            android:summary="This is a summary"
+            app:singleLineTitle="true" />
+        <CheckBoxPreference
+            android:key="checkbox"
+            android:title="Title_checkbox_preference"
+            android:summary="Summary_checkbox_preference"
+        />
+        <SwitchPreferenceCompat
+            android:key="switch"
+            android:title="title_switch_preference"
+            android:summary="Summary_switch_preference"
+        />
+        <DropDownPreference
+            android:key="dropdown"
+            android:title="dropdown_preference"
+            android:entries="@array/entries"
+            app:useSimpleSummaryProvider="true"
+            android:entryValues="@array/entry_values"/>
+        <ListPreference
+            app:key="list_example"
+            app:title="title_preference"
+            app:useSimpleSummaryProvider="true"
+            app:entries="@array/entries"
+            app:entryValues="@array/entry_values"
+            app:dialogTitle="dialog_title_preference"/>
+        <ListPreference
+            app:key="save_state_increment"
+            app:title="Rewind &amp; Forward Increment"
+            app:useSimpleSummaryProvider="true"
+            app:entries="@array/increment"
+            app:entryValues="@array/increment_values"
+            app:dialogTitle="Increment seconds"
+            android:defaultValue="@string/default_increment"
+            />
 
-    <ListPreference
-        app:key="save_state_sort_key"
-        app:title="Sort Audio By"
-        app:useSimpleSummaryProvider="true"
-        app:entries="@array/sort_keys_array"
-        app:entryValues="@array/sort_values"
-        app:dialogTitle="Sort Audio By"/>
+        <ListPreference
+            app:key="save_state_sort_key"
+            app:title="Sort Audio By"
+            app:useSimpleSummaryProvider="true"
+            app:entries="@array/sort_keys_array"
+            app:entryValues="@array/sort_values"
+            app:dialogTitle="Sort Audio By"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

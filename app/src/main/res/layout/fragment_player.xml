@@ -1,44 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
     style="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_dark"
+    android:background="@android:color/background_dark"
     android:orientation="vertical"
     tools:context=".PlayerFragment">
 
     <include
         layout="@layout/toolbar"
     />
-
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/main_view2"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="match_parent"
         app:controller_layout_id="@layout/controls_playback"
+        app:played_color="@android:color/holo_blue_bright"
+        app:unplayed_color="@color/DEFAULT_BUFFERED_COLOR"
+        app:buffered_color="@color/DEFAULT_BUFFERED_COLOR"
 
-        app:default_artwork="@drawable/ic_music_noteinv"
+
+        app:default_artwork="@drawable/music_note_circlesmallinv3"
         app:fastforward_increment="30000"
-        app:hide_on_touch="false"
         app:rewind_increment="30000"
+        app:hide_on_touch="false"
         app:show_shuffle_button="true"
         app:show_timeout="0"
         app:use_sensor_rotation="true" />
 
-    <TextView
-        android:id="@+id/fragTextIdB"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="fragment Player" />
-
-    <Button
-        android:id="@+id/btnB"
-        android:layout_width="171dp"
-        android:layout_height="wrap_content"
-        android:text="talk Service" />
-
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

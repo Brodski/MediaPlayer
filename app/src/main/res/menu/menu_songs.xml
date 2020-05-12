@@ -51,8 +51,8 @@
         </menu>
         </item>
     <item
-        android:id="@+id/optionsId"
-        android:title="Options"
+        android:id="@+id/settingsId"
+        android:title="Settings"
         app:showAsAction="never" >
     </item>
     <item

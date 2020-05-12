@@ -49,6 +49,35 @@
         <item>@string/sort_recent_least</item>
     </string-array>
 
+
+
+    <string name="save_state_increment">save_state_increment</string>
+    <string name="default_increment">15000</string>
+    <string-array name="increment">
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+        <item>20 seconds</item>
+        <item>25 seconds</item>
+        <item>30 seconds</item>
+        <item>45 seconds</item>
+        <item>60 seconds</item>
+    </string-array>
+
+    <string-array name="increment_values">
+        <item>5000</item>
+        <item>10000</item>
+        <item>@string/default_increment</item>
+        <item>20000</item>
+        <item>25000</item>
+        <item>30000</item>
+        <item>45000</item>
+        <item>60000</item>
+    </string-array>
+
+
+
+
     <string-array name="entries">
         <item>First Value</item>
         <item>Second Value</item>

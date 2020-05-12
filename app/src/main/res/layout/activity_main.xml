@@ -20,7 +20,7 @@
 
     <Button
         android:id="@+id/buttonId"
-        android:text="Button Right"
+        android:text="does nothing"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="bottonRight"
@@ -47,15 +47,6 @@
         android:layout_alignParentRight="true"
         android:text="edit settings"
         android:layout_below="@+id/buttonId2"
-        />
-    <Button
-        android:id="@+id/buttonId4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="preserveCurrentSelection"
-        android:layout_alignParentRight="true"
-        android:text="preserve Selection"
-        android:layout_below="@+id/buttonId3"
         />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

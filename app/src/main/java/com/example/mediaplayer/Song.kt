@@ -7,7 +7,6 @@ import android.os.Parcelable
 
 data class Song(
     var id: Int = -1,
-    var imageResource: Int,
     var title: String = "",
     var artist: String = "",
     var dateCreated: Int = 0,
@@ -17,19 +16,16 @@ data class Song(
     ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
-        parcel.readInt(),
         parcel.readString().toString(),
         parcel.readString().toString(),
         parcel.readInt(),
         parcel.readInt(),
         parcel.readParcelable(Uri::class.java.classLoader),
         parcel.readParcelable(Bitmap::class.java.classLoader)
-    ) {
-    }
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
-        parcel.writeInt(imageResource)
         parcel.writeString(title)
         parcel.writeString(artist)
         parcel.writeInt(dateCreated)

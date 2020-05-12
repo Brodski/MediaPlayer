@@ -33,12 +33,13 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
 class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, SongsFragment.SongsFragListener {
 
+
     private val MY_PERM_REQUEST = 1
 
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
     private var mBound = false
-    private  var someInt: Int = 0
+    private var someInt: Int = 0
 
     private var mService: AudioPlayerService? = null
 
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
+
     override fun onSongSelect(index: Int, uri: String) {
         Log.e(TAG, "currenlty playing " + mService?.exoPlayer?.currentWindowIndex.toString())
         Log.e(TAG, "onSongSelect: recived uri $uri index: $index" )
@@ -104,13 +106,29 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
-    override fun onOptionsSort() {
+    override fun onSettingsSort() {
 //        mService?.build2()
         mService?.buildMediaAgain()
     }
 
     override fun getPlayer(): SimpleExoPlayer? {
         return mService?.exoPlayer
+    }
+
+    override fun skipForward(rewind: Boolean) {
+        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        var increment = sharedpreferences.getString(resources.getString(R.string.save_state_increment), "15000")?.toInt() ?: 15000
+        if (rewind == true) {
+            increment = increment * -1
+        }
+        mService?.exoPlayer?.currentPosition?.also {playPosition ->
+            mService?.exoPlayer?.seekTo(playPosition + increment)
+        }
+
+    }
+
+    override fun skipRewind() {
+        skipForward(true)
     }
 
     override fun getPlaylist(): MutableList<Song>? {
@@ -126,6 +144,12 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 //            return true
 //        }
 //        return false
+    }
+
+    override fun handleSettingsClick() {
+        Log.e(TAG, "handleSettingsClick: handeling...")
+        this.inflateFragment(R.string.pref_frag_tag)
+        Log.e(TAG, "handleSettingsClick: handed! :)")
     }
 
 
@@ -286,27 +310,11 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 inflateFragment(R.string.song_frag_tag)
                 bool = true
             }
-            R.id.nav_search -> {
-                Log.e(TAG, "onNavClick: search")
-                inflateFragment(R.string.pref_frag_tag)
-                bool = true
-            }
             else -> bool = false
         }
         return bool
     }
 
-    var mState: Bundle = Bundle()
-    fun saveStatePro(nameFrag: Int) {
-        var frag: Fragment? = null
-        for ( f in supportFragmentManager.fragments) {
-            Log.e(TAG, "onSaveInstanceState: $f")
-            frag = f
-        }
-        if (frag != null) {
-            supportFragmentManager.putFragment(mState, getString(nameFrag), frag)
-        }
-    }
 
     fun inflateFragment(nameFrag: Int) {
         var frag: Fragment? = null

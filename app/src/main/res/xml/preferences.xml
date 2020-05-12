@@ -10,46 +10,61 @@
             android:title="this is a item that does nothing at all"
             android:summary="This is a summary"
             app:singleLineTitle="true" />
-        <CheckBoxPreference
-            android:key="checkbox"
-            android:title="Title_checkbox_preference"
-            android:summary="Summary_checkbox_preference"
-        />
-        <SwitchPreferenceCompat
-            android:key="switch"
-            android:title="title_switch_preference"
-            android:summary="Summary_switch_preference"
-        />
-        <DropDownPreference
-            android:key="dropdown"
-            android:title="dropdown_preference"
-            android:entries="@array/entries"
-            app:useSimpleSummaryProvider="true"
-            android:entryValues="@array/entry_values"/>
-        <ListPreference
-            app:key="list_example"
-            app:title="title_preference"
-            app:useSimpleSummaryProvider="true"
-            app:entries="@array/entries"
-            app:entryValues="@array/entry_values"
-            app:dialogTitle="dialog_title_preference"/>
+
         <ListPreference
             app:key="save_state_increment"
             app:title="Rewind &amp; Forward Increment"
+            android:summary="Time skipped on swipe"
             app:useSimpleSummaryProvider="true"
             app:entries="@array/increment"
             app:entryValues="@array/increment_values"
             app:dialogTitle="Increment seconds"
             android:defaultValue="@string/default_increment"
-            />
+        />
 
-        <ListPreference
-            app:key="save_state_sort_key"
-            app:title="Sort Audio By"
-            app:useSimpleSummaryProvider="true"
-            app:entries="@array/sort_keys_array"
-            app:entryValues="@array/sort_values"
-            app:dialogTitle="Sort Audio By"/>
+        <SeekBarPreference
+            android:key="@string/save_state_slop"
+            android:title="Play &amp; Pause sensitivity"
+            android:max="@string/slop_max"
+            android:summary="Higher = Easier to activate play/pause \nAllows for sloppy taps to play/pause"
+        />
+
+        <SeekBarPreference
+            android:key="@string/save_state_skip_zone"
+            android:title="Rewind &amp; Forward Skip Sensitivity"
+            android:max="60"
+            app:min="10"
+            android:defaultValue="55"
+            app:defaultValue="15"
+            android:summary="Higher = Harder to activate a skip but easier to activate a volume change. \nValue is the angle that divides volume from skip"
+        />
+
 
     </PreferenceCategory>
 </PreferenceScreen>
+
+<!--<ListPreference-->
+<!--app:key="save_state_sort_key"-->
+<!--app:title="Sort Audio By"-->
+<!--app:useSimpleSummaryProvider="true"-->
+<!--app:entries="@array/sort_keys_array"-->
+<!--app:entryValues="@array/sort_values"-->
+<!--app:dialogTitle="Sort Audio By"/>-->
+
+
+<!--<CheckBoxPreference-->
+<!--android:key="checkbox"-->
+<!--android:title="Title_checkbox_preference"-->
+<!--android:summary="Summary_checkbox_preference"-->
+<!--    />-->
+<!--<SwitchPreferenceCompat-->
+<!--android:key="switch"-->
+<!--android:title="title_switch_preference"-->
+<!--android:summary="Summary_switch_preference"-->
+<!--    />-->
+<!--<DropDownPreference-->
+<!--android:key="dropdown"-->
+<!--android:title="dropdown_preference"-->
+<!--android:entries="@array/entries"-->
+<!--app:useSimpleSummaryProvider="true"-->
+<!--android:entryValues="@array/entry_values"/>-->

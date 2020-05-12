@@ -1,10 +1,7 @@
 package com.example.mediaplayer
 
 import android.Manifest
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -46,6 +43,11 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     private var playWhenReady = true
     private var currentWindow = 0
     private var playBackPosition: Long = 0
+
+    private lateinit var sharedPreferences: SharedPreferences
+    private var increment: Int? = null
+    private var slop: Int? = null
+    private var skipZone: Int? = null
 
     companion object { const val TAG = "MainActivity"
                         const val tag ="MainActivity"}
@@ -115,24 +117,28 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         return mService?.exoPlayer
     }
 
+    // could be better
     override fun skipForward(rewind: Boolean) {
-        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        var increment = sharedpreferences.getString(resources.getString(R.string.save_state_increment), "15000")?.toInt() ?: 15000
-        if (rewind == true) {
-            increment = increment * -1
+        increment = sharedPreferences.getString(resources.getString(R.string.save_state_increment), "15000")?.toInt() ?: 15000
+        mService?.exoPlayer?.currentPosition?.also { playPosition ->
+            mService?.exoPlayer?.seekTo(playPosition + increment!!)
         }
-        mService?.exoPlayer?.currentPosition?.also {playPosition ->
-            mService?.exoPlayer?.seekTo(playPosition + increment)
-        }
-
     }
 
+    // could be better
     override fun skipRewind() {
-        skipForward(true)
+        increment = sharedPreferences.getString(resources.getString(R.string.save_state_increment), "15000")?.toInt() ?: 15000
+        mService?.exoPlayer?.currentPosition?.also { playPosition ->
+            mService?.exoPlayer?.seekTo(playPosition - increment!!)
+        }
     }
 
     override fun getPlaylist(): MutableList<Song>? {
         return mService?.songList?.toMutableList()
+    }
+
+    override fun isPlaying(): Boolean? {
+        return mService?.exoPlayer?.playWhenReady
     }
 
     override fun isService(): Boolean {
@@ -197,6 +203,25 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 }
             }
         })
+
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), 0)
+        skipZone = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 0)
+
+        if (slop == 0 || skipZone == 0 ){
+            val editor = sharedPreferences.edit()
+            val defaultSlop = resources.getString(R.string.default_slop).toInt()
+            editor.putInt(resources.getString(R.string.save_state_slop), defaultSlop)
+            editor.putInt(resources.getString(R.string.save_state_skip_zone), 30)
+            editor.commit()
+        }
+        Log.e(TAG, "buildMediaStartUp: slop $slop")
+        Log.e(TAG, "buildMediaStartUp: save_state_skip_zone $skipZone")
+
+
+
+
 
     }
 
@@ -409,24 +434,24 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     fun editSettings(view: View){
-        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = sharedpreferences.edit()
-        editor.putString("dropdown", "1")
-        editor.putString("list_example", "2")
-        editor.putString("save_state_sort_key", "")
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = sharedPreferences.edit()
+//        editor.putString("dropdown", "1")
+//        editor.putString("list_example", "2")
+      //  editor.putString("save_state_sort_key", "")
         editor.commit()
     }
 
     fun getSettings(view: View) {
         Log.e(TAG, "getSettings: getting")
-        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val z1 = sharedpreferences.getBoolean("checkbox", true)
-        val z2 = sharedpreferences.getString("dropdown","")
-        val z3 = sharedpreferences.getString("list_example","")
-        val save_state_sort_key = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key),"")
-        Log.e(TAG, "getSettings: $z1")
-        Log.e(TAG, "getSettings: $z2")
-        Log.e(TAG, "getSettings: $z3")
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val save_state_sort_key = sharedPreferences.getString(resources.getString(R.string.save_state_sort_key),"")
+        val slopMax = resources.getString(R.string.slop_max).toInt()
+        val default_slop = resources.getString(R.string.default_slop).toInt()
+        val save_state_slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop),0)
+        Log.e(TAG, "slopMax: $slopMax")
+        Log.e(TAG, "default_slop: $default_slop")
+        Log.e(TAG, "save_state_slop: $save_state_slop")
         Log.e(TAG, "save_state_sort_key: $save_state_sort_key")
 
     }

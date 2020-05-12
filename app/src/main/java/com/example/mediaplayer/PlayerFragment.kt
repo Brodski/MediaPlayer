@@ -34,6 +34,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.io.IOException
 import java.lang.RuntimeException
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.log
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -56,6 +57,7 @@ class PlayerFragment : Fragment() {
         fun getPlayer(): SimpleExoPlayer?
         fun skipForward(rewind: Boolean = false)
         fun skipRewind()
+        fun isPlaying(): Boolean?
     }
 
 
@@ -103,6 +105,10 @@ class PlayerFragment : Fragment() {
 
     private lateinit var audioManager: AudioManager
     private lateinit var mDetector: GestureDetector
+    var slop_prevention  = 100
+    var forward_zone_degrees = 35
+    var rewind_zone_degrees = 180 - forward_zone_degrees
+
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
@@ -118,6 +124,23 @@ class PlayerFragment : Fragment() {
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment),resources.getString(R.string.default_increment))?.toInt() ?: 15000
+        slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
+//        val slopMax = resources.getString(R.string.slop_max).toInt()
+//        slop_prevention = slopMax - slop_prevention
+        forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
+        rewind_zone_degrees = 180 - forward_zone_degrees
+
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
+        Log.e(TAG, "onCreateView: forward_zone_degrees $forward_zone_degrees")
+        Log.e(TAG, "onCreateView: rewind_zone_degrees $rewind_zone_degrees")
+
         playerView = v.findViewById(R.id.main_view2)
         playerView?.setRewindIncrementMs(skipIncrement)
         playerView?.setFastForwardIncrementMs(skipIncrement)
@@ -191,44 +214,86 @@ class PlayerFragment : Fragment() {
             return
         }
         Log.e(TAG, "processSwipe: ==========================================")
-        val distanceX = x2!! - x1!!
-        val distanceY = y2!! - y1!!
+//        var distanceX = x2!! - x1!!
+//        var distanceY = y2!! - y1!!
+        var distanceX = (x2!! - x1!!).toDouble()
+        var distanceY = (y2!! - y1!!).toDouble()
         Log.e(TAG, "processSwipe: distanceX $distanceX")
         Log.e(TAG, "processSwipe: distanceY $distanceY ")
 
+//        val slop_prevention  = 100
+//        val forward_zone_degrees = 35
+//        val rewind_zone_degrees = 180 - forward_zone_degrees
+
+        var angle = atan2(distanceY, distanceX)
+        angle = Math.toDegrees(angle)
+//        Log.e(TAG, "processSwipe: forward zone: $forward_zone_degrees")
+//        Log.e(TAG, "processSwipe: rewind zone: $rewind_zone_degrees")
+        Log.e(TAG, "processSwipe: angle: $angle")
+        Log.e(TAG, "processSwipe: abs(angle): ${abs(angle)}")
+
+        if (abs(angle) < forward_zone_degrees && distanceX > slop_prevention) {
+            Log.e(TAG, "processSwipe: ++++++++++++++++ ")
+            skipForward()
+        }
+        else if (abs(angle) > rewind_zone_degrees && distanceX < (slop_prevention * -1) ) {
+            Log.e(TAG, "processSwipe: --------------- ")
+            skipRewind()
+        }
+        else if (distanceY < (slop_prevention * -1) ) {
+            Log.e(TAG, "processSwipe: VOLUME UP ")
+            Log.e(TAG, "processSwipe: ${listener?.isPlaying()}")
+            if (listener?.isPlaying() == true) {
+                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+            }
+        }
+        else if (distanceY > slop_prevention ) {
+            Log.e(TAG, "processSwipe: VOLUME DOWN ")
+//            volumeDown()
+            Log.e(TAG, "processSwipe: ${listener?.isPlaying()}")
+            if (listener?.isPlaying() == true) {
+                audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+            }
+        }
+        else {
+            Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000  ")
+        }
+
         // absDiff = diagonal detection (if we run diagonally, then abs diff will be small. If x = y, then perfect 45 diagonal
         val absDiff = if (abs(distanceX) > abs(distanceY)) abs(distanceX) - abs(distanceY) else abs(distanceY) - abs(distanceX) // I'm tired, dont judge me
-        Log.e(TAG, "processSwipe: abs(distanceX - distanceY) xxxxxxxxxxxxxx $absDiff")
+  //      Log.e(TAG, "processSwipe: abs(distanceX - distanceY) xxxxxxxxxxxxxx $absDiff")
 
-        if (absDiff < 50) {
-            Log.e(TAG, "processSwipe: NOPE-NOPE-NOPE-NOPE-")
-            return
-        } else if (distanceX > 100) {
-            Log.e(TAG, " >>>>>>>>>>>>>>> processSwipe: fast forward")
-            skipForward()
-        } else if (distanceX < -100) {
-            Log.e(TAG, " <<<<<<<<<<< processSwipe: rewind")
-            skipRewind()
-        } else if (distanceY > 100) {
-            Log.e(TAG, " ------------- processSwipe: turn up volue")
-
-            audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
-            //fun atan2(y: Float, x: Float): Float
-//            var xx: Douq:qble = 50.toDouble()
-//            var yy: Double = -50.toDouble()
-//            var tt = atan2(yy,xx)
-//            val dd =Math.toDegrees(tt)
-//            println(tt)
-//            println(dd)
-
-        } else if (distanceY < -100) {
-            Log.e(TAG, " ++++++++++++ processSwipe: turn up volue")
-            audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
-
-        } else {
-            Log.e(TAG, "processSwipe: Not today + Not today + Not today ")
-        }
+//        if (absDiff < 50) {
+//            Log.e(TAG, "processSwipe: NOPE-NOPE-NOPE-NOPE-")
+//            return
+//        }
+//        if (distanceX > 100) {
+//            Log.e(TAG, " >>>>>>>>>>>>>>> processSwipe: fast forward")
+//            skipForward()
+//        } else if (distanceX < -100) {
+//            Log.e(TAG, " <<<<<<<<<<< processSwipe: rewind")
+//            skipRewind()
+//        } else if (distanceY > 100) {
+//            Log.e(TAG, " ------------- processSwipe: turn up volue")
+//
+//            audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+//
+//        } else if (distanceY < -100) {
+//            Log.e(TAG, " ++++++++++++ processSwipe: turn up volue")
+//            audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+//
+//        } else {
+//            Log.e(TAG, "processSwipe: Not today + Not today + Not today ")
+//        }
         Log.e(TAG, "processSwipe: ==========================================")
+    }
+
+    private fun volumeUp() {
+        audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+    }
+    private fun volumeDown() {
+        audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+
     }
 
     fun setPlayer(){

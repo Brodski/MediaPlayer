@@ -26,6 +26,8 @@
 
     <string name="save_state_song_index_key">save_state_song_index_key</string>
     <string name="save_state_song_playtime">save_state_song_playtime</string>
+    <string name="save_state_slop">save_state_slop</string>
+    <string name="save_state_skip_zone">save_state_skip_zone</string>
 
 
 
@@ -53,6 +55,8 @@
 
     <string name="save_state_increment">save_state_increment</string>
     <string name="default_increment">15000</string>
+    <string name="default_slop">100</string>
+    <string name="slop_max">300</string>
     <string-array name="increment">
         <item>5 seconds</item>
         <item>10 seconds</item>

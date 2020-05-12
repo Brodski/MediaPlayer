@@ -177,6 +177,7 @@ class AudioPlayerService : Service() {
         val sortBy = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key), resources.getString(R.string.sort_recent_most))
         val idxWhenStopped= sharedpreferences.getInt(resources.getString(R.string.save_state_song_index_key), 0)
         val playPosition = sharedpreferences.getLong(resources.getString(R.string.save_state_song_playtime), 0)
+
         Log.e(TAG, "buildMediaStartUp: ==========================================")
         Log.e(TAG, "buildMediaStartUp: building at sortBy $sortBy")
         Log.e(TAG, "buildMediaStartUp: building at idx $idxWhenStopped")

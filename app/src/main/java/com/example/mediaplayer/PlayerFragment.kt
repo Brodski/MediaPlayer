@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -52,12 +53,14 @@ class PlayerFragment : Fragment() {
     private var player: SimpleExoPlayer? = null
     private lateinit var mService: AudioPlayerService
     private var listener: PlayerFragListener? = null
+    private var skipIncrement: Int = 10000
 
     interface PlayerFragListener: IMainActivity {
         fun getPlayer(): SimpleExoPlayer?
         fun skipForward(rewind: Boolean = false)
         fun skipRewind()
         fun isPlaying(): Boolean?
+        fun togglePlayPause()
     }
 
 
@@ -123,41 +126,23 @@ class PlayerFragment : Fragment() {
 
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        val skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment),resources.getString(R.string.default_increment))?.toInt() ?: 15000
+        skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment),resources.getString(R.string.default_increment))?.toInt() ?: 15000
         slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
-//        val slopMax = resources.getString(R.string.slop_max).toInt()
-//        slop_prevention = slopMax - slop_prevention
+
         forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
         rewind_zone_degrees = 180 - forward_zone_degrees
-
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: slop_prevention $slop_prevention")
-        Log.e(TAG, "onCreateView: forward_zone_degrees $forward_zone_degrees")
-        Log.e(TAG, "onCreateView: rewind_zone_degrees $rewind_zone_degrees")
 
         playerView = v.findViewById(R.id.main_view2)
         playerView?.setRewindIncrementMs(skipIncrement)
         playerView?.setFastForwardIncrementMs(skipIncrement)
 
+        player = listener?.getPlayer()
+
+
         val toolbar: Toolbar = v.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
         toolbar.title = "Cool Player"
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
-//        playerView?.showController()
-        
-//        var bundle: Bundle? = this!!.arguments
-//        if (bundle!!.containsKey(getString(R.string.song_bundle))) {
-//            Log.e(TAG, "HAS SONG BUNDLE!!!")
-//            val s =bundle.getParcelable<Song>(getString(R.string.song_bundle))
-//            Log.e(TAG, s.toString())
-//        }
 
         mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
             override fun onShowPress(e: MotionEvent?) {
@@ -166,6 +151,7 @@ class PlayerFragment : Fragment() {
 
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
                 Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000 ")
+                listener?.togglePlayPause()
                 return true
             }
 
@@ -205,6 +191,9 @@ class PlayerFragment : Fragment() {
                 return true;
             }
         })
+
+
+
         return v
     }
 
@@ -214,21 +203,12 @@ class PlayerFragment : Fragment() {
             return
         }
         Log.e(TAG, "processSwipe: ==========================================")
-//        var distanceX = x2!! - x1!!
-//        var distanceY = y2!! - y1!!
         var distanceX = (x2!! - x1!!).toDouble()
         var distanceY = (y2!! - y1!!).toDouble()
         Log.e(TAG, "processSwipe: distanceX $distanceX")
         Log.e(TAG, "processSwipe: distanceY $distanceY ")
-
-//        val slop_prevention  = 100
-//        val forward_zone_degrees = 35
-//        val rewind_zone_degrees = 180 - forward_zone_degrees
-
         var angle = atan2(distanceY, distanceX)
         angle = Math.toDegrees(angle)
-//        Log.e(TAG, "processSwipe: forward zone: $forward_zone_degrees")
-//        Log.e(TAG, "processSwipe: rewind zone: $rewind_zone_degrees")
         Log.e(TAG, "processSwipe: angle: $angle")
         Log.e(TAG, "processSwipe: abs(angle): ${abs(angle)}")
 
@@ -256,9 +236,8 @@ class PlayerFragment : Fragment() {
         }
         else {
             Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000  ")
+            listener?.togglePlayPause()
         }
-
-
         Log.e(TAG, "processSwipe: ==========================================")
     }
 
@@ -307,7 +286,26 @@ class PlayerFragment : Fragment() {
             }
             R.id.supportId -> {
                 Log.e(TAG, "baby: supportId click")
+                // Internet to donate intent
+//                val googleString:String = "https://www.google.com/"
+                val googleString:String = resources.getString(R.string.donate_uri)
+                val mUri: Uri = Uri.parse(googleString)
+                //isntead of context of our app, this will go outside of our app
+                val goToGoogleIntent = Intent(Intent.ACTION_VIEW, mUri)
 
+                val pm = activity?.packageManager
+                if (pm != null) {
+                    if (goToGoogleIntent.resolveActivity(pm) != null) {
+                        startActivity(goToGoogleIntent)
+                    }
+                }
+
+                // Intent must exist before to start it
+//                val acts: List<ResolveInfo> = packageManager.queryIntentActivities(goToGoogleIntent, 0)
+//                val isIntentSafe: Boolean = acts.isNotEmpty()
+//                if (isIntentSafe){
+//                    startActivity(goToGoogleIntent)
+//                }
                 return false
             }
         }

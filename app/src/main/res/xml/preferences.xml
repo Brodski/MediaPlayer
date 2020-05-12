@@ -28,7 +28,7 @@
             android:title="Rewind &amp; Forward Zone Size"
             android:max="60"
             app:min="15"
-            android:summary="Higher = Easier to activate a skip but easier to activate a volume change. \nIs the angle that seperates volume from skip"
+            android:summary="Higher = Easier to activate a skip but harder to activate a volume change. \nIs the angle that seperates volume from skip"
         />
 
 

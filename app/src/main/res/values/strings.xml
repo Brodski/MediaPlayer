@@ -2,6 +2,8 @@
     <string name="app_name">MediaPlayer</string>
     <string name="playback_channel_name">MediaPlayer channel name</string>
     <string name="playback_channel_description">Cool MediaPlayer description</string>
+    <string name="donate_uri">https://www.youtube.com/watch?v=0vnXH18FMoc</string>
+
     <string name="song_frag_tag">songsTag</string>
     <string name="player_frag_tag">playerTag</string>
     <string name="pref_frag_tag">preferenceTag</string>

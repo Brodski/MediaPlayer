@@ -10,11 +10,11 @@ import android.os.IBinder
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.preference.ListPreference
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
@@ -113,6 +113,17 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         mService?.buildMediaAgain()
     }
 
+    override fun togglePlayPause() {
+        Log.e(TAG, "togglePlayPause: ${!(mService?.exoPlayer?.playWhenReady)!!}")
+        if (mService != null ) {
+            if (mService!!.exoPlayer != null) {
+                mService?.exoPlayer?.playWhenReady = !(mService?.exoPlayer?.playWhenReady)!!
+            }
+        }
+
+
+    }
+
     override fun getPlayer(): SimpleExoPlayer? {
         return mService?.exoPlayer
     }
@@ -160,11 +171,22 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         Log.e(TAG, "initPlayer2: mbound $mBound")
         Log.e(TAG, "initPlayer2: service !null ${(mService != null)}")
         Log.e(TAG, "initPlayer2: mService $mService")
+        askPermissions()
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
+        Log.e(TAG, "initPlayer2: NO!!!!!!")
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(this, intent)
+
+
+//        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+//        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//        Util.startForegroundService(this, intent)
     }
 
     private fun releasePlayer2() {
@@ -185,7 +207,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
             Log.e(TAG, "found some fragment $restoredFragment")
         }
-        initPlayer2()
+//        initPlayer2()
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigationId)
         bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
@@ -199,8 +221,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 }
             }
         })
-
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), 0)
         skipZone = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 0)
@@ -214,15 +234,12 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
         Log.e(TAG, "buildMediaStartUp: slop $slop")
         Log.e(TAG, "buildMediaStartUp: save_state_skip_zone $skipZone")
-
-
-
-
-
     }
 
     override fun onStart() {
         super.onStart()
+        initPlayer2()
+
         Log.e(TAG,"START MainActivity")
         //Log.e(TAG, someInt.toString())
      //   initPlayer2()
@@ -241,7 +258,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
                 .commit()
         } else if (supportFragmentManager.fragments.size == 0) {
-            askPermissions()
+//            askPermissions()
+            continueBuildApp()
+//            continueBuildApp2()
         }
 
     }
@@ -273,8 +292,16 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         releasePlayer2()
     }
 
+    fun continueBuildApp2() {
+        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        Util.startForegroundService(this, intent)
+        inflateFragment(R.string.player_frag_tag)
+
+    }
     fun continueBuildApp() {
         inflateFragment(R.string.player_frag_tag)
+
         //val audioList = queryActually()
      //   Log.e(TAG, "Is granted")
     }
@@ -285,14 +312,29 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     fun askPermissions() {
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
             // Has permissions
-            continueBuildApp()
+//            continueBuildApp()
+            continueBuildApp2()
+
+//            var intent: Intent = Intent(this, AudioPlayerService::class.java)
+//            this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//            Util.startForegroundService(this, intent)
+//            continueBuildApp()
         } else {
 
             Log.e(TAG, "READ EXTERNAL NOT GRANTED")
             // shouldShowRequestPermissionRationale: false if disabled or "do not ask again"
             // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
             if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
+                //ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
+                AlertDialog.Builder(this)
+                    .setTitle("Permission needed")
+                    .setMessage("Required to access audio files")
+                    .setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which -> ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST) })
+                    .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
+                    .create().show()
+
+
+
             } else {
                 ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
             }
@@ -303,8 +345,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         when (requestCode) {
             MY_PERM_REQUEST -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-//                    Log.e(TAG,":) Permission granted!")
-                    continueBuildApp()
+                    Log.e(TAG,":) Permission granted!")
+//                    continueBuildApp()
+                    continueBuildApp2()
                 } else {
                     var startMain = Intent(Intent.ACTION_MAIN);
                     startMain.addCategory(Intent.CATEGORY_HOME);
@@ -416,18 +459,11 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        Log.e(TAG,"onRestoreInstanceState")
-
-
-//        if (savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
-//            restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
-//            Log.e(TAG, ">>>>>>>>>>>>>>>>>>> onCreate bundle Frag $restoredFragment <<<<<<<<<<<<<<<<<")
-//        } else {
-//            Log.e(TAG, ">>>>>>>>>>>>>>>>>>>> onCreate no bundlde<<<<<<<<<<<<<<<<<}")
-//        }
-    }
+//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+//        super.onRestoreInstanceState(savedInstanceState)
+//        Log.e(TAG,"onRestoreInstanceState")
+//
+//    }
 
     fun editSettings(view: View){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)

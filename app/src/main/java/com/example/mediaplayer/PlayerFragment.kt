@@ -275,42 +275,22 @@ class PlayerFragment : Fragment() {
     
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.item2 -> {
-                Log.e(TAG, "item 2")
-                return false
-            }
             R.id.settingsId -> {
                 Log.e(TAG, "baby: settings click")
                 listener?.handleSettingsClick()
                 return false
             }
+            R.id.contactId -> {
+                listener?.sendEmail()
+            }
             R.id.supportId -> {
-                Log.e(TAG, "baby: supportId click")
-                // Internet to donate intent
-//                val googleString:String = "https://www.google.com/"
-                val googleString:String = resources.getString(R.string.donate_uri)
-                val mUri: Uri = Uri.parse(googleString)
-                //isntead of context of our app, this will go outside of our app
-                val goToGoogleIntent = Intent(Intent.ACTION_VIEW, mUri)
-
-                val pm = activity?.packageManager
-                if (pm != null) {
-                    if (goToGoogleIntent.resolveActivity(pm) != null) {
-                        startActivity(goToGoogleIntent)
-                    }
-                }
-
-                // Intent must exist before to start it
-//                val acts: List<ResolveInfo> = packageManager.queryIntentActivities(goToGoogleIntent, 0)
-//                val isIntentSafe: Boolean = acts.isNotEmpty()
-//                if (isIntentSafe){
-//                    startActivity(goToGoogleIntent)
-//                }
+//                listener?.plzDonate()
                 return false
             }
         }
         return false
     }
+
     companion object {
         const val TAG = "PlayerFragment"
         @JvmStatic
@@ -372,3 +352,4 @@ class PlayerFragment : Fragment() {
 //                    Log.e(TAG, "o?????nTouch: mDetector activiated")
 //                    return true
 //                }
+

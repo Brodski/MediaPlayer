@@ -13,5 +13,10 @@
         android:title="Donate"
         app:showAsAction="never" >
     </item>
+    <item
+        android:id="@+id/contactId"
+        android:title="Contact"
+        app:showAsAction="never" >
+    </item>
 
 </menu>

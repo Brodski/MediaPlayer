@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/search_bar_songs"
-        android:icon="@drawable/ic_search"
+        android:icon="@drawable/ic_search_white"
         android:title="search"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
@@ -58,6 +58,11 @@
     <item
         android:id="@+id/supportId"
         android:title="Donate"
+        app:showAsAction="never" >
+    </item>
+    <item
+        android:id="@+id/contactId"
+        android:title="Contact"
         app:showAsAction="never" >
     </item>
 

@@ -227,9 +227,9 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 listener?.handleSettingsClick()
                 return false
             }
-            R.id.supportId -> {
-                Log.e(TAG, "onOptionsItemSelected: support click")
-
+            R.id.contactId -> {
+                Log.e(TAG, "onOptionsItemSelected: contactId click")
+                listener?.sendEmail()
                 return false
             }
             else -> super.onOptionsItemSelected(item)

@@ -12,6 +12,7 @@ import android.graphics.Canvas
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.MediaStore
@@ -21,13 +22,16 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
@@ -81,6 +85,7 @@ class AudioPlayerService : Service() {
         const val TAG = "AudioPlayerService"
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate() {
         super.onCreate()
 
@@ -108,6 +113,14 @@ class AudioPlayerService : Service() {
             }
         })
         mediaSessionConnector!!.setPlayer(exoPlayer)
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.CONTENT_TYPE_MUSIC)
+            .build()
+        exoPlayer?.setAudioAttributes(audioAttributes, true)
+
+
     }
 
     private fun initializeNotificationManager() {
@@ -282,6 +295,8 @@ class AudioPlayerService : Service() {
     private fun actualQuerySongs(context: Context): MutableList<Song> {
         val songList = mutableListOf<Song>()
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
+
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -337,9 +352,13 @@ class AudioPlayerService : Service() {
                 var art: Bitmap? = if (rawArt != null) {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
-//                    BitmapFactory.decodeResource(resources, R.drawable.music_note_icon)
-                    getBitmapFromVectorDrawable(context, R.drawable.ic_music_note)
+//                    BitmapFactory.decodeResource(resources, R.drawable.ic_music_video_whitesoft)
+//                    BitmapFactory.decodeResource(resources, R.drawable.ic_folder)
+                    defaultArt
+//                    getBitmapFromVectorDrawable(context, R.drawable.ic_music_note)
+//                    getBitmapFromVectorDrawable(context, R.drawable.music_note_iconinv)
                 }
+                //var thefuck = BitmapFactory.decodeResource(resources, R.drawable.ic_audiotrack)
 //                Log.e(TAG, "id $id")
 //                Log.e(TAG, "audioUri $audioUri")
 //                Log.e(TAG, "title $title")
@@ -500,7 +519,7 @@ class AudioPlayerService : Service() {
                 artist = "Media Right Productions",
                 duration = 10,
                 dateCreated = 100,
-                art = getBitmapFromVectorDrawable(mContext, R.drawable.ic_music_note)
+                art = getBitmapFromVectorDrawable(mContext, R.drawable.ic_audiotrack_white)
             )
         )
         if (songList2?.size == 1) {
@@ -512,7 +531,7 @@ class AudioPlayerService : Service() {
                     artist = "Sacha Goedegebure",
                     duration = 11,
                     dateCreated = 101,
-                    art = getBitmapFromVectorDrawable(mContext, R.drawable.ic_music_note)
+                    art = getBitmapFromVectorDrawable(mContext, R.drawable.ic_audiotrack_white)
                 )
             )
         }

@@ -52,12 +52,12 @@
                 style="@style/ExoMediaButton.Next" />
 
 
-            <ImageButton android:id="@id/exo_rew"
-                style="@style/ExoMediaButton.Rewind"/>
-            <ImageButton android:id="@id/exo_ffwd"
-                style="@style/ExoMediaButton.FastForward"/>
         </LinearLayout>
 
+<!--        <ImageButton android:id="@id/exo_rew"-->
+<!--            style="@style/ExoMediaButton.Rewind"/>-->
+<!--        <ImageButton android:id="@id/exo_ffwd"-->
+<!--            style="@style/ExoMediaButton.FastForward"/>-->
 <!--        <ImageButton android:id="@id/exo_vr"-->
 <!--            style="@style/ExoMediaButton.VR"/>-->
 <!--        <ImageButton android:id="@id/exo_repeat_toggle"-->

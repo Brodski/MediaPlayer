@@ -6,7 +6,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
+    android:background="#ebebeb"
 
     tools:context=".MainActivity">
 
@@ -54,11 +54,16 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
+        android:background="@color/colorBottomNav"
+        app:itemTextColor="@drawable/nav_item_background"
+        app:itemIconTint="@drawable/nav_item_background"
         app:menu="@menu/bottom_navigation"
-        android:background="@android:color/holo_red_dark"
+
+
     />
 
 </RelativeLayout>
+<!--    android:background="@color/colorPrimary2"-->
 
-
+<!--    android:background="@android:color/holo_red_dark"-->
 <!--    app:controller_layout_id="@layout/custom_playback_control"-->

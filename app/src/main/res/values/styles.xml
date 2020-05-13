@@ -9,8 +9,22 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+<!--    <style name="CoolToolThemeBADOLD" parent="@style/ThemeOverlay.AppCompat.Light">-->
+<!--        <item name="android:textColorPrimary">@android:color/holo_green_dark</item>-->
+<!--        <item name="android:textColor">@android:color/holo_green_dark</item>-->
+<!--    </style>-->
+<!--    <style name="CoolToolTheme" parent="@style/Widget.MaterialComponents.BottomNavigationView.Colored">-->
+<!--        <item name="backgroundTint">@color/colorWhite</item>-->
+<!--        <item name="colorPrimary">#292937</item>-->
+<!--        <item name="android:textColorPrimary">@android:color/holo_green_dark</item>-->
+<!--        <item name="android:textColor">@android:color/holo_green_dark</item>-->
+<!--        <item name="colorOnSurface">@android:color/holo_red_light</item>-->
+<!--    </style>-->
+
 <!--    <style name="MyActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">-->
 <!--        <item name="android:textColorPrimary">#fa0</item>-->
 <!--    </style>-->
+<!--    <item name="colorPrimary">@color/colorPrimary</item>-->
+<!--    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
 
 </resources>

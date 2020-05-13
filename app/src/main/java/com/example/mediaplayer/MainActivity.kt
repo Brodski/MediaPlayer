@@ -95,6 +95,22 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
+    override fun sendEmail() {
+        //https://developer.android.com/guide/components/intents-common#ComposeEmail
+        Log.e(TAG, "onOptionsItemSelected: support/donate click")
+        val mAddress = arrayOf(resources.getString(R.string.contact_my_email))
+        val subject = resources.getString(R.string.contact_subject)
+        val msg = resources.getString(R.string.contact_intent_msg)
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:") // only email apps should handle this
+            putExtra(Intent.EXTRA_EMAIL, mAddress)
+            putExtra(Intent.EXTRA_SUBJECT, subject)
+            //     Intent.createChooser(this, msg)
+        }
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
 
     override fun onSongSelect(index: Int, uri: String) {
         Log.e(TAG, "currenlty playing " + mService?.exoPlayer?.currentWindowIndex.toString())
@@ -105,6 +121,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             Log.e(TAG, "onSongSelect: Chaning song")
             mService?.exoPlayer?.seekTo(index,0)
             mService?.exoPlayer?.playWhenReady = true
+            inflateFragment(R.string.player_frag_tag)
         }
     }
 
@@ -492,6 +509,25 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     }
 
+    fun plzDonate() {
+        fun plzDonate() {
+            Log.e(TAG, "baby: supportId click")
+            // Internet to donate intent
+//                val googleString:String = "https://www.google.com/"
+            val googleString:String = resources.getString(R.string.donate_uri)
+            val mUri: Uri = Uri.parse(googleString)
+
+
+            val goToGoogleIntent = Intent(Intent.ACTION_VIEW, mUri)
+            val title = resources.getString(R.string.contact_intent_msg)
+            val chooser: Intent = Intent.createChooser(goToGoogleIntent, title)
+
+            // Intent must exist before we start it
+            if (goToGoogleIntent.resolveActivity(packageManager) != null) {
+                startActivity(goToGoogleIntent)
+            }
+        }
+    }
 
 
     fun findFrag(){

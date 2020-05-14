@@ -35,3 +35,6 @@ output.json
 obj/
 .externalNativeBuild
 Since Android Studio 2.2 and
+
+*.aab
+*.apk

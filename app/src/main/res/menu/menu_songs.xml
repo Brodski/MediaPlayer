@@ -56,7 +56,7 @@
         app:showAsAction="never" >
     </item>
     <item
-        android:id="@+id/supportId"
+        android:id="@+id/donateId"
         android:title="Donate"
         app:showAsAction="never" >
     </item>

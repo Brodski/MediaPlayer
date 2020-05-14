@@ -2,6 +2,7 @@
     <string name="app_name">MediaPlayer</string>
     <string name="playback_channel_name">MediaPlayer channel name</string>
     <string name="playback_channel_description">Cool MediaPlayer description</string>
+    <string name="toolbar_name">Music Player</string>
 
     <string name="donate_uri">https://data.whicdn.com/images/331252347/original.jpg</string>
     <string name="contact_my_email">cbrodski@gmail.com</string>
@@ -16,10 +17,10 @@
     <string name="song_position">song_position</string>
     <string name="play_this_position">play_this_position</string>
 
-<!--    <string name="sort_alpha_asc">sort_alpha_asc</string>-->
-<!--    <string name="sort_alpha_des">sort_alpha_des</string>-->
-<!--    <string name="sort_created_recently">sort_created_recently</string>-->
-<!--    <string name="sort_created_oldest">sort_created_oldest</string>-->
+    <!--    <string name="sort_alpha_asc">sort_alpha_asc</string>-->
+    <!--    <string name="sort_alpha_des">sort_alpha_des</string>-->
+    <!--    <string name="sort_created_recently">sort_created_recently</string>-->
+    <!--    <string name="sort_created_oldest">sort_created_oldest</string>-->
 
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -37,9 +38,8 @@
     <string name="save_state_skip_zone">save_state_skip_zone</string>
 
 
-
     <string name="save_state_sort_key">save_state_sort_key</string>
-<!--    <string name="sort_keys">sort_keys_array</string>-->
+    <!--    <string name="sort_keys">sort_keys_array</string>-->
     <string-array name="sort_keys_array">
         <item>Artist Ascending</item>
         <item>Artist Descending</item>
@@ -57,7 +57,6 @@
         <item>@string/sort_recent_most</item>
         <item>@string/sort_recent_least</item>
     </string-array>
-
 
 
     <string name="save_state_increment">save_state_increment</string>
@@ -86,18 +85,12 @@
         <item>60000</item>
     </string-array>
 
-
-
-
-    <string-array name="entries">
-        <item>First Value</item>
-        <item>Second Value</item>
-        <item>Third Value</item>
-    </string-array>
-
-    <string-array name="entry_values">
+    <string-array name="money_array">
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>5</item>
+        <item>10</item>
     </string-array>
+
 </resources>

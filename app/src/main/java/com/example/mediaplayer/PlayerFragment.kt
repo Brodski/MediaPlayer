@@ -141,7 +141,7 @@ class PlayerFragment : Fragment() {
 
         val toolbar: Toolbar = v.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
-        toolbar.title = "Cool Player"
+        toolbar.title = resources.getString(R.string.toolbar_name)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
@@ -283,9 +283,8 @@ class PlayerFragment : Fragment() {
             R.id.contactId -> {
                 listener?.sendEmail()
             }
-            R.id.supportId -> {
-//                listener?.plzDonate()
-                return false
+            R.id.donateId -> {
+                listener?.plzDoante()
             }
         }
         return false
@@ -305,51 +304,3 @@ class PlayerFragment : Fragment() {
     }
 
 }
-
-///////////////////////////////////////////////////////////////////////
-
-
-//                when (action) {
-//                    MotionEvent.ACTION_DOWN -> {
-//                        Log.e(TAG, "onTouch: ------------- ACTION_DOWN")
-//                        val pointerIndex = event.actionIndex
-//
-//                        mLastTouchX = event.getX(pointerIndex)
-//                        mLastTouchY = event.getY(pointerIndex)
-//
-//                        mActivePointerId = event.getPointerId(0)
-//                        Log.e(TAG, "onTouch: mlast $mLastTouchX")
-//                        Log.e(TAG, "onTouch: mlast $mLastTouchY")
-//                        Log.e(TAG, "onTouch: mActivePointerId $mActivePointerId")
-//                    }
-//                    MotionEvent.ACTION_UP -> {
-//                        Log.e(TAG, "onTouch: --------------- ACTION_UP")
-//                        mActivePointerId = 999
-//                    }
-//                    MotionEvent.ACTION_CANCEL -> {
-//                        Log.e(TAG, "onTouch: --------------- ACTION_CANCEL")
-//                        mActivePointerId = 999
-//                    }
-//                    MotionEvent.ACTION_POINTER_UP -> {
-//                        Log.e(TAG, "onTouch: --------------- ACTION_POINTER_UP")
-//                        mActivePointerId = 999
-//                        val pointerIndex = event.actionIndex
-//                        val pointerId = event.getPointerId(pointerIndex)
-//                      //  if (pointerId == mActivePointerId) {
-//
-//                            val newPointerIdex = if (pointerIndex == 0) 1 else 0
-//                            mLastTouchX = event.getX(newPointerIdex)
-//                            mLastTouchY = event.getY(newPointerIdex)
-//                            mActivePointerId = event.getPointerId(newPointerIdex)
-//                            Log.e(TAG, "onTouch: mlast $mLastTouchX")
-//                            Log.e(TAG, "onTouch: mlast $mLastTouchY")
-//                            Log.e(TAG, "onTouch: mActivePointerId $mActivePointerId")
-//                        //}
-//                    }
-//                }
-
-//                if (mDetector.onTouchEvent(event) ) {
-//                    Log.e(TAG, "o?????nTouch: mDetector activiated")
-//                    return true
-//                }
-

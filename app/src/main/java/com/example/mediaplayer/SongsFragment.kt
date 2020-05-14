@@ -76,7 +76,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
-        toolbar.title = "Cool Player"
+        toolbar.title = resources.getString(R.string.toolbar_name)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         recycler_songs = view.findViewById(R.id.recycler_songs)
@@ -232,6 +232,9 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 listener?.sendEmail()
                 return false
             }
+            R.id.donateId -> {
+                listener?.plzDoante()
+            }
             else -> super.onOptionsItemSelected(item)
         }
         return true
@@ -253,32 +256,3 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 }
 
 
-//// BUTTON a
-//fun doButtonA(v: View) {
-//    Log.e(TAG, "Clicked Button A")
-//
-//    if ( fragmentManager != null) {
-//        Log.e(TAG, "Found fragment: " + requireFragmentManager().backStackEntryCount.toString())
-//        for (entry in 0 until requireFragmentManager().backStackEntryCount) {
-//            Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).id)
-//            Log.e(TAG, "Found fragment: " + requireFragmentManager().getBackStackEntryAt(entry).name)
-//        }
-//    }
-//}
-
-//        val intent = Intent("custom-event-name")
-//        intent.putExtra("message", "This is SONGSONGSONGSONG message!")
-//        LocalBroadcastManager.getInstance(context!!).sendBroadcast(intent)
-
-//        var bundle  = Bundle()
-//        bundle.putString( "keyOther2", "message")
-//        bundle.putParcelable(getString(R.string.song_bundle), songList?.get(position))
-//        bundle.putInt(getString(R.string.song_position), position)
-//        playerFragment.arguments = bundle
-//        fragmentManager
-//            ?.beginTransaction()
-//            ?.replace(R.id.newmain_view, playerFragment)
-//            ?.addToBackStack("From song")
-//            ?.commit()
-
-//    bottomNav?.selectedItemId = R.id.nav_home //Go to media player

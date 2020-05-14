@@ -327,24 +327,39 @@ class AudioPlayerService : Service() {
             val durationC = cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)
 
             while (cursor.moveToNext()) {
-                //Log.e(TAG, "+++++++++++++++++++++++++++")
+                Log.e(TAG, "+++++++++++++++++++++++++++")
                 val id = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
-//                var artist = cursor.getString(artistColumn)
                 val isAlarmC = cursor.getString(isAlarmC)
                 val isNotif = cursor.getString(isNotifC)
                 val isRing = cursor.getString(isRingC)
                 var dateAdded = cursor.getInt(dateAddedC)
                 var dur = cursor.getInt(durationC)
+//                var artist = cursor.getString(artistColumn)
                 val artist = if (cursor.getString(artistColumn) == "<unknown>"){
                     ""
                 } else {
                     cursor.getString(artistColumn)
                 }
                 val audioUri: Uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-
+                Log.e(TAG, "id $id")
+                Log.e(TAG, "audioUri $audioUri")
+                Log.e(TAG, "title $title")
+                Log.e(TAG, "artist $artist")
+                Log.e(TAG, "is isAlarmC $isAlarmC")
+                Log.e(TAG, "is isNotif $isNotif")
+                Log.e(TAG, "is isRing $isRing")
+                Log.e(TAG, " dateAdded $dateAdded")
+                Log.e(TAG, " duration $dur")
                 val mmr = MediaMetadataRetriever()
-                mmr.setDataSource(context, audioUri)
+                try {
+                    mmr.setDataSource(context, audioUri)
+                } catch (e:Exception){
+                    Log.e(TAG, "actualQuerySongs: $e")
+                    Log.e(TAG, "actualQuerySongs: Probably URI problem after editing/deleting file")
+                    continue
+                }
+
                 var rawArt: ByteArray? = mmr.embeddedPicture
                 //var rawArt: ByteArray? = null
                 val bfo = BitmapFactory.Options()
@@ -352,22 +367,10 @@ class AudioPlayerService : Service() {
                 var art: Bitmap? = if (rawArt != null) {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
-//                    BitmapFactory.decodeResource(resources, R.drawable.ic_music_video_whitesoft)
-//                    BitmapFactory.decodeResource(resources, R.drawable.ic_folder)
                     defaultArt
-//                    getBitmapFromVectorDrawable(context, R.drawable.ic_music_note)
 //                    getBitmapFromVectorDrawable(context, R.drawable.music_note_iconinv)
                 }
-                //var thefuck = BitmapFactory.decodeResource(resources, R.drawable.ic_audiotrack)
-//                Log.e(TAG, "id $id")
-//                Log.e(TAG, "audioUri $audioUri")
-//                Log.e(TAG, "title $title")
-//                Log.e(TAG, "artist $artist")
-////                Log.e(TAG, "is isAlarmC $isAlarmC")
-////                Log.e(TAG, "is isNotif $isNotif")
-////                Log.e(TAG, "is isRing $isRing")
-//                Log.e(TAG, " dateAdded $dateAdded")
-//                Log.e(TAG, " duration $dur")
+
                 songList.add(
                     Song(
                         id = id.toInt(),

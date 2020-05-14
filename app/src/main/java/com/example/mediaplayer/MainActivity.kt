@@ -112,6 +112,13 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
+    override fun plzDoante() {
+        Log.e(TAG, "plzDonate")
+        val mIntent = Intent(this@MainActivity, MoneyActivity::class.java)
+        mIntent.putExtra("fav_num", 69)
+        startActivity(mIntent)
+    }
+
     override fun onSongSelect(index: Int, uri: String) {
         Log.e(TAG, "currenlty playing " + mService?.exoPlayer?.currentWindowIndex.toString())
         Log.e(TAG, "onSongSelect: recived uri $uri index: $index" )
@@ -476,11 +483,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
-//    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        super.onRestoreInstanceState(savedInstanceState)
-//        Log.e(TAG,"onRestoreInstanceState")
-//
-//    }
+
 
     fun editSettings(view: View){
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -509,23 +512,22 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     }
 
-    fun plzDonate() {
-        fun plzDonate() {
-            Log.e(TAG, "baby: supportId click")
-            // Internet to donate intent
+
+    fun plzDonateOld() {
+        Log.e(TAG, "baby: supportId click")
+        // Internet to donate intent
 //                val googleString:String = "https://www.google.com/"
-            val googleString:String = resources.getString(R.string.donate_uri)
-            val mUri: Uri = Uri.parse(googleString)
+        val googleString:String = resources.getString(R.string.donate_uri)
+        val mUri: Uri = Uri.parse(googleString)
 
 
-            val goToGoogleIntent = Intent(Intent.ACTION_VIEW, mUri)
-            val title = resources.getString(R.string.contact_intent_msg)
-            val chooser: Intent = Intent.createChooser(goToGoogleIntent, title)
+        val goToGoogleIntent = Intent(Intent.ACTION_VIEW, mUri)
+        val title = resources.getString(R.string.contact_intent_msg)
+        val chooser: Intent = Intent.createChooser(goToGoogleIntent, title)
 
-            // Intent must exist before we start it
-            if (goToGoogleIntent.resolveActivity(packageManager) != null) {
-                startActivity(goToGoogleIntent)
-            }
+        // Intent must exist before we start it
+        if (goToGoogleIntent.resolveActivity(packageManager) != null) {
+            startActivity(goToGoogleIntent)
         }
     }
 
@@ -566,6 +568,11 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             player!!.release()
             player = null
         }
+    }
+
+    fun donate(view: View) {
+        val intent = Intent(this, MoneyActivity::class.java)
+        startActivity(intent)
     }
 
 

@@ -1,19 +1,8 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import androidx.preference.ListPreference
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"

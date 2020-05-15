@@ -2,14 +2,21 @@
 <resources>
     <color name="colorPrimary">#00ddff</color>
     <color name="colorPrimary2">@android:color/holo_blue_bright</color>
+
+
+    <color name="colorBothbars">#2D2D32</color>
     <color name="colorToolbar">#363640</color>
     <color name="colorBottomNav">#292937</color>
+    <color name="colorItemBackground">#181818</color>
+
     <color name="colorPrimaryDark">#06A3BC</color>
     <color name="colorPrimaryDark2">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorInactive">#d1dae8</color>
     <color name="colorSoftWhite">#DBDBDB</color>
+
+    <color name="colorMainAct">#ebebeb</color>
 <!--    https://github.com/google/ExoPlayer/blob/62092e664586175107a3aaac3e1b0efa3059049f/library/ui/src/main/java/com/google/android/exoplayer2/ui/DefaultTimeBar.java-->
     <color name="DEFAULT_UNPLAYED_COLOR">#33FFFFFF</color>
     <color name="DEFAULT_BUFFERED_COLOR">#CCFFFFFF</color>

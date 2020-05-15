@@ -28,35 +28,9 @@
             android:title="Rewind &amp; Forward Zone Size"
             android:max="60"
             app:min="15"
-            android:summary="Higher = Easier to activate a skip but harder to activate a volume change. \nIs the angle that seperates volume from skip"
+            android:summary="Higher = Easier to activate a skip but harder to activate a volume change. \nIt is the angle that seperates volume from skip"
         />
 
 
     </PreferenceCategory>
 </PreferenceScreen>
-
-<!--<ListPreference-->
-<!--app:key="save_state_sort_key"-->
-<!--app:title="Sort Audio By"-->
-<!--app:useSimpleSummaryProvider="true"-->
-<!--app:entries="@array/sort_keys_array"-->
-<!--app:entryValues="@array/sort_values"-->
-<!--app:dialogTitle="Sort Audio By"/>-->
-
-
-<!--<CheckBoxPreference-->
-<!--android:key="checkbox"-->
-<!--android:title="Title_checkbox_preference"-->
-<!--android:summary="Summary_checkbox_preference"-->
-<!--    />-->
-<!--<SwitchPreferenceCompat-->
-<!--android:key="switch"-->
-<!--android:title="title_switch_preference"-->
-<!--android:summary="Summary_switch_preference"-->
-<!--    />-->
-<!--<DropDownPreference-->
-<!--android:key="dropdown"-->
-<!--android:title="dropdown_preference"-->
-<!--android:entries="@array/entries"-->
-<!--app:useSimpleSummaryProvider="true"-->
-<!--android:entryValues="@array/entry_values"/>-->

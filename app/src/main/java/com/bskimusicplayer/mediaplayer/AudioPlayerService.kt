@@ -1,4 +1,4 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
 import android.Manifest
 import android.app.Notification
@@ -23,10 +23,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Player
@@ -37,24 +35,15 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.Util
-import kotlin.math.log
 
 // Building feature-rich media apps with ExoPlayer (Google I/O '18)
 // https://www.youtube.com/watch?v=svdq1BWl4r8
 class AudioPlayerService : Service() {
-
-    //https://medium.com/google-exoplayer/easy-audio-focus-with-exoplayer-a2dcbbe4640e
-//        val audioAttributes = AudioAttributes.Builder()
-//            .setUsage(C.USAGE_MEDIA)
-//            .setContentType(C.CONTENT_TYPE_MOVIE)
-//            .build()
-//        exoPlayer!!.setAudioAttributes(audioAttributes, true)
 
     private val binder: IBinder? = LocalBinder()
 
@@ -62,28 +51,18 @@ class AudioPlayerService : Service() {
         fun getService(): AudioPlayerService = this@AudioPlayerService
     }
 
-    //  val randomNumber: Int get() = Random().nextInt(100)
     public var exoPlayer: SimpleExoPlayer? = null
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var mediaSession: MediaSessionCompat? = null
     private var mediaSessionConnector: MediaSessionConnector? = null
 
-    private val MY_PERM_REQUEST = 1
-
     private val PLAYBACK_CHANNEL_ID = "playback_channel"
     private val PLAYBACK_NOTIFICATION_ID = 1
-
-    private val ARG_URI = "uri_string"
-    private val ARG_TITLE = "title"
-    private val ARG_START_POSITION = "start_position"
     private val MEDIA_SESSION_TAG = "hello-world-media"
     var songList: List<Song>? = null
-
     private lateinit var mContext: Context
+    val TAG = "AudioPlayerService"
 
-    companion object {
-        const val TAG = "AudioPlayerService"
-    }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate() {
@@ -428,7 +407,6 @@ class AudioPlayerService : Service() {
         }
     }
 
-
     fun releasePlayer() {
         if (exoPlayer != null) {
             mediaSession?.release()
@@ -448,8 +426,8 @@ class AudioPlayerService : Service() {
         Log.e(TAG, "saveState: Saving index at $playingIndex")
         Log.e(TAG, "saveState: Saving playTime at $playTime")
         Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
-        val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
-        val editor = sharedpreferences.edit()
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val editor = sharedPreferences.edit()
 
         //song Index
         editor.putInt(resources.getString(R.string.save_state_song_index_key), playingIndex)
@@ -483,23 +461,7 @@ class AudioPlayerService : Service() {
         return START_STICKY
     }
 
-    // https://stackoverflow.com/questions/8802157/how-to-use-localbroadcastmanager
-//    private val mMessageReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-//        override fun onReceive(context: Context?, intent: Intent) {
-//            // Get extra data included in the Intent
-//            val extras = intent.extras
-//            if (extras?.containsKey("message") == true){
-//                val message = extras.getString("message")
-//                Log.e("receiver", "Got message: $message")
-//            }
-//            else if (extras?.containsKey(getString(R.string.play_this_position)) == true) {
-//                val position = extras.getInt(getString(R.string.play_this_position))
-//
-//            }
-//            Log.e(TAG, "Leaving onReceiver broadcaster")
-//        }
-//    }
-//
+
     fun goofydebugging(): MutableList<Song> {
         val concatenatingMediaSource = ConcatenatingMediaSource()
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(

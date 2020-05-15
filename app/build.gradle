@@ -8,8 +8,8 @@ android {
 
 
     defaultConfig {
-        applicationId "com.example.mediaplayer"
-        minSdkVersion 16
+        applicationId "com.bskimusicplayer.mediaplayer"
+        minSdkVersion defaultMinSdkVersion
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"

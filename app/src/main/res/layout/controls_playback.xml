@@ -11,11 +11,43 @@
     android:id="@+id/controllerId"
     >
 
+
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        android:paddingLeft="15dp"-->
+<!--        android:paddingRight="15dp"-->
+<!--        >-->
+<!--        <TextView-->
+<!--            android:id="@+id/titleTextScrolling"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="18sp"-->
+<!--            android:ellipsize="marquee"-->
+<!--            android:marqueeRepeatLimit ="marquee_forever"-->
+<!--            android:scrollHorizontally="true"-->
+<!--            android:singleLine="true"-->
+<!--            android:text="Simple application that shows how to use marquee, with a long text"-->
+<!--            android:textColor="#ff4500"-->
+<!--        />-->
+<!--        <TextView-->
+<!--            android:id="@+id/artistTextScrolling"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textSize="14sp"-->
+<!--            android:paddingTop="1dp"-->
+<!--            android:singleLine="true"-->
+<!--            android:text="atist and stuff we make art"-->
+<!--            android:textColor="#ff4500"-->
+<!--            />-->
+<!--    </LinearLayout>-->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingTop="4dp"
         android:orientation="horizontal">
 
         <ImageButton

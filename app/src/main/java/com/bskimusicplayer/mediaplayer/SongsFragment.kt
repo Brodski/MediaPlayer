@@ -1,31 +1,19 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
 import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
-import android.preference.PreferenceActivity
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.preference.ListPreference
-import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil
-import javax.security.auth.login.LoginException
-import kotlin.reflect.typeOf
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -55,13 +43,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //mService = binder.getService()
         mService = AudioPlayerService()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
@@ -72,11 +54,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         var songsIcon: MenuItem =  nav.menu.findItem(R.id.nav_favorites)
         songsIcon.isChecked = true
 
-        var bundle: Bundle? = this.arguments
-
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
-        toolbar.title = resources.getString(R.string.toolbar_name)
+//        toolbar.title = resources.getString(R.string.toolbar_name)
+        toolbar.title = resources.getString(R.string.toolbar_name_browse)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         recycler_songs = view.findViewById(R.id.recycler_songs)

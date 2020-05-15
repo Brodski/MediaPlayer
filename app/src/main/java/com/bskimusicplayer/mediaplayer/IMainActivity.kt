@@ -1,4 +1,4 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
 interface IMainActivity {
     fun isService(): Boolean

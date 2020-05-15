@@ -3,11 +3,12 @@
     <string name="playback_channel_name">MediaPlayer channel name</string>
     <string name="playback_channel_description">Cool MediaPlayer description</string>
     <string name="toolbar_name">Music Player</string>
+    <string name="toolbar_name_browse">Browse</string>
 
     <string name="donate_uri">https://data.whicdn.com/images/331252347/original.jpg</string>
-    <string name="contact_my_email">cbrodski@gmail.com</string>
+    <string name="contact_my_email">bskimusicplayer@gmail.com</string>
     <string name="contact_subject">Comment about your incredible music app</string>
-    <string name="contact_intent_msg">Send feedback, comments, questions, or concerns to cbrodski@gmail.com</string>
+    <string name="contact_intent_msg">Send feedback, comments, questions, or concerns to bskimusicplayer@gmail.com</string>
 
 
     <string name="song_frag_tag">songsTag</string>
@@ -86,11 +87,11 @@
     </string-array>
 
     <string-array name="money_array">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>5</item>
-        <item>10</item>
+        <item>donate_1</item>
+        <item>donate_2</item>
+        <item>donate_3</item>
+        <item>donate_5</item>
+        <item>donate_10</item>
     </string-array>
 
 </resources>

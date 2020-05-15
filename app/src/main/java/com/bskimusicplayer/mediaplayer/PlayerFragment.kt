@@ -1,42 +1,32 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
-import android.annotation.SuppressLint
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.media.AudioManager
-import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
-import android.util.Log
-import android.view.*
-import android.widget.Button
-import android.widget.TextView
 //import androidx.fragment.app.FragmentManager
 //import android.widget.Toolbar
-import androidx.appcompat.widget.Toolbar
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GestureDetectorCompat
-import androidx.core.view.MotionEventCompat
-import androidx.core.view.get
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.media.AudioManager
+import android.os.Build
+import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.util.Log
+import android.view.*
+import android.widget.TextView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.PlaybackParameters
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ui.PlayerControlView
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.io.IOException
-import java.lang.RuntimeException
 import kotlin.math.abs
 import kotlin.math.atan2
-import kotlin.math.log
+
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
@@ -54,22 +44,33 @@ class PlayerFragment : Fragment() {
     private lateinit var mService: AudioPlayerService
     private var listener: PlayerFragListener? = null
     private var skipIncrement: Int = 10000
+    private var playbackStateListener: PlaybackStateListener? = null
 
-    interface PlayerFragListener: IMainActivity {
+    private lateinit var audioManager: AudioManager
+    private lateinit var mDetector: GestureDetector
+    var slop_prevention = 100
+    var forward_zone_degrees = 35
+    var rewind_zone_degrees = 180 - forward_zone_degrees
+    private lateinit var tvArtist: TextView
+    private lateinit var tvTitle: TextView
+    private var vibrator: Vibrator? = null
+
+    interface PlayerFragListener : IMainActivity {
         fun getPlayer(): SimpleExoPlayer?
         fun skipForward(rewind: Boolean = false)
         fun skipRewind()
         fun isPlaying(): Boolean?
         fun togglePlayPause()
+        fun getSongTitle(): String
+        fun getSongArtist(): String
     }
 
 
     override fun onStart() {
         Log.e(TAG, "onStart: PlayerFragment")
         super.onStart()
-        //initPlayer2()
-
         setPlayer()
+        getTitleStuff()
         playerView?.showController()
     }
 
@@ -78,71 +79,77 @@ class PlayerFragment : Fragment() {
         super.onAttach(context)
         Log.e(TAG, "onAttach: PlayerFragment")
         // other class must implement this
-        Log.e(TAG, "onAttach: $context")
-        Log.e(TAG, "onAttach: $activity")
+
         listener = context as PlayerFragListener
 //        listener = activity as PlayerFragListener
-        Log.e(TAG, "onAttach: $listener")
+        Log.e(TAG, "onAttach: contexxt $context")
+        Log.e(TAG, "onAttach: listener $listener")
+        Log.e(TAG, "onAttach: playerView $playerView")
     }
 
     override fun onResume() {
         super.onResume()
         Log.e(TAG, "onResume: PlayerFragment")
+        Log.e(TAG, "onResume: playerview $playerView")
     }
-    
+
     override fun onDetach() {
         super.onDetach()
+        Log.e(TAG, "onDetach: detaching")
+        Log.e(TAG, "onDetach: playerview $playerView")
         listener = null
     }
 
     override fun onStop() {
         super.onStop()
         Log.e(TAG, "onStop: stopping player")
-//        releasePlayer2()
+        Log.e(TAG, "onStop: playerview $playerView")
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         Log.e(TAG, "onDestroyView: destroying view Player")
+        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
+        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
+        playbackStateListener?.let { player?.removeListener(it) }
     }
 
-    private lateinit var audioManager: AudioManager
-    private lateinit var mDetector: GestureDetector
-    var slop_prevention  = 100
-    var forward_zone_degrees = 35
-    var rewind_zone_degrees = 180 - forward_zone_degrees
 
     @SuppressLint("ClickableViewAccessibility")
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.e(TAG, "onCreateView Player Frag")
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
+        audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        vibrator = activity?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
+        tvTitle = v.findViewById(R.id.titleTextScrolling)
+        tvArtist = v.findViewById(R.id.artistTextScrolling)
 
         var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
-        var homeIcon: MenuItem =  nav.menu.findItem(R.id.nav_home)
+        var homeIcon: MenuItem = nav.menu.findItem(R.id.nav_home)
         homeIcon.setChecked(true)
 
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment),resources.getString(R.string.default_increment))?.toInt() ?: 15000
+        skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment), resources.getString(R.string.default_increment))?.toInt() ?: 15000
         slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
 
         forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
         rewind_zone_degrees = 180 - forward_zone_degrees
-
+        Log.e(TAG, "onCreateView: ------------- playerView $playerView -----------------")
         playerView = v.findViewById(R.id.main_view2)
+        Log.e(TAG, "onCreateView: +++++ playerView $playerView +++++")
         playerView?.setRewindIncrementMs(skipIncrement)
         playerView?.setFastForwardIncrementMs(skipIncrement)
 
         player = listener?.getPlayer()
+        getTitleStuff()
+        playbackStateListener = PlaybackStateListener()
 
 
-        val toolbar: Toolbar = v.findViewById(R.id.toolbar)
-        setHasOptionsMenu(true)
-        toolbar.title = resources.getString(R.string.toolbar_name)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+//        val toolbar: Toolbar = v.findViewById(R.id.toolbar)
+//        toolbar.title = resources.getString(R.string.toolbar_name)
+//        setHasOptionsMenu(true)
+//        (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
             override fun onShowPress(e: MotionEvent?) {
@@ -151,12 +158,14 @@ class PlayerFragment : Fragment() {
 
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
                 Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000 ")
+
+                doVibrate()
                 listener?.togglePlayPause()
                 return true
             }
 
             override fun onDown(e: MotionEvent?): Boolean {
-                Log.e(TAG, "onDown: ")
+                //           Log.e(TAG, "onDown: ")
                 return true
             }
 
@@ -182,11 +191,9 @@ class PlayerFragment : Fragment() {
                 Log.e(TAG, "onLongPress: ")
             }
         })
-
-        playerView?.setOnTouchListener(object: View.OnTouchListener {
-            @SuppressLint("ClickableViewAccessibility")
+        Log.e(TAG, "onCreateView: playerView $playerView")
+        playerView?.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//                Log.e(TAG, "Top of it all: mActivePointerId ------ $mActivePointerId")
                 mDetector.onTouchEvent(event)
                 return true;
             }
@@ -197,6 +204,21 @@ class PlayerFragment : Fragment() {
         return v
     }
 
+    fun getTitleStuff() {
+        tvTitle?.isSelected = true
+        tvTitle?.text = listener?.getSongTitle()
+
+        tvArtist?.isSelected = true
+        tvArtist?.text = listener?.getSongArtist()
+        Log.e(TAG, "getTitleStuff: playerview $playerView")
+        if (player != null) {
+//            player?.addListener(getMyListener())
+            Log.e(TAG, "onDestroyView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
+            Log.e(TAG, "onDestroyView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
+            playbackStateListener?.let { player?.addListener(it) }
+        }
+    }
+
 
     private fun processSwipe(x1: Float?, y1: Float?, x2: Float?, y2: Float?) {
         if (arrayOf(x1, y1, x2, y2).contains(null)) {
@@ -205,63 +227,77 @@ class PlayerFragment : Fragment() {
         Log.e(TAG, "processSwipe: ==========================================")
         var distanceX = (x2!! - x1!!).toDouble()
         var distanceY = (y2!! - y1!!).toDouble()
-        Log.e(TAG, "processSwipe: distanceX $distanceX")
-        Log.e(TAG, "processSwipe: distanceY $distanceY ")
         var angle = atan2(distanceY, distanceX)
         angle = Math.toDegrees(angle)
+        Log.e(TAG, "processSwipe: distanceX $distanceX")
+        Log.e(TAG, "processSwipe: distanceY $distanceY ")
         Log.e(TAG, "processSwipe: angle: $angle")
         Log.e(TAG, "processSwipe: abs(angle): ${abs(angle)}")
 
         if (abs(angle) < forward_zone_degrees && distanceX > slop_prevention) {
             Log.e(TAG, "processSwipe: ++++++++++++++++ ")
             skipForward()
-        }
-        else if (abs(angle) > rewind_zone_degrees && distanceX < (slop_prevention * -1) ) {
+        } else if (abs(angle) > rewind_zone_degrees && distanceX < (slop_prevention * -1)) {
             Log.e(TAG, "processSwipe: --------------- ")
             skipRewind()
-        }
-        else if (distanceY < (slop_prevention * -1) ) {
+        } else if (distanceY < (slop_prevention * -1)) {
             Log.e(TAG, "processSwipe: VOLUME UP ")
-            Log.e(TAG, "processSwipe: ${listener?.isPlaying()}")
             if (listener?.isPlaying() == true) {
+                volumeUp()
                 audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
             }
-        }
-        else if (distanceY > slop_prevention ) {
+        } else if (distanceY > slop_prevention) {
             Log.e(TAG, "processSwipe: VOLUME DOWN ")
-            Log.e(TAG, "processSwipe: ${listener?.isPlaying()}")
             if (listener?.isPlaying() == true) {
-                audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
+                volumeDown()
             }
-        }
-        else {
+        } else {
             Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000  ")
+            doVibrate()
             listener?.togglePlayPause()
         }
         Log.e(TAG, "processSwipe: ==========================================")
     }
 
     private fun volumeUp() {
+        doVibrate()
         audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
     }
+
     private fun volumeDown() {
+        doVibrate()
         audioManager.adjustVolume(AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI)
 
     }
 
-    fun setPlayer(){
+    private fun doVibrate(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator?.vibrate(VibrationEffect.createOneShot(80, VibrationEffect.EFFECT_TICK));
+        } else {
+            //deprecated in API 26
+            vibrator?.vibrate(80);
+        }
+    }
+
+    fun setPlayer() {
         Log.e(TAG, "setPlayer: now setting")
 //        if ( listener?.getPlayer() != null ){
-        if ( listener?.isService() == true ){
+        if (listener?.isService() == true) {
             playerView?.player = listener?.getPlayer()
+        }
+        if (player == null) {
+            player = listener?.getPlayer()
+            playbackStateListener?.let { player?.addListener(it) }
         }
     }
 
     fun skipForward() {
+        doVibrate()
         listener?.skipForward()
     }
 
     fun skipRewind() {
+        doVibrate()
         listener?.skipRewind()
     }
 
@@ -272,9 +308,9 @@ class PlayerFragment : Fragment() {
         inflater.inflate(R.menu.menu_player, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
-    
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId){
+        when (item.itemId) {
             R.id.settingsId -> {
                 Log.e(TAG, "baby: settings click")
                 listener?.handleSettingsClick()
@@ -303,4 +339,39 @@ class PlayerFragment : Fragment() {
         }
     }
 
+
+    inner class PlaybackStateListener:  Player.EventListener {
+        override fun onPlayerStateChanged( playWhenReady: Boolean, playbackState: Int ) {
+            val stateString: String
+            stateString = when (playbackState) {
+                ExoPlayer.STATE_IDLE -> "ExoPlayer.STATE_IDLE      -"
+                ExoPlayer.STATE_BUFFERING -> "ExoPlayer.STATE_BUFFERING -"
+                ExoPlayer.STATE_READY -> "ExoPlayer.STATE_READY     -"
+                ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
+                else -> "UNKNOWN_STATE             -"
+            }
+            Log.d(TAG, "changed state to " + stateString + " playWhenReady: " + playWhenReady)
+        }
+
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+//            super.onPlaybackParametersChanged(playbackParameters)
+            Log.e(TAG, "onPlaybackParametersChanged: bang!")
+        }
+        override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
+//                super.onTracksChanged(trackGroups, trackSelections)
+            Log.e(TAG, "onTracksChanged: CHANGED")
+                tvTitle.text = listener?.getSongTitle()
+                tvArtist.text = listener?.getSongArtist()
+        }
+    }
+
 }
+
+
+
+
+
+
+
+
+

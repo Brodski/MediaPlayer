@@ -1,8 +1,9 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.PointF
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.os.IBinder
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -62,15 +64,13 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             mBound = true
 
             Log.e(TAG, "``````onServiceConnected: setting``````")
-            Log.e(TAG, "``````onServiceConnected: setting``````")
-            Log.e(TAG, "``````onServiceConnected: setting``````")
-            Log.e(TAG, "``````onServiceConnected: setting``````")
             val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
             Log.e(TAG, "onServiceConnected: $pFrag")
 
             if (pFrag is PlayerFragment) {
                 Log.e(TAG, "onServiceConnected: PlayerFrag Currenlty showing $pFrag")
                 pFrag.setPlayer()
+                pFrag.getTitleStuff()
             } else if (pFrag is SongsFragment) {
                 pFrag.updateRecViewer()
             } else {
@@ -148,6 +148,23 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     }
 
+    override fun getSongTitle(): String {
+        var title: String = ""
+        if (mService?.exoPlayer != null ) {
+            title = mService?.songList?.get(mService?.exoPlayer?.currentWindowIndex!!)?.title.toString()
+        }
+        return title
+    }
+
+    override fun getSongArtist(): String {
+        var artist: String = ""
+        if (mService?.exoPlayer != null ) {
+            artist = mService?.songList?.get(mService?.exoPlayer?.currentWindowIndex!!)?.artist.toString()
+        }
+        return artist
+
+    }
+
     override fun getPlayer(): SimpleExoPlayer? {
         return mService?.exoPlayer
     }
@@ -196,14 +213,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         Log.e(TAG, "initPlayer2: service !null ${(mService != null)}")
         Log.e(TAG, "initPlayer2: mService $mService")
         askPermissions()
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
-        Log.e(TAG, "initPlayer2: NO!!!!!!")
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
 
@@ -226,6 +235,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+//        var tv: TextView = findViewById(R.id.scrollText)
+//        tv.isSelected = true
         Log.e(TAG,"CREATED MainActivity")
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")

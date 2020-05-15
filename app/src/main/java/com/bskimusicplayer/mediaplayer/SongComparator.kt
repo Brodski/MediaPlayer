@@ -1,4 +1,4 @@
-package com.example.mediaplayer
+package com.bskimusicplayer.mediaplayer
 
 class SongCreatedComparable(): Comparator<Song> {
     override fun compare(song1: Song, song2: Song): Int {

@@ -6,8 +6,8 @@
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ebebeb"
 
+    android:background="#ebebeb"
     tools:context=".MainActivity">
 
     <FrameLayout
@@ -16,7 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigationId"
-    />
+        />
+
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigationId"
@@ -29,7 +31,7 @@
         app:menu="@menu/bottom_navigation"
 
 
-    />
+        />
 
 </RelativeLayout>
 <!--    android:background="@color/colorPrimary2"-->

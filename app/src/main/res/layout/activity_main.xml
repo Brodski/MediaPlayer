@@ -3,40 +3,20 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:background="#f2f2f2"
-
     tools:context=".MainActivity">
-
     <FrameLayout
         android:id="@+id/newmain_view"
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottom_navigationId"
         />
-
-
-
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="60dp"-->
-<!--    android:layout_alignParentBottom="true"-->
-<!--    android:background="@color/colorBottomNav"-->
-<!--    app:itemTextColor="@drawable/nav_item_background"-->
-<!--    app:itemIconTint="@drawable/nav_item_background"-->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigationId"
         app:menu="@menu/bottom_navigation"
         style="@style/NavStyle"
-
-
         />
 
 </RelativeLayout>
-<!--    android:background="@color/colorPrimary2"-->
-
-<!--    android:background="@android:color/holo_red_dark"-->
-<!--    app:controller_layout_id="@layout/custom_playback_control"-->

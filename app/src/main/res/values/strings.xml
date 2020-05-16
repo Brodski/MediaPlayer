@@ -9,7 +9,6 @@
     <string name="contact_subject">Comment about your incredible music app</string>
     <string name="contact_intent_msg">Send feedback, comments, questions, or concerns to bskimusicplayer@gmail.com</string>
 
-
     <string name="song_frag_tag">songsTag</string>
     <string name="player_frag_tag">playerTag</string>
     <string name="pref_frag_tag">preferenceTag</string>

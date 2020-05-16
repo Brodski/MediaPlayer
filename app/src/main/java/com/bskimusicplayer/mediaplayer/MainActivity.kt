@@ -347,13 +347,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     fun askPermissions() {
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
             // Has permissions
-//            continueBuildApp()
             continueBuildApp2()
-
-//            var intent: Intent = Intent(this, AudioPlayerService::class.java)
-//            this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-//            Util.startForegroundService(this, intent)
-//            continueBuildApp()
         } else {
 
             Log.e(TAG, "READ EXTERNAL NOT GRANTED")

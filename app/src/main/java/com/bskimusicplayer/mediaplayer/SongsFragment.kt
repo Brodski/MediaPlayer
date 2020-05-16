@@ -64,10 +64,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
         updateRecViewer()
 
-//        songList.add(Song(R.drawable.ic_audiotrack, "Bruce Takara", "Tonight (Blue Note remix)"))
-//        songList.add(Song(R.drawable.ic_queue_music, "Tim Jones ft Domion", "Let me get around"))
-//        songList.add(Song(R.drawable.ic_search_black_24dp, "Joe ft Nas", "Get to know me"))
-
         return view
     }
 

@@ -11,52 +11,17 @@
     android:id="@+id/controllerId"
     >
 
-
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="vertical"-->
-<!--        android:paddingLeft="15dp"-->
-<!--        android:paddingRight="15dp"-->
-<!--        >-->
-<!--        <TextView-->
-<!--            android:id="@+id/titleTextScrolling"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textSize="18sp"-->
-<!--            android:ellipsize="marquee"-->
-<!--            android:marqueeRepeatLimit ="marquee_forever"-->
-<!--            android:scrollHorizontally="true"-->
-<!--            android:singleLine="true"-->
-<!--            android:text="Simple application that shows how to use marquee, with a long text"-->
-<!--            android:textColor="#ff4500"-->
-<!--        />-->
-<!--        <TextView-->
-<!--            android:id="@+id/artistTextScrolling"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:textSize="14sp"-->
-<!--            android:paddingTop="1dp"-->
-<!--            android:singleLine="true"-->
-<!--            android:text="atist and stuff we make art"-->
-<!--            android:textColor="#ff4500"-->
-<!--            />-->
-<!--    </LinearLayout>-->
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
-
         <ImageButton
             android:id="@id/exo_shuffle"
             style="@style/ExoMediaButton"
             app:layout_constraintEnd_toStartOf="@+id/linearLayout"
             app:layout_constraintTop_toTopOf="parent"
             />
-
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
@@ -66,24 +31,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             >
-
             <ImageButton
                 android:id="@id/exo_prev"
                 style="@style/ExoMediaButton.Previous" />
-
             <ImageButton
                 android:id="@id/exo_play"
                 style="@style/ExoMediaButton.Play" />
-
             <ImageButton
                 android:id="@id/exo_pause"
                 style="@style/ExoMediaButton.Pause" />
-
             <ImageButton
                 android:id="@id/exo_next"
                 style="@style/ExoMediaButton.Next" />
-
-
         </LinearLayout>
 
 <!--        <ImageButton android:id="@id/exo_rew"-->
@@ -132,13 +91,3 @@
     </LinearLayout>
 
 </LinearLayout>
-
-<!--    <com.google.android.exoplayer2.ui.PlayerControlView-->
-<!--        android:id="@+id/controls"-->
-<!--        app:show_timeout="0"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@id/main_view2"-->
-<!--        app:rewind_increment=""-->
-<!--        app:show_shuffle_button="true"-->
-<!--    />-->

@@ -19,10 +19,12 @@ import android.provider.MediaStore
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.preference.PreferenceManager
@@ -122,7 +124,6 @@ class AudioPlayerService : Service() {
                 @Nullable
                 override fun getCurrentLargeIcon(player: Player, callback: PlayerNotificationManager.BitmapCallback ): Bitmap? {
                     return songList?.get(player.currentWindowIndex)?.art
-                    //return getBitmapFromVectorDrawable(context, R.drawable.ic_queue_music)
                 }
 
                 @Nullable
@@ -138,7 +139,6 @@ class AudioPlayerService : Service() {
             object : PlayerNotificationManager.NotificationListener {
 
                 override fun onNotificationCancelled(notificationId: Int) {
-                    //  _playerStatusLiveData.value = PlayerStatus.Cancelled(episodeId)
                     stopSelf()
                 }
 
@@ -177,8 +177,10 @@ class AudioPlayerService : Service() {
         Log.e(TAG, "buildMediaStartUp: ==========================================")
         // Get songs/media on phone, sort, and set
         songList = querySongs(mContext)
-        if (songList?.size!! < 2){
+        if (songList.isNullOrEmpty() ){
             songList = goofydebugging()
+            Toast.makeText(mContext,"You need to have at least 1 song on your application", Toast.LENGTH_SHORT).show()
+            return
         }
         songList = sortSongs(sortBy)
         songList?.forEach { it ->
@@ -248,22 +250,10 @@ class AudioPlayerService : Service() {
         Log.e(TAG, "sortby $sortBy")
 
        val sortedList = when (sortBy) {
-            getString(R.string.sort_artist_asc) ->  {
-                Log.e(TAG, "sortSongs: ARTIST ASC")
-                (songList?.sortedWith(SongArtistComparable()))?.reversed()  as MutableList<Song>?
-            }
-            getString(R.string.sort_artist_desc) -> {
-                Log.e(TAG, "sortSongs: ARTIST DEC")
-                songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
-            }
-            getString(R.string.sort_title_asc) -> {
-                Log.e(TAG, "sortSongs: TITLE ASC")
-                (songList?.sortedWith(SongTitleComparable()) )?.reversed() as MutableList<Song>?
-            }
-            getString(R.string.sort_title_desc) -> {
-                Log.e(TAG, "sortSongs: TITLE DESC")
-                songList?.sortedWith(SongTitleComparable()) as MutableList<Song>?
-            }
+            getString(R.string.sort_artist_asc) -> (songList?.sortedWith(SongArtistComparable()))?.reversed()  as MutableList<Song>?
+            getString(R.string.sort_artist_desc) -> songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
+            getString(R.string.sort_title_asc) ->  (songList?.sortedWith(SongTitleComparable()) )?.reversed() as MutableList<Song>?
+            getString(R.string.sort_title_desc) -> songList?.sortedWith(SongTitleComparable()) as MutableList<Song>?
             getString(R.string.sort_recent_most) -> songList?.sortedWith(SongCreatedComparable() ) as MutableList<Song>?
             getString(R.string.sort_recent_least) -> (songList?.sortedWith(SongCreatedComparable()) )?.reversed() as MutableList<Song>?
             else ->  songList?.sortedWith(comparator = SongCreatedComparable() ) as MutableList<Song>?
@@ -287,7 +277,7 @@ class AudioPlayerService : Service() {
         val songList = mutableListOf<Song>()
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
-
+        Log.e(TAG, "actualQuerySongs: queirying in")
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -303,10 +293,12 @@ class AudioPlayerService : Service() {
                 "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
                 "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
 
+        Log.e(TAG, "actualQuerySongs: geting query")
         val query = context.contentResolver.query(songUri, projection, selection, null, null)
 
+        Log.e(TAG, "actualQuerySongs: got queiry")
         query?.use { cursor ->
-            //Log.e(TAG, "000000000000000000000000")
+            Log.e(TAG, "000000000000000000000000")
             val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
             val titleColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
             val artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
@@ -359,7 +351,6 @@ class AudioPlayerService : Service() {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
                     defaultArt
-//                    getBitmapFromVectorDrawable(context, R.drawable.music_note_iconinv)
                 }
 
                 songList.add(
@@ -387,7 +378,7 @@ class AudioPlayerService : Service() {
     //private fun mediaHelper(context: Context,  metaData: MediaMetadataCompat): MediaDescriptionCompat {
     private fun mediaHelper(windowIndex: Int, song: Song?): MediaDescriptionCompat {
         var extras: Bundle = Bundle()
-        //var bitmap: Bitmap? = getBitmapFromVectorDrawable(context, R.drawable.ic_queue_music)
+        //var bitmap: Bitmap? = getBitmapFromVectorDrawable(context, R.drawable.ic_ajskdf)
         //var bitmap = metaData.description.iconBitmap
         extras.putParcelable(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, song?.art)
         extras.putParcelable(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, song?.art)
@@ -475,6 +466,7 @@ class AudioPlayerService : Service() {
 
 
     fun goofydebugging(): MutableList<Song> {
+
         val concatenatingMediaSource = ConcatenatingMediaSource()
         val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(
             mContext,

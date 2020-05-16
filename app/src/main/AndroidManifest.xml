@@ -16,34 +16,35 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name="com.bskimusicplayer.mediaplayer.MoneyActivity"></activity>
+        <receiver android:name="androidx.media.session.MediaButtonReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name="com.bskimusicplayer.mediaplayer.MoneyActivity" />
         <activity
             android:name="com.bskimusicplayer.mediaplayer.MainActivity"
             android:screenOrientation="fullSensor">
+
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.SENDTO" /> -->
-            <!-- <data android:scheme="mailto" /> -->
-            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-            <!-- </intent-filter> -->
+
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:scheme="content" />
                 <data android:scheme="file" />
                 <data android:mimeType="audio/*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:scheme="file" />
                 <data android:mimeType="audio/*" />
             </intent-filter>
@@ -70,7 +71,9 @@
         <service
             android:name="com.bskimusicplayer.mediaplayer.AudioPlayerService"
             android:foregroundServiceType="mediaPlayback"
-            android:stopWithTask="false" />
+            android:stopWithTask="false" >
+        </service>
+
     </application>
 
 </manifest>

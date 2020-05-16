@@ -80,30 +80,28 @@ class PlayerFragment : Fragment() {
         Log.e(TAG, "onAttach: PlayerFragment")
         // other class must implement this
 
+        Log.e(TAG, "onAttach: LISTENER CREATED")
         listener = context as PlayerFragListener
 //        listener = activity as PlayerFragListener
         Log.e(TAG, "onAttach: contexxt $context")
         Log.e(TAG, "onAttach: listener $listener")
-        Log.e(TAG, "onAttach: playerView $playerView")
     }
 
     override fun onResume() {
         super.onResume()
         Log.e(TAG, "onResume: PlayerFragment")
-        Log.e(TAG, "onResume: playerview $playerView")
     }
 
     override fun onDetach() {
         super.onDetach()
         Log.e(TAG, "onDetach: detaching")
-        Log.e(TAG, "onDetach: playerview $playerView")
+        Log.e(TAG, "onDetach: LISTENR NULL'D")
         listener = null
     }
 
     override fun onStop() {
-        super.onStop()
         Log.e(TAG, "onStop: stopping player")
-        Log.e(TAG, "onStop: playerview $playerView")
+        super.onStop()
     }
 
     override fun onDestroyView() {
@@ -135,9 +133,7 @@ class PlayerFragment : Fragment() {
 
         forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
         rewind_zone_degrees = 180 - forward_zone_degrees
-        Log.e(TAG, "onCreateView: ------------- playerView $playerView -----------------")
         playerView = v.findViewById(R.id.main_view2)
-        Log.e(TAG, "onCreateView: +++++ playerView $playerView +++++")
         playerView?.setRewindIncrementMs(skipIncrement)
         playerView?.setFastForwardIncrementMs(skipIncrement)
 
@@ -283,10 +279,12 @@ class PlayerFragment : Fragment() {
         Log.e(TAG, "setPlayer: now setting")
 //        if ( listener?.getPlayer() != null ){
         if (listener?.isService() == true) {
+            Log.e(TAG, " ==== setPlayer: SETTING PLAYER === ")
             playerView?.player = listener?.getPlayer()
         }
         if (player == null) {
             player = listener?.getPlayer()
+            Log.e(TAG, " ==== setPlayer: SETTING PLAYER AND IMPLEMETNIGN LISTERN ==== ")
             playbackStateListener?.let { player?.addListener(it) }
         }
     }

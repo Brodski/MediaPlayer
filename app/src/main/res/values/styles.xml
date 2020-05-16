@@ -59,11 +59,12 @@
         <item name="android:background" >@color/colorToolbar</item>
     </style>
 <!--    #1C1C20-->
+<!--    <item name="android:background" >@color/colorBottomNav</item>-->
     <style name="NavStyle">
         <item name="android:layout_width" >match_parent</item>
-        <item name="android:layout_height" >55dp</item>
+        <item name="android:layout_height" >65dp</item>
         <item name="android:layout_alignParentBottom" >true</item>
-        <item name="android:background" >@color/colorBottomNav</item>
+        <item name="android:background" >@color/colorToolbar</item>
         <item name="itemTextColor" >@drawable/nav_item_background</item>
         <item name="itemIconTint" >@drawable/nav_item_background</item>
     </style>
@@ -95,4 +96,9 @@
         <item name="android:textSize" >15sp</item>
         <item name="android:textColor" >#000000</item>
     </style>
+
+    <style name="PreferenceTheme" parent="@style/AppTheme">
+        <item name="android:background">#FFEAEAEA</item>
+    </style>
+
 </resources>

@@ -248,10 +248,22 @@ class AudioPlayerService : Service() {
         Log.e(TAG, "sortby $sortBy")
 
        val sortedList = when (sortBy) {
-            getString(R.string.sort_artist_asc) ->  (songList?.sortedWith(SongArtistComparable()))?.reversed()  as MutableList<Song>?
-            getString(R.string.sort_artist_desc) -> songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
-            getString(R.string.sort_title_asc) -> (songList?.sortedWith(SongTitleComparable()) )?.reversed() as MutableList<Song>?
-            getString(R.string.sort_title_desc) -> songList?.sortedWith(SongTitleComparable()) as MutableList<Song>?
+            getString(R.string.sort_artist_asc) ->  {
+                Log.e(TAG, "sortSongs: ARTIST ASC")
+                (songList?.sortedWith(SongArtistComparable()))?.reversed()  as MutableList<Song>?
+            }
+            getString(R.string.sort_artist_desc) -> {
+                Log.e(TAG, "sortSongs: ARTIST DEC")
+                songList?.sortedWith(SongArtistComparable()) as MutableList<Song>?
+            }
+            getString(R.string.sort_title_asc) -> {
+                Log.e(TAG, "sortSongs: TITLE ASC")
+                (songList?.sortedWith(SongTitleComparable()) )?.reversed() as MutableList<Song>?
+            }
+            getString(R.string.sort_title_desc) -> {
+                Log.e(TAG, "sortSongs: TITLE DESC")
+                songList?.sortedWith(SongTitleComparable()) as MutableList<Song>?
+            }
             getString(R.string.sort_recent_most) -> songList?.sortedWith(SongCreatedComparable() ) as MutableList<Song>?
             getString(R.string.sort_recent_least) -> (songList?.sortedWith(SongCreatedComparable()) )?.reversed() as MutableList<Song>?
             else ->  songList?.sortedWith(comparator = SongCreatedComparable() ) as MutableList<Song>?
@@ -325,9 +337,9 @@ class AudioPlayerService : Service() {
                 Log.e(TAG, "audioUri $audioUri")
                 Log.e(TAG, "title $title")
                 Log.e(TAG, "artist $artist")
-                Log.e(TAG, "is isAlarmC $isAlarmC")
-                Log.e(TAG, "is isNotif $isNotif")
-                Log.e(TAG, "is isRing $isRing")
+//                Log.e(TAG, "is isAlarmC $isAlarmC")
+//                Log.e(TAG, "is isNotif $isNotif")
+//                Log.e(TAG, "is isRing $isRing")
                 Log.e(TAG, " dateAdded $dateAdded")
                 Log.e(TAG, " duration $dur")
                 val mmr = MediaMetadataRetriever()

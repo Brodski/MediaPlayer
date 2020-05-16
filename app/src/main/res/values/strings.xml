@@ -1,12 +1,11 @@
 <resources>
-    <string name="app_name">MediaPlayer</string>
-    <string name="playback_channel_name">MediaPlayer channel name</string>
-    <string name="playback_channel_description">Cool MediaPlayer description</string>
+    <string name="app_name">B.Ski\'s Player</string>
+    <string name="playback_channel_name">B.Ski\'s Player</string>
+    <string name="playback_channel_description">B.Ski\'s Minimalist Music Player</string>
     <string name="toolbar_name">Music Player</string>
     <string name="toolbar_name_browse">Browse</string>
 
-    <string name="donate_uri">https://data.whicdn.com/images/331252347/original.jpg</string>
-    <string name="contact_my_email">bskimusicplayer@gmail.com</string>
+    <string name="contact_my_email">bskismusicplayer@gmail.com</string>
     <string name="contact_subject">Comment about your incredible music app</string>
     <string name="contact_intent_msg">Send feedback, comments, questions, or concerns to bskimusicplayer@gmail.com</string>
 
@@ -17,14 +16,6 @@
     <string name="song_bundle">song_bundle</string>
     <string name="song_position">song_position</string>
     <string name="play_this_position">play_this_position</string>
-
-    <!--    <string name="sort_alpha_asc">sort_alpha_asc</string>-->
-    <!--    <string name="sort_alpha_des">sort_alpha_des</string>-->
-    <!--    <string name="sort_created_recently">sort_created_recently</string>-->
-    <!--    <string name="sort_created_oldest">sort_created_oldest</string>-->
-
-
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="sort_artist_asc">sort_artist_asc</string>
     <string name="sort_artist_desc">sort_artist_desc</string>
@@ -40,7 +31,6 @@
 
 
     <string name="save_state_sort_key">save_state_sort_key</string>
-    <!--    <string name="sort_keys">sort_keys_array</string>-->
     <string-array name="sort_keys_array">
         <item>Artist Ascending</item>
         <item>Artist Descending</item>

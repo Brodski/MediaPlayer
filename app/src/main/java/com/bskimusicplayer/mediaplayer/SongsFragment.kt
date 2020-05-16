@@ -213,9 +213,9 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 listener?.sendEmail()
                 return false
             }
-            R.id.donateId -> {
-                listener?.plzDoante()
-            }
+//            R.id.donateId -> {
+//                listener?.plzDoante()
+//            }
             else -> super.onOptionsItemSelected(item)
         }
         return true
@@ -225,11 +225,9 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     companion object {
         const val TAG = "SongsFragment"
         @JvmStatic
-        fun newInstance(param1: String, param2: String) : SongsFragment {
+        fun newInstance() : SongsFragment {
             val songsFragment = SongsFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
             songsFragment.arguments = args
             return songsFragment
         }

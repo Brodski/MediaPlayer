@@ -384,10 +384,13 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 //                    continueBuildApp()
                     continueBuildApp2()
                 } else {
-                    var startMain = Intent(Intent.ACTION_MAIN);
-                    startMain.addCategory(Intent.CATEGORY_HOME);
-                    startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(startMain);
+                    Log.e(TAG, "onRequestPermissionsResult: nope, closing")
+                    AlertDialog.Builder(this)
+                        .setTitle("You have previously denied permissions")
+                        .setMessage("Try again \nOr go to app settings, find Bski's Music Player and turn on permissions")
+                        .setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
+//                        .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
+                        .create().show()
                     Log.e(TAG,":( Permission not granted.")
                 }
                 return
@@ -420,10 +423,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
         if (nameFrag == R.string.song_frag_tag) {
             if (supportFragmentManager.findFragmentByTag(getString(R.string.song_frag_tag)) !=null  ) {
-//                songsFragment = supportFragmentManager.findFragmentByTag(getString(R.string.song_frag_tag)) as SongsFragment
                 frag = supportFragmentManager.findFragmentByTag(getString(R.string.song_frag_tag)) as SongsFragment
             } else {
-                frag = SongsFragment.newInstance("pp1", "pp2")
+                frag = SongsFragment.newInstance()
             }
         }
 
@@ -431,8 +433,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             if (supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag)) != null  ){
                 frag = supportFragmentManager.findFragmentByTag(getString(R.string.player_frag_tag)) as PlayerFragment
             } else {
-//                playerFragment = PlayerFragment.newInstance("pp1", "pp2")
-                frag = PlayerFragment.newInstance("pp1", "pp2")
+                frag = PlayerFragment.newInstance()
             }
         }
 
@@ -440,7 +441,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             frag = if (supportFragmentManager.findFragmentByTag(getString(R.string.pref_frag_tag)) !=null  ){
                 supportFragmentManager.findFragmentByTag(getString(R.string.pref_frag_tag)) as PreferenceFragment
             } else {
-                PreferenceFragment.newInstance("pp1", "pp2")
+                PreferenceFragment.newInstance()
             }
         }
 
@@ -522,26 +523,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 //        Log.e(TAG, "save_state_sort_key: $save_state_sort_key")
 
     }
-
-
-    fun plzDonateOld() {
-        Log.e(TAG, "baby: supportId click")
-        // Internet to donate intent
-//                val googleString:String = "https://www.google.com/"
-        val googleString:String = resources.getString(R.string.donate_uri)
-        val mUri: Uri = Uri.parse(googleString)
-
-
-        val goToGoogleIntent = Intent(Intent.ACTION_VIEW, mUri)
-        val title = resources.getString(R.string.contact_intent_msg)
-        val chooser: Intent = Intent.createChooser(goToGoogleIntent, title)
-
-        // Intent must exist before we start it
-        if (goToGoogleIntent.resolveActivity(packageManager) != null) {
-            startActivity(goToGoogleIntent)
-        }
-    }
-
 
     fun findFrag(){
         Log.e(TAG,"Finding frag")

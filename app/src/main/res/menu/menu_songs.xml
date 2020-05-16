@@ -55,11 +55,11 @@
         android:title="Settings"
         app:showAsAction="never" >
     </item>
-    <item
-        android:id="@+id/donateId"
-        android:title="Donate"
-        app:showAsAction="never" >
-    </item>
+<!--    <item-->
+<!--        android:id="@+id/donateId"-->
+<!--        android:title="Donate"-->
+<!--        app:showAsAction="never" >-->
+<!--    </item>-->
     <item
         android:id="@+id/contactId"
         android:title="Contact"

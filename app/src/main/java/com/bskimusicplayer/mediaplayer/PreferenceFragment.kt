@@ -25,11 +25,9 @@ class PreferenceFragment : PreferenceFragmentCompat() {
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) : PreferenceFragment {
+        fun newInstance() : PreferenceFragment {
             val preferenceFragment = PreferenceFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
             preferenceFragment.arguments = args
             return preferenceFragment
             }

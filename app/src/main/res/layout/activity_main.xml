@@ -7,7 +7,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:background="#ebebeb"
+    android:background="#f2f2f2"
+
     tools:context=".MainActivity">
 
     <FrameLayout
@@ -20,15 +21,16 @@
 
 
 
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="60dp"-->
+<!--    android:layout_alignParentBottom="true"-->
+<!--    android:background="@color/colorBottomNav"-->
+<!--    app:itemTextColor="@drawable/nav_item_background"-->
+<!--    app:itemIconTint="@drawable/nav_item_background"-->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigationId"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorBottomNav"
-        app:itemTextColor="@drawable/nav_item_background"
-        app:itemIconTint="@drawable/nav_item_background"
         app:menu="@menu/bottom_navigation"
+        style="@style/NavStyle"
 
 
         />

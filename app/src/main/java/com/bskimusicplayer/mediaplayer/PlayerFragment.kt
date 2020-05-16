@@ -319,9 +319,9 @@ class PlayerFragment : Fragment() {
             R.id.contactId -> {
                 listener?.sendEmail()
             }
-            R.id.donateId -> {
-                listener?.plzDoante()
-            }
+//            R.id.donateId -> {
+//                listener?.plzDoante()
+//            }
         }
         return false
     }
@@ -329,11 +329,9 @@ class PlayerFragment : Fragment() {
     companion object {
         const val TAG = "PlayerFragment"
         @JvmStatic
-        fun newInstance(param1: String, param2: String): PlayerFragment {
+        fun newInstance(): PlayerFragment {
             val playerFragment = PlayerFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
             playerFragment.arguments = args
             return playerFragment
         }

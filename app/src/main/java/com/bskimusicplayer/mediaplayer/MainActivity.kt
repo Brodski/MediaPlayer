@@ -52,20 +52,20 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
-            Log.e(TAG, "``````onServiceConnected: setting``````")
+//            Log.e(TAG, "``````onServiceConnected: setting``````")
             val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
-            Log.e(TAG, "onServiceConnected: current frag $pFrag")
+//            Log.e(TAG, "onServiceConnected: current frag $pFrag")
 
             if (pFrag is PlayerFragment) {
                 pFrag.setPlayer()
                 pFrag.getTitleStuff()
-                Log.e(TAG, "onServiceConnected: DONE")
+//                Log.e(TAG, "onServiceConnected: DONE")
             } else if (pFrag is SongsFragment) {
                 pFrag.updateRecViewer()
             }
         }
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e(TAG, "Disconnected Service :o")
+//            Log.e(TAG, "Disconnected Service :o")
             mService = null
         }
     }
@@ -75,10 +75,10 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.e(TAG,"onCreate: CREATED MainActivity")
+//        Log.e(TAG,"onCreate: CREATED MainActivity")
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
-            Log.e(TAG, "onCreate: found some fragment $restoredFragment")
+//            Log.e(TAG, "onCreate: found some fragment $restoredFragment")
         }
 //        initPlayer2()
 
@@ -109,13 +109,13 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onStart() {
         super.onStart()
-        Log.e(TAG,"START MainActivity")
+//        Log.e(TAG,"START MainActivity")
         initPlayer2()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.e(TAG,"RESUME MainActivity")
+//        Log.e(TAG,"RESUME MainActivity")
         // onRestoreInstanceState() is called after onStart() & before onResume()
         // restoreFragment is assigned in onRestoreInstanceState()
         if (restoredFragment != null ) {
@@ -130,35 +130,35 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onPause() {
         super.onPause()
-        Log.e(TAG,"PAUSE MainActivity")
+//        Log.e(TAG,"PAUSE MainActivity")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.e(TAG,"onSaveInstanceState")
+//        Log.e(TAG,"onSaveInstanceState")
         if ( !supportFragmentManager.fragments.isNullOrEmpty()) {
             var frag = supportFragmentManager.fragments.get(0)
-            Log.e(TAG, "onSaveInstanceState: putting this frag in $frag")
-            Log.e(TAG, "onSaveInstanceState: putting this frag in ${frag.tag}")
+//            Log.e(TAG, "onSaveInstanceState: putting this frag in $frag")
+//            Log.e(TAG, "onSaveInstanceState: putting this frag in ${frag.tag}")
             supportFragmentManager.putFragment(outState, "currentFragment", frag)
         }
     }
 
     override fun onStop() {
         super.onStop()
-        Log.e(TAG,"STOP MainActivity")
+//        Log.e(TAG,"STOP MainActivity")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.e(TAG,"DESTROY MainActivity")
+//        Log.e(TAG,"DESTROY MainActivity")
         releasePlayer2()
     }
 
 
 
     private fun initPlayer2() {
-        Log.e(TAG, "initPlayer2: '(mService != null)'  ${(mService != null)}")
+//        Log.e(TAG, "initPlayer2: '(mService != null)'  ${(mService != null)}")
         askPermissions()
         // Google' Building feature-rich media apps with ExoPlayer - https://www.youtube.com/watch?v=svdq1BWl4r8
         // https://stackoverflow.com/questions/23017767/communicate-with-foreground-service-android
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     private fun releasePlayer2() {
-        Log.e(TAG, "releasePlayer2: Releasing some shit")
+//        Log.e(TAG, "releasePlayer2: Releasing some shit")
         if (mService != null) {
             this.unbindService(connection)
         }
@@ -182,9 +182,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         inflateFragment(R.string.player_frag_tag)
 
     }
-    fun continueBuildApp() {
-        inflateFragment(R.string.player_frag_tag)
-    }
 
 
     // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
@@ -194,7 +191,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             // Has permissions
             continueBuildApp2()
         } else {
-            Log.e(TAG, "READ EXTERNAL NOT GRANTED")
+//            Log.e(TAG, "READ EXTERNAL NOT GRANTED")
             // shouldShowRequestPermissionRationale: false if disabled or "do not ask again"
             // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
             if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -286,18 +283,18 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             currentFrag = f
         }
         if (currentFrag?.tag == tag) {
-            Log.e(TAG, "Current frag is already showing. No change")
+//            Log.e(TAG, "Current frag is already showing. No change")
             return
         }
         else if ( currentFrag == null ){
-            Log.e(TAG, "Initial load to $tag")
+//            Log.e(TAG, "Initial load to $tag")
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.newmain_view, fragment, tag)
                 .commit()
         }
         else {
-            Log.e(TAG, "Changing to $tag")
+//            Log.e(TAG, "Changing to $tag")
             supportFragmentManager
                 .beginTransaction()
                 .addToBackStack(tag)
@@ -308,7 +305,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     override fun onSongSelect(index: Int, uri: String) {
-        Log.e(TAG, "onSongSelect: recived uri $uri index: $index" )
+//        Log.e(TAG, "onSongSelect: recived uri $uri index: $index" )
         // If we tapped a new item then go to it, else nothing
         if (mService?.exoPlayer?.currentWindowIndex != index) {
             mService?.exoPlayer?.seekTo(index,0)
@@ -387,7 +384,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun sendEmail() {
         //https://developer.android.com/guide/components/intents-common#ComposeEmail
-        Log.e(TAG, "onOptionsItemSelected: emaile")
+//        Log.e(TAG, "onOptionsItemSelected: email")
         val mAddress = arrayOf(resources.getString(R.string.contact_my_email))
         val subject = resources.getString(R.string.contact_subject)
         val msg = resources.getString(R.string.contact_intent_msg)
@@ -402,7 +399,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     }
 
     override fun plzDoante() {
-        Log.e(TAG, "plzDonate")
+//        Log.e(TAG, "plzDonate")
         val mIntent = Intent(this@MainActivity, MoneyActivity::class.java)
         startActivity(mIntent)
     }

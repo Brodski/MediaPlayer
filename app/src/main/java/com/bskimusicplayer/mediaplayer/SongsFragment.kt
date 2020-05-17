@@ -15,9 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil
 
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
@@ -42,7 +39,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-        Log.e(TAG,"onCreateView SongsFragment")
+//        Log.e(TAG,"onCreateView SongsFragment")
         var view: View = inflater.inflate(R.layout.fragment_items, container, false)
 
         var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
@@ -78,15 +75,15 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onItemClick(position: Int, uri: String) {
 
-        Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
-        Log.e(TAG, "onItemClick text/uri: $uri")
+//        Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
+//        Log.e(TAG, "onItemClick text/uri: $uri")
         val x = songList
         songListFull?.forEachIndexed { idx, element ->
             if (element.uri.toString() == uri) {
                 listener?.onSongSelect(idx, uri)
-                Log.e(TAG, "onItemClick: FOUND IT ${element.uri.toString()}")
-                Log.e(TAG, "onItemClick: FOUND IT $uri")
-                Log.e(TAG, "onItemClick: FOUND IT $idx")
+//                Log.e(TAG, "onItemClick: FOUND IT ${element.uri.toString()}")
+//                Log.e(TAG, "onItemClick: FOUND IT $uri")
+//                Log.e(TAG, "onItemClick: FOUND IT $idx")
                 return@forEachIndexed
             }
         }
@@ -106,7 +103,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        Log.e(TAG, "onCreateOptionsMenu: SongFragment")
+//        Log.e(TAG, "onCreateOptionsMenu: SongFragment")
         inflater.inflate(R.menu.menu_songs, menu)
 
         val searchItem = menu.findItem(R.id.search_bar_songs)
@@ -150,7 +147,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     fun handleSortClick(sortBy: String){
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val editor = sharedpreferences.edit()
-        Log.e(TAG, "handleSortClick: sortby $sortBy")
+//        Log.e(TAG, "handleSortClick: sortby $sortBy")
         editor.putString(resources.getString(R.string.save_state_sort_key), sortBy)
         editor.commit()
         listener?.onSettingsSort()
@@ -160,8 +157,8 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        Log.e(TAG, "onOptionsItemSelected clicked id: ${item.itemId}")
-        Log.e(TAG, "onOptionsItemSelected clicked title: ${item.title}")
+//        Log.e(TAG, "onOptionsItemSelected clicked id: ${item.itemId}")
+//        Log.e(TAG, "onOptionsItemSelected clicked title: ${item.title}")
 
         when (item.itemId){
             R.id.sortArtistAscId -> {
@@ -195,12 +192,12 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 return false
             }
             R.id.settingsId -> {
-                Log.e(TAG, "onOptionsItemSelected: options click")
+//                Log.e(TAG, "onOptionsItemSelected: options click")
                 listener?.handleSettingsClick()
                 return false
             }
             R.id.contactId -> {
-                Log.e(TAG, "onOptionsItemSelected: contactId click")
+//                Log.e(TAG, "onOptionsItemSelected: contactId click")
                 listener?.sendEmail()
                 return false
             }

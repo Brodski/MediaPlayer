@@ -234,11 +234,11 @@ class AudioPlayerService : Service() {
         var updatedIndex = 0
         run loop@ {
             songList?.forEachIndexed { index, song ->
-                Log.e(TAG, "build2: song.uri ${song.uri}")
+//                Log.e(TAG, "build2: song.uri ${song.uri}")
                 if (song.uri == prevUri) {
                     updatedIndex = index
-                    Log.e(TAG, "build2: FOUND!")
-                    Log.e(TAG, "build2: updatedIndex $updatedIndex")
+//                    Log.e(TAG, "build2: FOUND!")
+//                    Log.e(TAG, "build2: updatedIndex $updatedIndex")
                     return@loop
                 }
             }
@@ -275,7 +275,7 @@ class AudioPlayerService : Service() {
     private fun actualQuerySongs(context: Context): MutableList<Song> {
         val songList = mutableListOf<Song>()
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-    //    val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
+        val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
 //        Log.e(TAG, "actualQuerySongs: queirying in")
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
@@ -352,8 +352,8 @@ class AudioPlayerService : Service() {
                 var art: Bitmap? = if (rawArt != null) {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
-                    //defaultArt
-                    BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
+                    defaultArt
+//                    BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
 //                    Log.e(TAG, "actualQuerySongs: WHUT")
 //                    Log.e(TAG, "actualQuerySongs: WHUT")
 //                    Log.e(TAG, "actualQuerySongs: WHUT")
@@ -403,10 +403,10 @@ class AudioPlayerService : Service() {
     // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
 //    @MainThread
     private fun getBitmapFromVectorDrawable(context: Context, @DrawableRes drawableId: Int): Bitmap? {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-            Log.e(TAG, "getBitmapFromVectorDrawable: PIE!!!!! DRAWABLE!")
-            return BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+////            Log.e(TAG, "getBitmapFromVectorDrawable: PIE!!!!! DRAWABLE!")
+//            return BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
+//        }
         return ContextCompat.getDrawable(context, drawableId)?.let {
             val drawable = DrawableCompat.wrap(it).mutate()
             val bitmap = Bitmap.createBitmap(
@@ -437,10 +437,10 @@ class AudioPlayerService : Service() {
         // Save Media State
         var playingIndex = exoPlayer?.currentWindowIndex ?: 0
         var playTime = exoPlayer?.currentPosition ?: 0
-        Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
-        Log.e(TAG, "saveState: Saving index at $playingIndex")
-        Log.e(TAG, "saveState: Saving playTime at $playTime")
-        Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
+//        Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
+//        Log.e(TAG, "saveState: Saving index at $playingIndex")
+//        Log.e(TAG, "saveState: Saving playTime at $playTime")
+//        Log.e(TAG, "buildMediaStartUp: +++++++++++++++++++++++++++++++++++++++")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
         val editor = sharedPreferences.edit()
 
@@ -452,14 +452,14 @@ class AudioPlayerService : Service() {
     }
 
     override fun onDestroy() {
-        Log.e(TAG, "onDestroy: Player Service, destroying")
+//        Log.e(TAG, "onDestroy: Player Service, destroying")
 
         saveState()
         releasePlayer()
 
-        Log.e(TAG, "onDestroy: Player Service, destroyed 1/2")
+//        Log.e(TAG, "onDestroy: Player Service, destroyed 1/2")
         super.onDestroy()
-        Log.e(TAG, "onDestroy: Player Service, destroyed 2/2")
+//        Log.e(TAG, "onDestroy: Player Service, destroyed 2/2")
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

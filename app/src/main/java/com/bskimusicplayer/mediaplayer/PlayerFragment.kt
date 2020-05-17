@@ -61,7 +61,7 @@ class PlayerFragment : Fragment() {
 
 
     override fun onStart() {
-        Log.e(TAG, "onStart: PlayerFragment")
+//        Log.e(TAG, "onStart: PlayerFragment")
         super.onStart()
         setPlayer()
         getTitleStuff()
@@ -71,38 +71,38 @@ class PlayerFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.e(TAG, "onAttach: PlayerFragment")
+//        Log.e(TAG, "onAttach: PlayerFragment")
         listener = context as PlayerFragListener
     }
 
     override fun onResume() {
         super.onResume()
-        Log.e(TAG, "onResume: PlayerFragment")
+//        Log.e(TAG, "onResume: PlayerFragment")
     }
 
     override fun onDetach() {
         super.onDetach()
-        Log.e(TAG, "onDetach: detaching, listenr set to null")
+//        Log.e(TAG, "onDetach: detaching, listenr set to null")
         listener = null
     }
 
     override fun onStop() {
-        Log.e(TAG, "onStop: stopping player")
+//        Log.e(TAG, "onStop: stopping player")
         super.onStop()
         
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
-        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
+//        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
+//        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
         playbackStateListener?.let { player?.removeListener(it) }
     }
 
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.e(TAG, "onCreateView Player Frag")
+//        Log.e(TAG, "onCreateView Player Frag")
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
         audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         vibrator = activity?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
@@ -190,8 +190,8 @@ class PlayerFragment : Fragment() {
         tvArtist?.isSelected = true
         tvArtist?.text = listener?.getSongArtist()
         if (player != null) {
-            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
-            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
+//            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
+//            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
             playbackStateListener?.let { player?.addListener(it) }
         }
     }
@@ -252,17 +252,17 @@ class PlayerFragment : Fragment() {
     }
 
     fun setPlayer() {
-        Log.e(TAG, "setPlayer: ")
+//        Log.e(TAG, "setPlayer: ")
         if (listener?.isService() == true) {
-            Log.e(TAG, "setPlayer: SETTING PLAYER ")
+//            Log.e(TAG, "setPlayer: SETTING PLAYER ")
             playerView?.player = listener?.getPlayer()
         }
         if (player == null) {
-            Log.e(TAG, "setPlayer: SETTING PLAYER AND IMPLEMETNIGN LISTERN ")
+//            Log.e(TAG, "setPlayer: SETTING PLAYER AND IMPLEMETNIGN LISTERN ")
             player = listener?.getPlayer()
             playbackStateListener?.let { player?.addListener(it) }
         }
-        Log.e(TAG, "setPlayer: done")
+//        Log.e(TAG, "setPlayer: done")
     }
 
     fun skipForward() {
@@ -286,7 +286,7 @@ class PlayerFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settingsId -> {
-                Log.e(TAG, "baby: settings click")
+//                Log.e(TAG, "baby: settings click")
                 listener?.handleSettingsClick()
                 return false
             }
@@ -310,12 +310,12 @@ class PlayerFragment : Fragment() {
                 ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
                 else -> "UNKNOWN_STATE             -"
             }
-            Log.d(TAG, "changed state to " + stateString + " playWhenReady: " + playWhenReady)
+//            Log.d(TAG, "changed state to " + stateString + " playWhenReady: " + playWhenReady)
         }
 
         override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
 //                super.onTracksChanged(trackGroups, trackSelections)
-            Log.e(TAG, "onTracksChanged: CHANGED")
+//            Log.e(TAG, "onTracksChanged: CHANGED")
                 tvTitle.text = listener?.getSongTitle()
                 tvArtist.text = listener?.getSongArtist()
         }

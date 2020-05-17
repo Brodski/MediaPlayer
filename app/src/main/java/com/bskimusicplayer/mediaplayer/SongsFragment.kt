@@ -35,11 +35,12 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e(TAG, "onCreate: mServce = AudioPlayerService()")
         mService = AudioPlayerService()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-//        Log.e(TAG,"onCreateView SongsFragment")
+        Log.e(TAG,"onCreateView SongsFragment")
         var view: View = inflater.inflate(R.layout.fragment_items, container, false)
 
         var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
@@ -60,8 +61,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     }
 
     fun updateRecViewer() {
+        Log.e(TAG, "updateRecViewer: ")
 //        songList = mService.querySongs(requireActivity())
         if (listener?.isService() == true) {
+            Log.e(TAG, "updateRecViewer: inisde of If")
             songList = listener?.getPlaylist()
             songListFull = songList?.map { it.copy() }
 
@@ -93,19 +96,35 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.e(TAG, "onAttach: setting listener")
         // other class must implement this
         listener = context as SongsFragListener
     }
 
+    override fun onStop() {
+        super.onStop()
+        Log.e(TAG, "onStop: ")
+    }
+
     override fun onDetach() {
         super.onDetach()
+        Log.e(TAG, "onDetach: listerning set to null")
         listener = null
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        Log.e(TAG, "onCreateOptionsMenu: SongFragment")
-        inflater.inflate(R.menu.menu_songs, menu)
+    override fun onStart() {
+        super.onStart()
+        Log.e(TAG, "onStart: ")
+    }
 
+    override fun onResume() {
+        super.onResume()
+        Log.e(TAG, "onResume: ")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Log.e(TAG, "onCreateOptionsMenu: SongFragment")
+        inflater.inflate(R.menu.menu_songs, menu)
         val searchItem = menu.findItem(R.id.search_bar_songs)
         val searchView = searchItem.actionView as SearchView
         searchView.imeOptions = EditorInfo.IME_ACTION_DONE
@@ -121,7 +140,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         })
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val sortBy = sharedpreferences.getString(resources.getString(R.string.save_state_sort_key),"")
-
         //TODO - the below seems stupid.
         if ( sortBy == getString(R.string.sort_artist_asc) ){
             menu.findItem(R.id.sortArtistAscId).isChecked = true

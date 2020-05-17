@@ -99,10 +99,14 @@ class PlayerFragment : Fragment() {
         playbackStateListener?.let { player?.removeListener(it) }
     }
 
-
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Log.e(TAG, "onCreate: ")
+}
+    
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        Log.e(TAG, "onCreateView Player Frag")
+        Log.e(TAG, "onCreateView Player Frag")
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
         audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         vibrator = activity?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?

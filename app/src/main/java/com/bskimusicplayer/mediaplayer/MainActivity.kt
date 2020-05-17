@@ -53,9 +53,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
-//            Log.e(TAG, "``````onServiceConnected: setting``````")
+            Log.e(TAG, "``````onServiceConnected: setting``````")
             val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
-//            Log.e(TAG, "onServiceConnected: current frag $pFrag")
+            Log.e(TAG, "onServiceConnected: current frag $pFrag")
 
             if (pFrag is PlayerFragment) {
                 pFrag.setPlayer()
@@ -75,11 +75,12 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e(TAG, "onCreate: MAIN!!")
         setContentView(R.layout.activity_main)
 //        Log.e(TAG,"onCreate: CREATED MainActivity")
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
-//            Log.e(TAG, "onCreate: found some fragment $restoredFragment")
+            Log.e(TAG, "onCreate: found some fragment $restoredFragment.tag")
         }
 //        initPlayer2()
 
@@ -107,26 +108,15 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             editor.commit()
         }
 
-        Log.e(TAG, "onCreate: mService == null? ${mService == null}")
         if (mService == null){
-
-            Log.e(TAG, "onCreate: -=-=-=-= creating intent -=-=-=-=")
             var intent: Intent = Intent(this, AudioPlayerService::class.java)
-            Log.e(TAG, "onCreate: -=-=-=-=binding Service -=-=-=-=")
             this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-            Log.e(TAG, "onCreate: -=-=-=-=before startforegorundservice -=-=-=-=")
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(intent)
                 startService(intent)
             } else{
                 Util.startForegroundService(this, intent)
             }
-
-            Log.e(TAG, "onCreate: -=-=-=-=after startforegorundservice -=-=-=-=")
-    //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-    //            startForegroundService(intent)
-    //        }
         }
     }
 
@@ -138,15 +128,18 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onResume() {
         super.onResume()
-//        Log.e(TAG,"RESUME MainActivity")
+        Log.e(TAG,"RESUME MainActivity")
         // onRestoreInstanceState() is called after onStart() & before onResume()
         // restoreFragment is assigned in onRestoreInstanceState()
         if (restoredFragment != null ) {
+            Log.e(TAG, "onResume: RESTORING OSEOMTIHG")
             supportFragmentManager
                 .beginTransaction()
+                .addToBackStack(tag) // BAM?
                 .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
                 .commit()
         } else if (supportFragmentManager.fragments.size == 0) {
+            Log.e(TAG, "onResume: frage = 0")
             continueBuildApp2()
         }
     }
@@ -158,11 +151,11 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-//        Log.e(TAG,"onSaveInstanceState")
+        Log.e(TAG,"onSaveInstanceState")
         if ( !supportFragmentManager.fragments.isNullOrEmpty()) {
             var frag = supportFragmentManager.fragments.get(0)
 //            Log.e(TAG, "onSaveInstanceState: putting this frag in $frag")
-//            Log.e(TAG, "onSaveInstanceState: putting this frag in ${frag.tag}")
+            Log.e(TAG, "onSaveInstanceState: putting this frag in ${frag.tag}")
             supportFragmentManager.putFragment(outState, "currentFragment", frag)
         }
     }
@@ -192,7 +185,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     private fun releasePlayer2() {
 //        Log.e(TAG, "releasePlayer2: Releasing some shit")
-        Log.e(TAG, "releasePlayer2: is mService null? ${(mService == null)}")
         if (mService != null) {
             this.unbindService(connection)
         }
@@ -255,6 +247,22 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
+    fun onNavClick(menuItem: MenuItem) : Boolean {
+        var bool = false
+        when (menuItem.itemId) {
+            R.id.nav_home -> {
+                inflateFragment(R.string.player_frag_tag)
+                bool = true
+            }
+            R.id.nav_favorites -> {
+                inflateFragment(R.string.song_frag_tag)
+                bool = true
+            }
+            else -> bool = false
+        }
+        return bool
+    }
+
     fun inflateFragment(nameFrag: Int) {
         var frag: Fragment? = null
 
@@ -287,22 +295,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         if (frag != null) {
             doFragmentTransaction(frag, getString(nameFrag))
         }
-    }
-
-    fun onNavClick(menuItem: MenuItem) : Boolean {
-        var bool = false
-        when (menuItem.itemId) {
-            R.id.nav_home -> {
-                inflateFragment(R.string.player_frag_tag)
-                bool = true
-            }
-            R.id.nav_favorites -> {
-                inflateFragment(R.string.song_frag_tag)
-                bool = true
-            }
-            else -> bool = false
-        }
-        return bool
     }
 
     fun doFragmentTransaction(fragment: Fragment, tag: String){

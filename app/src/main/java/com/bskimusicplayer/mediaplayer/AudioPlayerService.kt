@@ -68,7 +68,7 @@ class AudioPlayerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.e(TAG, "---------------------- onCreate: ----------------------")
+//        Log.e(TAG, "---------------------- onCreate: ----------------------")
         isFirst = true
 
         mContext = this
@@ -104,13 +104,6 @@ class AudioPlayerService : Service() {
     }
 
     private fun initializeNotificationManager() {
-        Log.e(TAG, "initializeNotificationManager: Initizlting manager")
-//         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            var name = resources.getString(R.string.app_name))
-//            var newNotif = NotificationChannel( PLAYBACK_CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT )
-//            newNotif.description = resources.getString(R.string.playback_channel_description)
-//        }
-
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
             mContext,
             PLAYBACK_CHANNEL_ID,
@@ -149,20 +142,10 @@ class AudioPlayerService : Service() {
                 }
 
                 override fun onNotificationPosted( notificationId: Int, notification: Notification, ongoing: Boolean) {
-                    Log.e(TAG, " ++++  BAM! ++++")
-                    Log.e(TAG, " ongoing $ongoing")
-                    Log.e(TAG, " isFirst $isFirst")
-//                    if (isFirst){
-//                        Log.e(TAG, "onNotificationPosted: STARTING VIA FIRST")
-//                        startForeground(notificationId, notification)
-//                        isFirst = false
-//                    }
                     if (ongoing) {
                         // Make sure the service will not get destroyed while playing media.
-                        Log.e(TAG, "onNotificationPosted: START FOREGROUND")
                         startForeground(notificationId, notification)
                     } else {
-                        Log.e(TAG, "onNotificationPosted: STOPPING")
                         // Make notification cancellable.
                         stopForeground(false)
                     }
@@ -370,12 +353,6 @@ class AudioPlayerService : Service() {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
                     defaultArt
-//                    BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
-//                    Log.e(TAG, "actualQuerySongs: WHUT")
-//                    Log.e(TAG, "actualQuerySongs: WHUT")
-//                    Log.e(TAG, "actualQuerySongs: WHUT")
-//                    Log.e(TAG, "actualQuerySongs: WHUT")
-//                    BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 }
 
                 songList.add(
@@ -471,15 +448,11 @@ class AudioPlayerService : Service() {
 
         saveState()
         releasePlayer()
-
-//        Log.e(TAG, "onDestroy: Player Service, destroyed 1/2")
         super.onDestroy()
-//        Log.e(TAG, "onDestroy: Player Service, destroyed 2/2")
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        Log.e(TAG, "TASK REMOVED")
         stopSelf()
     }
 

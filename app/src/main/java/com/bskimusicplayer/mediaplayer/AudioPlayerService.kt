@@ -169,11 +169,11 @@ class AudioPlayerService : Service() {
         val idxWhenStopped= sharedpreferences.getInt(resources.getString(R.string.save_state_song_index_key), 0)
         val playPosition = sharedpreferences.getLong(resources.getString(R.string.save_state_song_playtime), 0)
 
-        Log.e(TAG, "buildMediaStartUp: ==========================================")
-        Log.e(TAG, "buildMediaStartUp: building at sortBy $sortBy")
-        Log.e(TAG, "buildMediaStartUp: building at idx $idxWhenStopped")
-        Log.e(TAG, "buildMediaStartUp: building at playPosition $playPosition")
-        Log.e(TAG, "buildMediaStartUp: ==========================================")
+//        Log.e(TAG, "buildMediaStartUp: ==========================================")
+//        Log.e(TAG, "buildMediaStartUp: building at sortBy $sortBy")
+//        Log.e(TAG, "buildMediaStartUp: building at idx $idxWhenStopped")
+//        Log.e(TAG, "buildMediaStartUp: building at playPosition $playPosition")
+//        Log.e(TAG, "buildMediaStartUp: ==========================================")
         // Get songs/media on phone, sort, and set
         songList = querySongs(mContext)
         if (songList.isNullOrEmpty() ) {
@@ -247,8 +247,6 @@ class AudioPlayerService : Service() {
     }
 
     fun sortSongs(sortBy: String?): MutableList<Song>? {
-        Log.e(TAG, "sortSongs: going in")
-        Log.e(TAG, "sortby $sortBy")
 
        val sortedList = when (sortBy) {
             getString(R.string.sort_artist_asc) -> (songList?.sortedWith(SongArtistComparable()))?.reversed()  as MutableList<Song>?
@@ -259,7 +257,7 @@ class AudioPlayerService : Service() {
             getString(R.string.sort_recent_least) -> (songList?.sortedWith(SongCreatedComparable()) )?.reversed() as MutableList<Song>?
             else ->  songList?.sortedWith(comparator = SongCreatedComparable() ) as MutableList<Song>?
         }
-        sortedList?.forEach { android.util.Log.e(TAG, "sortSongs: ${it.title} -- ${it.dateCreated} - ${it.artist}") }
+//        sortedList?.forEach { android.util.Log.e(TAG, "sortSongs: ${it.title} -- ${it.dateCreated} - ${it.artist}") }
         return sortedList
 
     }
@@ -278,7 +276,7 @@ class AudioPlayerService : Service() {
         val songList = mutableListOf<Song>()
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     //    val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
-        Log.e(TAG, "actualQuerySongs: queirying in")
+//        Log.e(TAG, "actualQuerySongs: queirying in")
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
@@ -294,12 +292,12 @@ class AudioPlayerService : Service() {
                 "${MediaStore.Audio.Media.IS_NOTIFICATION} != 1 AND " +
                 "${MediaStore.Audio.Media.IS_RINGTONE} != 1"
 
-        Log.e(TAG, "actualQuerySongs: geting query")
+//        Log.e(TAG, "actualQuerySongs: geting query")
         val query = context.contentResolver.query(songUri, projection, selection, null, null)
 
-        Log.e(TAG, "actualQuerySongs: got queiry")
+//        Log.e(TAG, "actualQuerySongs: got queiry")
         query?.use { cursor ->
-            Log.e(TAG, "000000000000000000000000")
+//            Log.e(TAG, "000000000000000000000000")
             val idColumn = cursor.getColumnIndex(MediaStore.Audio.Media._ID)
             val titleColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
             val artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
@@ -309,12 +307,12 @@ class AudioPlayerService : Service() {
 
             val dateAddedC = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
             val durationC = cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)
-            Log.e(TAG, "actualQuerySongs: ${cursor.columnNames}")
-            Log.e(TAG, "actualQuerySongs: ${cursor.count}")
+//            Log.e(TAG, "actualQuerySongs: ${cursor.columnNames}")
+//            Log.e(TAG, "actualQuerySongs: ${cursor.count}")
 //            cursor.columnNames.forEach { Log.e(TAG, "actualQuerySongs: $it") }
 //            cursor.count .forEach { Log.e(TAG, "actualQuerySongs: $it") }
             while (cursor.moveToNext()) {
-                Log.e(TAG, "+++++++++++++++++++++++++++")
+//                Log.e(TAG, "+++++++++++++++++++++++++++")
                 val id = cursor.getLong(idColumn)
                 val title = cursor.getString(titleColumn)
                 val isAlarmC = cursor.getString(isAlarmC)
@@ -329,15 +327,15 @@ class AudioPlayerService : Service() {
                     cursor.getString(artistColumn)
                 }
                 val audioUri: Uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                Log.e(TAG, "id $id")
-                Log.e(TAG, "audioUri $audioUri")
-                Log.e(TAG, "title $title")
-                Log.e(TAG, "artist $artist")
-//                Log.e(TAG, "is isAlarmC $isAlarmC")
-//                Log.e(TAG, "is isNotif $isNotif")
-//                Log.e(TAG, "is isRing $isRing")
-                Log.e(TAG, " dateAdded $dateAdded")
-                Log.e(TAG, " duration $dur")
+//                Log.e(TAG, "id $id")
+//                Log.e(TAG, "audioUri $audioUri")
+//                Log.e(TAG, "title $title")
+//                Log.e(TAG, "artist $artist")
+////                Log.e(TAG, "is isAlarmC $isAlarmC")
+////                Log.e(TAG, "is isNotif $isNotif")
+////                Log.e(TAG, "is isRing $isRing")
+//                Log.e(TAG, " dateAdded $dateAdded")
+//                Log.e(TAG, " duration $dur")
                 val mmr = MediaMetadataRetriever()
                 try {
                     mmr.setDataSource(context, audioUri)

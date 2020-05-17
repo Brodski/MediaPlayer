@@ -89,6 +89,7 @@ class PlayerFragment : Fragment() {
     override fun onStop() {
         Log.e(TAG, "onStop: stopping player")
         super.onStop()
+        
     }
 
     override fun onDestroyView() {
@@ -135,13 +136,10 @@ class PlayerFragment : Fragment() {
 
         mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
             override fun onShowPress(e: MotionEvent?) {
-                Log.e(TAG, "onShowPress: ")
             }
 
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000 ")
-
-//                doVibrate()
+//                doVibrate()f
                 listener?.togglePlayPause()
                 return true
             }
@@ -170,10 +168,9 @@ class PlayerFragment : Fragment() {
             }
 
             override fun onLongPress(e: MotionEvent?) {
-                Log.e(TAG, "onLongPress: ")
+
             }
         })
-        Log.e(TAG, "onCreateView: playerView $playerView")
         playerView?.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 mDetector.onTouchEvent(event)

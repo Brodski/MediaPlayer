@@ -124,7 +124,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
                 .commit()
         } else if (supportFragmentManager.fragments.size == 0) {
-//            continueBuildApp()
             continueBuildApp2()
         }
     }

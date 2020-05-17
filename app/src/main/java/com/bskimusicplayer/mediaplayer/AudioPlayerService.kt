@@ -1,9 +1,7 @@
 package com.bskimusicplayer.mediaplayer
 
 import android.Manifest
-import android.app.Notification
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -42,6 +40,7 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.Util
+import kotlin.math.log
 
 // Building feature-rich media apps with ExoPlayer (Google I/O '18)
 // https://www.youtube.com/watch?v=svdq1BWl4r8
@@ -53,12 +52,13 @@ class AudioPlayerService : Service() {
         fun getService(): AudioPlayerService = this@AudioPlayerService
     }
 
+    private var isFirst: Boolean = true
     public var exoPlayer: SimpleExoPlayer? = null
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var mediaSession: MediaSessionCompat? = null
     private var mediaSessionConnector: MediaSessionConnector? = null
 
-    private val PLAYBACK_CHANNEL_ID = "playback_channel"
+    private val PLAYBACK_CHANNEL_ID = "playback_channel_for_bski_player"
     private val PLAYBACK_NOTIFICATION_ID = 1
     private val MEDIA_SESSION_TAG = "hello-world-media"
     var songList: List<Song>? = null
@@ -68,12 +68,14 @@ class AudioPlayerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        Log.e(TAG, "---------------------- onCreate: ----------------------")
+        isFirst = true
 
         mContext = this
         //LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, IntentFilter("custom-event-name"));
 
         exoPlayer = SimpleExoPlayer.Builder(this).build()
-        exoPlayer!!.playWhenReady = false
+        exoPlayer?.playWhenReady = false
 
         buildMediaStartUp()
 
@@ -81,12 +83,11 @@ class AudioPlayerService : Service() {
 
         // The below syncs the foreground player with t he player
         mediaSession = MediaSessionCompat(mContext, MEDIA_SESSION_TAG)
-        mediaSession!!.isActive = true
-
-        playerNotificationManager!!.setMediaSessionToken(mediaSession!!.sessionToken) // Lock screen
-        mediaSessionConnector = MediaSessionConnector(mediaSession!!)
+        mediaSession?.isActive = true
+        playerNotificationManager?.setMediaSessionToken(mediaSession!!.sessionToken) // Lock screen
 
         // Sync playlist with the queue
+        mediaSessionConnector = MediaSessionConnector(mediaSession!!)
         mediaSessionConnector?.setQueueNavigator(object : TimelineQueueNavigator(mediaSession!!) {
             override fun getMediaDescription( player: Player, windowIndex: Int ): MediaDescriptionCompat {
                 return mediaHelper(windowIndex, songList?.get(windowIndex))
@@ -100,10 +101,16 @@ class AudioPlayerService : Service() {
             .build()
         exoPlayer?.setAudioAttributes(audioAttributes, true)
 
-
     }
 
     private fun initializeNotificationManager() {
+        Log.e(TAG, "initializeNotificationManager: Initizlting manager")
+//         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            var name = resources.getString(R.string.app_name))
+//            var newNotif = NotificationChannel( PLAYBACK_CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT )
+//            newNotif.description = resources.getString(R.string.playback_channel_description)
+//        }
+
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
             mContext,
             PLAYBACK_CHANNEL_ID,
@@ -142,10 +149,20 @@ class AudioPlayerService : Service() {
                 }
 
                 override fun onNotificationPosted( notificationId: Int, notification: Notification, ongoing: Boolean) {
+                    Log.e(TAG, " ++++  BAM! ++++")
+                    Log.e(TAG, " ongoing $ongoing")
+                    Log.e(TAG, " isFirst $isFirst")
+//                    if (isFirst){
+//                        Log.e(TAG, "onNotificationPosted: STARTING VIA FIRST")
+//                        startForeground(notificationId, notification)
+//                        isFirst = false
+//                    }
                     if (ongoing) {
                         // Make sure the service will not get destroyed while playing media.
+                        Log.e(TAG, "onNotificationPosted: START FOREGROUND")
                         startForeground(notificationId, notification)
                     } else {
+                        Log.e(TAG, "onNotificationPosted: STOPPING")
                         // Make notification cancellable.
                         stopForeground(false)
                     }
@@ -403,10 +420,6 @@ class AudioPlayerService : Service() {
     // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
 //    @MainThread
     private fun getBitmapFromVectorDrawable(context: Context, @DrawableRes drawableId: Int): Bitmap? {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-////            Log.e(TAG, "getBitmapFromVectorDrawable: PIE!!!!! DRAWABLE!")
-//            return BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
-//        }
         return ContextCompat.getDrawable(context, drawableId)?.let {
             val drawable = DrawableCompat.wrap(it).mutate()
             val bitmap = Bitmap.createBitmap(
@@ -424,11 +437,13 @@ class AudioPlayerService : Service() {
 
     fun releasePlayer() {
         if (exoPlayer != null) {
+            Log.e(TAG, "releasePlayer: here we go")
             mediaSession?.release()
             mediaSessionConnector?.setPlayer(null)
             playerNotificationManager?.setPlayer(null)
             exoPlayer!!.release()
             exoPlayer = null
+            Log.e(TAG, "releasePlayer:  complete")
         }
     }
 

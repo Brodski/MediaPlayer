@@ -24,6 +24,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
+import kotlin.math.log
 
 
 // Media streaming with ExoPlayer
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             }
         }
         override fun onServiceDisconnected(name: ComponentName?) {
-//            Log.e(TAG, "Disconnected Service :o")
+            Log.e(TAG, "Disconnected Service :o")
             mService = null
         }
     }
@@ -104,6 +105,28 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             editor.putInt(resources.getString(R.string.save_state_slop), defaultSlop)
             editor.putInt(resources.getString(R.string.save_state_skip_zone), 30)
             editor.commit()
+        }
+
+        Log.e(TAG, "onCreate: mService == null? ${mService == null}")
+        if (mService == null){
+
+            Log.e(TAG, "onCreate: -=-=-=-= creating intent -=-=-=-=")
+            var intent: Intent = Intent(this, AudioPlayerService::class.java)
+            Log.e(TAG, "onCreate: -=-=-=-=binding Service -=-=-=-=")
+            this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            Log.e(TAG, "onCreate: -=-=-=-=before startforegorundservice -=-=-=-=")
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+                startService(intent)
+            } else{
+                Util.startForegroundService(this, intent)
+            }
+
+            Log.e(TAG, "onCreate: -=-=-=-=after startforegorundservice -=-=-=-=")
+    //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    //            startForegroundService(intent)
+    //        }
         }
     }
 
@@ -151,7 +174,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onDestroy() {
         super.onDestroy()
-//        Log.e(TAG,"DESTROY MainActivity")
+        Log.e(TAG,"DESTROY MainActivity")
         releasePlayer2()
     }
 
@@ -169,6 +192,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     private fun releasePlayer2() {
 //        Log.e(TAG, "releasePlayer2: Releasing some shit")
+        Log.e(TAG, "releasePlayer2: is mService null? ${(mService == null)}")
         if (mService != null) {
             this.unbindService(connection)
         }
@@ -176,11 +200,16 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
 
     fun continueBuildApp2() {
-        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        Util.startForegroundService(this, intent)
+
+//        var intent: Intent = Intent(this, AudioPlayerService::class.java)
+//        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//        Util.startForegroundService(this, intent)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(intent)
+//        ContextCompat.startForegroundService(this, intent)
         inflateFragment(R.string.player_frag_tag)
 
+//        }
     }
 
 

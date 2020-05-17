@@ -99,14 +99,9 @@ class PlayerFragment : Fragment() {
         playbackStateListener?.let { player?.removeListener(it) }
     }
 
-override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    Log.e(TAG, "onCreate: ")
-}
-    
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.e(TAG, "onCreateView Player Frag")
+//        Log.e(TAG, "onCreateView Player Frag")
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
         audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         vibrator = activity?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
@@ -131,25 +126,18 @@ override fun onCreate(savedInstanceState: Bundle?) {
         player = listener?.getPlayer()
         getTitleStuff()
         playbackStateListener = PlaybackStateListener()
-
-
-//        val toolbar: Toolbar = v.findViewById(R.id.toolbar)
-//        toolbar.title = resources.getString(R.string.toolbar_name)
-//        setHasOptionsMenu(true)
-//        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-
         mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
             override fun onShowPress(e: MotionEvent?) {
             }
 
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
-//                doVibrate()f
+//                doVibrate()
                 listener?.togglePlayPause()
                 return true
             }
 
             override fun onDown(e: MotionEvent?): Boolean {
-                //           Log.e(TAG, "onDown: ")
+//           Log.e(TAG, "onDown: ")
                 return true
             }
 
@@ -164,8 +152,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
             }
 
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-//                Log.e(TAG, "onScroll: ")
-//                // downtime
 //                Log.e(TAG, "onScroll: e1: ${e1?.x}, ${e1?.y}")
 //                Log.e(TAG, "onScroll: e2: ${e2?.x}, ${e2?.y}")
                 return true
@@ -181,9 +167,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
                 return true;
             }
         })
-
-
-
         return v
     }
 
@@ -280,9 +263,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        //return super.onCreateOptionsMenu(menu)
-        val frags = requireFragmentManager().fragments
-
         inflater.inflate(R.menu.menu_player, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
@@ -290,7 +270,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settingsId -> {
-//                Log.e(TAG, "baby: settings click")
                 listener?.handleSettingsClick()
                 return false
             }
@@ -318,7 +297,6 @@ override fun onCreate(savedInstanceState: Bundle?) {
         }
 
         override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
-//                super.onTracksChanged(trackGroups, trackSelections)
 //            Log.e(TAG, "onTracksChanged: CHANGED")
                 tvTitle.text = listener?.getSongTitle()
                 tvArtist.text = listener?.getSongArtist()

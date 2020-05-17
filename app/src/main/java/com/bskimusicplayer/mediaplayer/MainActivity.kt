@@ -53,9 +53,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             val binder = service as AudioPlayerService.LocalBinder
             mService = binder.getService()
-            Log.e(TAG, "``````onServiceConnected: setting``````")
+//            Log.e(TAG, "``````onServiceConnected: setting``````")
             val pFrag = supportFragmentManager.findFragmentById(R.id.newmain_view)
-            Log.e(TAG, "onServiceConnected: current frag $pFrag")
+//            Log.e(TAG, "onServiceConnected: current frag $pFrag")
 
             if (pFrag is PlayerFragment) {
                 pFrag.setPlayer()
@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             }
         }
         override fun onServiceDisconnected(name: ComponentName?) {
-            Log.e(TAG, "Disconnected Service :o")
+//            Log.e(TAG, "Disconnected Service :o")
             mService = null
         }
     }
@@ -75,12 +75,10 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.e(TAG, "onCreate: MAIN!!")
         setContentView(R.layout.activity_main)
-//        Log.e(TAG,"onCreate: CREATED MainActivity")
         if (savedInstanceState != null && savedInstanceState.containsKey("currentFragment") && restoredFragment == null ) {
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
-            Log.e(TAG, "onCreate: found some fragment $restoredFragment.tag")
+//            Log.e(TAG, "onCreate: found some fragment $restoredFragment.tag")
         }
 //        initPlayer2()
 
@@ -128,46 +126,31 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
     override fun onResume() {
         super.onResume()
-        Log.e(TAG,"RESUME MainActivity")
         // onRestoreInstanceState() is called after onStart() & before onResume()
         // restoreFragment is assigned in onRestoreInstanceState()
         if (restoredFragment != null ) {
-            Log.e(TAG, "onResume: RESTORING OSEOMTIHG")
             supportFragmentManager
                 .beginTransaction()
                 .addToBackStack(tag) // BAM?
                 .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
                 .commit()
         } else if (supportFragmentManager.fragments.size == 0) {
-            Log.e(TAG, "onResume: frage = 0")
             continueBuildApp2()
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-//        Log.e(TAG,"PAUSE MainActivity")
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.e(TAG,"onSaveInstanceState")
         if ( !supportFragmentManager.fragments.isNullOrEmpty()) {
             var frag = supportFragmentManager.fragments.get(0)
 //            Log.e(TAG, "onSaveInstanceState: putting this frag in $frag")
-            Log.e(TAG, "onSaveInstanceState: putting this frag in ${frag.tag}")
+//            Log.e(TAG, "onSaveInstanceState: putting this frag in ${frag.tag}")
             supportFragmentManager.putFragment(outState, "currentFragment", frag)
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-//        Log.e(TAG,"STOP MainActivity")
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        Log.e(TAG,"DESTROY MainActivity")
         releasePlayer2()
     }
 
@@ -192,16 +175,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 
 
     fun continueBuildApp2() {
-
-//        var intent: Intent = Intent(this, AudioPlayerService::class.java)
-//        this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-//        Util.startForegroundService(this, intent)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            startForegroundService(intent)
-//        ContextCompat.startForegroundService(this, intent)
         inflateFragment(R.string.player_frag_tag)
-
-//        }
     }
 
 

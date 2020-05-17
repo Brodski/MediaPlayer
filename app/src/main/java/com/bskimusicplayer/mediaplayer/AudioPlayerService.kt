@@ -66,7 +66,6 @@ class AudioPlayerService : Service() {
     val TAG = "AudioPlayerService"
 
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate() {
         super.onCreate()
 
@@ -177,10 +176,12 @@ class AudioPlayerService : Service() {
         Log.e(TAG, "buildMediaStartUp: ==========================================")
         // Get songs/media on phone, sort, and set
         songList = querySongs(mContext)
-        if (songList.isNullOrEmpty() ){
-            songList = goofydebugging()
-            Toast.makeText(mContext,"You need to have at least 1 song on your application", Toast.LENGTH_SHORT).show()
-            return
+        if (songList.isNullOrEmpty() ) {
+            if (songList?.size!! < 2) {
+                songList = goofydebugging()
+                Toast.makeText(mContext, "You need to have at least 2 song on your application\nConnecting to two remote files online\nRestart app required", Toast.LENGTH_LONG).show()
+                return
+            }
         }
         songList = sortSongs(sortBy)
         songList?.forEach { it ->
@@ -276,7 +277,7 @@ class AudioPlayerService : Service() {
     private fun actualQuerySongs(context: Context): MutableList<Song> {
         val songList = mutableListOf<Song>()
         val songUri: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
+    //    val defaultArt = getBitmapFromVectorDrawable(context, R.drawable.ic_music_note_white)
         Log.e(TAG, "actualQuerySongs: queirying in")
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
@@ -308,7 +309,10 @@ class AudioPlayerService : Service() {
 
             val dateAddedC = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
             val durationC = cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)
-
+            Log.e(TAG, "actualQuerySongs: ${cursor.columnNames}")
+            Log.e(TAG, "actualQuerySongs: ${cursor.count}")
+//            cursor.columnNames.forEach { Log.e(TAG, "actualQuerySongs: $it") }
+//            cursor.count .forEach { Log.e(TAG, "actualQuerySongs: $it") }
             while (cursor.moveToNext()) {
                 Log.e(TAG, "+++++++++++++++++++++++++++")
                 val id = cursor.getLong(idColumn)
@@ -350,7 +354,13 @@ class AudioPlayerService : Service() {
                 var art: Bitmap? = if (rawArt != null) {
                     BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 } else {
-                    defaultArt
+                    //defaultArt
+                    BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
+//                    Log.e(TAG, "actualQuerySongs: WHUT")
+//                    Log.e(TAG, "actualQuerySongs: WHUT")
+//                    Log.e(TAG, "actualQuerySongs: WHUT")
+//                    Log.e(TAG, "actualQuerySongs: WHUT")
+//                    BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
                 }
 
                 songList.add(
@@ -393,8 +403,12 @@ class AudioPlayerService : Service() {
     }
 
     // https://dev.to/mgazar_/playing-local-and-remote-media-files-on-android-using-exoplayer-g3a
-    @MainThread
+//    @MainThread
     private fun getBitmapFromVectorDrawable(context: Context, @DrawableRes drawableId: Int): Bitmap? {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+            Log.e(TAG, "getBitmapFromVectorDrawable: PIE!!!!! DRAWABLE!")
+            return BitmapFactory.decodeResource(resources,R.drawable.ic_music_note_white )
+        }
         return ContextCompat.getDrawable(context, drawableId)?.let {
             val drawable = DrawableCompat.wrap(it).mutate()
             val bitmap = Bitmap.createBitmap(
@@ -472,9 +486,9 @@ class AudioPlayerService : Service() {
             mContext,
             Util.getUserAgent(mContext, this.getString(R.string.app_name))
         )
-        val audioUri =
-            Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
-        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        val audioUri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
+//        val mp4VideoUri: Uri = Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+        val mp4VideoUri: Uri = Uri.parse("https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3")
         val ms: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(audioUri)
         val ms2: MediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mp4VideoUri)
         concatenatingMediaSource.addMediaSource(ms)
@@ -484,7 +498,7 @@ class AudioPlayerService : Service() {
             Song(
                 id = 123,
                 uri = audioUri,
-                title = "Jazz in paris",
+                title = "Jazz in paris 1",
                 artist = "Media Right Productions",
                 duration = 10,
                 dateCreated = 100,
@@ -496,8 +510,8 @@ class AudioPlayerService : Service() {
                 Song(
                     id = 123,
                     uri = mp4VideoUri,
-                    title = "Big Buck Bunny",
-                    artist = "Sacha Goedegebure",
+                    title = "Jazz in Paris 2",
+                    artist = "Media Right Productions",
                     duration = 11,
                     dateCreated = 101,
                     art = getBitmapFromVectorDrawable(mContext, R.drawable.ic_audiotrack_white)

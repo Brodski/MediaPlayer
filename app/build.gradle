@@ -38,7 +38,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.android.support:support-media-compat:28.0.0'
+    implementation 'androidx.media:media:1.1.0'
     implementation "com.google.android.exoplayer:exoplayer-core:2.11.4"
     implementation "com.google.android.exoplayer:exoplayer-ui:2.11.4"
     implementation 'com.google.android.exoplayer:extension-mediasession:2.11.4'
@@ -48,6 +48,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
 
+    //requried for exoplayer
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation "net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC2"

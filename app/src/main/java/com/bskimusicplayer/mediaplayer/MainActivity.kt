@@ -71,10 +71,10 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 Log.e(TAG, "onServiceConnected: PlayerFrag Currenlty showing $pFrag")
                 pFrag.setPlayer()
                 pFrag.getTitleStuff()
+                Log.e(TAG, "onServiceConnected: DONE")
             } else if (pFrag is SongsFragment) {
                 pFrag.updateRecViewer()
             } else {
-                Log.e(TAG, "onServiceConnected: some other fragmetn")
             }
             when {
                 pFrag is PlayerFragment -> Log.e(TAG, "onServiceConnected: playerfrag")

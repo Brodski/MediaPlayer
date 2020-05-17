@@ -155,7 +155,7 @@ class PlayerFragment : Fragment() {
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
                 Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000 ")
 
-                doVibrate()
+//                doVibrate()
                 listener?.togglePlayPause()
                 return true
             }
@@ -209,8 +209,8 @@ class PlayerFragment : Fragment() {
         Log.e(TAG, "getTitleStuff: playerview $playerView")
         if (player != null) {
 //            player?.addListener(getMyListener())
-            Log.e(TAG, "onDestroyView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
-            Log.e(TAG, "onDestroyView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
+            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
+            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
             playbackStateListener?.let { player?.addListener(it) }
         }
     }
@@ -249,7 +249,7 @@ class PlayerFragment : Fragment() {
             }
         } else {
             Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000  ")
-            doVibrate()
+//            doVibrate()
             listener?.togglePlayPause()
         }
         Log.e(TAG, "processSwipe: ==========================================")
@@ -277,7 +277,6 @@ class PlayerFragment : Fragment() {
 
     fun setPlayer() {
         Log.e(TAG, "setPlayer: now setting")
-//        if ( listener?.getPlayer() != null ){
         if (listener?.isService() == true) {
             Log.e(TAG, " ==== setPlayer: SETTING PLAYER === ")
             playerView?.player = listener?.getPlayer()

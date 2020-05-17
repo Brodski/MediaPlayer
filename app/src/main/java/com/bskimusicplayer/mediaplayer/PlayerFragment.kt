@@ -32,16 +32,10 @@ import kotlin.math.atan2
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ItemsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PlayerFragment : Fragment() {
 
     private var playerView: PlayerView? = null
     private var player: SimpleExoPlayer? = null
-    private lateinit var mService: AudioPlayerService
     private var listener: PlayerFragListener? = null
     private var skipIncrement: Int = 10000
     private var playbackStateListener: PlaybackStateListener? = null
@@ -54,7 +48,7 @@ class PlayerFragment : Fragment() {
     private lateinit var tvArtist: TextView
     private lateinit var tvTitle: TextView
     private var vibrator: Vibrator? = null
-
+    private val TAG = "PlayerFragment"
     interface PlayerFragListener : IMainActivity {
         fun getPlayer(): SimpleExoPlayer?
         fun skipForward(rewind: Boolean = false)
@@ -78,13 +72,7 @@ class PlayerFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         Log.e(TAG, "onAttach: PlayerFragment")
-        // other class must implement this
-
-        Log.e(TAG, "onAttach: LISTENER CREATED")
         listener = context as PlayerFragListener
-//        listener = activity as PlayerFragListener
-        Log.e(TAG, "onAttach: contexxt $context")
-        Log.e(TAG, "onAttach: listener $listener")
     }
 
     override fun onResume() {
@@ -94,8 +82,7 @@ class PlayerFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
-        Log.e(TAG, "onDetach: detaching")
-        Log.e(TAG, "onDetach: LISTENR NULL'D")
+        Log.e(TAG, "onDetach: detaching, listenr set to null")
         listener = null
     }
 
@@ -106,7 +93,6 @@ class PlayerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.e(TAG, "onDestroyView: destroying view Player")
         Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
         Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
         playbackStateListener?.let { player?.removeListener(it) }
@@ -206,9 +192,7 @@ class PlayerFragment : Fragment() {
 
         tvArtist?.isSelected = true
         tvArtist?.text = listener?.getSongArtist()
-        Log.e(TAG, "getTitleStuff: playerview $playerView")
         if (player != null) {
-//            player?.addListener(getMyListener())
             Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
             Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
             playbackStateListener?.let { player?.addListener(it) }
@@ -220,39 +204,34 @@ class PlayerFragment : Fragment() {
         if (arrayOf(x1, y1, x2, y2).contains(null)) {
             return
         }
-        Log.e(TAG, "processSwipe: ==========================================")
+//        Log.e(TAG, "processSwipe: ==========================================")
         var distanceX = (x2!! - x1!!).toDouble()
         var distanceY = (y2!! - y1!!).toDouble()
         var angle = atan2(distanceY, distanceX)
         angle = Math.toDegrees(angle)
-        Log.e(TAG, "processSwipe: distanceX $distanceX")
-        Log.e(TAG, "processSwipe: distanceY $distanceY ")
-        Log.e(TAG, "processSwipe: angle: $angle")
-        Log.e(TAG, "processSwipe: abs(angle): ${abs(angle)}")
+//        Log.e(TAG, "processSwipe: distanceX $distanceX")
+//        Log.e(TAG, "processSwipe: distanceY $distanceY ")
+//        Log.e(TAG, "processSwipe: angle: $angle")
+//        Log.e(TAG, "processSwipe: abs(angle): ${abs(angle)}")
 
         if (abs(angle) < forward_zone_degrees && distanceX > slop_prevention) {
-            Log.e(TAG, "processSwipe: ++++++++++++++++ ")
             skipForward()
         } else if (abs(angle) > rewind_zone_degrees && distanceX < (slop_prevention * -1)) {
-            Log.e(TAG, "processSwipe: --------------- ")
             skipRewind()
         } else if (distanceY < (slop_prevention * -1)) {
-            Log.e(TAG, "processSwipe: VOLUME UP ")
             if (listener?.isPlaying() == true) {
                 volumeUp()
                 audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
             }
         } else if (distanceY > slop_prevention) {
-            Log.e(TAG, "processSwipe: VOLUME DOWN ")
             if (listener?.isPlaying() == true) {
                 volumeDown()
             }
         } else {
-            Log.e(TAG, "00000000000000000000000 onSingleTapUp: 00000000000000000000000  ")
 //            doVibrate()
             listener?.togglePlayPause()
         }
-        Log.e(TAG, "processSwipe: ==========================================")
+//        Log.e(TAG, "processSwipe: ==========================================")
     }
 
     private fun volumeUp() {
@@ -276,16 +255,17 @@ class PlayerFragment : Fragment() {
     }
 
     fun setPlayer() {
-        Log.e(TAG, "setPlayer: now setting")
+        Log.e(TAG, "setPlayer: ")
         if (listener?.isService() == true) {
-            Log.e(TAG, " ==== setPlayer: SETTING PLAYER === ")
+            Log.e(TAG, "setPlayer: SETTING PLAYER ")
             playerView?.player = listener?.getPlayer()
         }
         if (player == null) {
+            Log.e(TAG, "setPlayer: SETTING PLAYER AND IMPLEMETNIGN LISTERN ")
             player = listener?.getPlayer()
-            Log.e(TAG, " ==== setPlayer: SETTING PLAYER AND IMPLEMETNIGN LISTERN ==== ")
             playbackStateListener?.let { player?.addListener(it) }
         }
+        Log.e(TAG, "setPlayer: done")
     }
 
     fun skipForward() {
@@ -323,18 +303,6 @@ class PlayerFragment : Fragment() {
         return false
     }
 
-    companion object {
-        const val TAG = "PlayerFragment"
-        @JvmStatic
-        fun newInstance(): PlayerFragment {
-            val playerFragment = PlayerFragment()
-            val args = Bundle()
-            playerFragment.arguments = args
-            return playerFragment
-        }
-    }
-
-
     inner class PlaybackStateListener:  Player.EventListener {
         override fun onPlayerStateChanged( playWhenReady: Boolean, playbackState: Int ) {
             val stateString: String
@@ -348,10 +316,6 @@ class PlayerFragment : Fragment() {
             Log.d(TAG, "changed state to " + stateString + " playWhenReady: " + playWhenReady)
         }
 
-        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-//            super.onPlaybackParametersChanged(playbackParameters)
-            Log.e(TAG, "onPlaybackParametersChanged: bang!")
-        }
         override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
 //                super.onTracksChanged(trackGroups, trackSelections)
             Log.e(TAG, "onTracksChanged: CHANGED")

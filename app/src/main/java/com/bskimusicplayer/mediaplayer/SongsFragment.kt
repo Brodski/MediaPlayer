@@ -19,11 +19,6 @@ import net.yslibrary.android.keyboardvisibilityevent.util.UIUtil
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SongsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     private var songListFull: List<Song>? = null
@@ -32,7 +27,7 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     private lateinit var recycler_songs: RecyclerView
     private lateinit var adaptor: SongsAdaptor
     private lateinit var mService: AudioPlayerService
-
+    private val TAG = "SongFragment"
     private var listener: SongsFragListener? = null
     interface SongsFragListener: IMainActivity {
         fun onSongSelect(index: Int, text: String)
@@ -216,17 +211,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         }
         return true
         //return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        const val TAG = "SongsFragment"
-        @JvmStatic
-        fun newInstance() : SongsFragment {
-            val songsFragment = SongsFragment()
-            val args = Bundle()
-            songsFragment.arguments = args
-            return songsFragment
-        }
     }
 }
 

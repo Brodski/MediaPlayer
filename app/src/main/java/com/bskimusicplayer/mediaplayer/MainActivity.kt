@@ -63,6 +63,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
 //                Log.e(TAG, "onServiceConnected: DONE")
             } else if (pFrag is SongsFragment) {
                 pFrag.updateRecViewer()
+            } else if (pFrag == null) {
+                inflateFragment(R.string.player_frag_tag)
             }
         }
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -106,16 +108,16 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             editor.commit()
         }
 
-        if (mService == null){
-            var intent: Intent = Intent(this, AudioPlayerService::class.java)
-            this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-                startService(intent)
-            } else{
-                Util.startForegroundService(this, intent)
-            }
-        }
+//        if (mService == null){
+//            var intent: Intent = Intent(this, AudioPlayerService::class.java)
+//            this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                startForegroundService(intent)
+//                startService(intent)
+//            } else{
+//                Util.startForegroundService(this, intent)
+//            }
+//        }
     }
 
     override fun onStart() {
@@ -135,7 +137,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 .replace(R.id.newmain_view, restoredFragment!!, restoredFragment!!.tag)
                 .commit()
         } else if (supportFragmentManager.fragments.size == 0) {
-            continueBuildApp2()
+//            continueBuildApp2()
+//            Log.e(TAG, "onResume: RIP, waiting")
         }
     }
 
@@ -173,9 +176,23 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
+    private fun startMyService(){
+        if (mService == null){
+            var intent: Intent = Intent(this, AudioPlayerService::class.java)
+            this.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent)
+                startService(intent)
+            } else{
+                Util.startForegroundService(this, intent)
+            }
+        }
+    }
+
 
     fun continueBuildApp2() {
-        inflateFragment(R.string.player_frag_tag)
+        startMyService()
+        //inflateFragment(R.string.player_frag_tag)
     }
 
 
@@ -184,13 +201,13 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     fun askPermissions() {
         if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED) {
             // Has permissions
+//            startMyService()
             continueBuildApp2()
         } else {
 //            Log.e(TAG, "READ EXTERNAL NOT GRANTED")
             // shouldShowRequestPermissionRationale: false if disabled or "do not ask again"
             // if true, show a dialog that explains why we need permission. shows when user already denied it but trying again
             if (ActivityCompat.shouldShowRequestPermissionRationale(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                //ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), MY_PERM_REQUEST)
                 AlertDialog.Builder(this)
                     .setTitle("Permission needed")
                     .setMessage("Required to access audio files")
@@ -211,7 +228,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 } else {
                     AlertDialog.Builder(this)
                         .setTitle("You have previously denied permissions")
-                        .setMessage("Try again \nOr go to app settings, find Bski's Music Player and turn on permissions")
+                        .setMessage("Try again \n\nOr go to app settings, find Bski's Music Player and turn on permissions")
                         .setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
 //                        .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
                         .create().show()

@@ -2,7 +2,6 @@ package com.bskimusicplayer.mediaplayer
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
@@ -35,26 +34,21 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        Log.e(TAG, "onCreate: mServce = AudioPlayerService()")
         mService = AudioPlayerService()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View? {
-//        Log.e(TAG,"onCreateView SongsFragment")
         var view: View = inflater.inflate(R.layout.fragment_items, container, false)
-
         var nav: BottomNavigationView = requireActivity().findViewById(R.id.bottom_navigationId)
         var songsIcon: MenuItem =  nav.menu.findItem(R.id.nav_favorites)
         songsIcon.isChecked = true
 
         val toolbar: Toolbar = view.findViewById(R.id.toolbar)
         setHasOptionsMenu(true)
-//        toolbar.title = resources.getString(R.string.toolbar_name)
         toolbar.title = resources.getString(R.string.toolbar_name_browse)
         (activity as AppCompatActivity).setSupportActionBar(toolbar)
 
         recycler_songs = view.findViewById(R.id.recycler_songs)
-
         updateRecViewer()
 
         return view
@@ -64,7 +58,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
         if (listener?.isService() == true) {
             songList = listener?.getPlaylist()
             songListFull = songList?.map { it.copy() }
-
             adaptor = SongsAdaptor((songList as MutableList<Song>?)!!, this)
             recycler_songs.adapter = adaptor
             recycler_songs.layoutManager = LinearLayoutManager(context)
@@ -74,15 +67,9 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
 
     override fun onItemClick(position: Int, uri: String) {
-
-//        Log.e(TAG, "vvvvvvvvvvvvvvvvvvvvvvvvvv")
-//        Log.e(TAG, "onItemClick text/uri: $uri")
         songListFull?.forEachIndexed { idx, element ->
             if (element.uri.toString() == uri) {
                 listener?.onSongSelect(idx, uri)
-//                Log.e(TAG, "onItemClick: FOUND IT ${element.uri.toString()}")
-//                Log.e(TAG, "onItemClick: FOUND IT $uri")
-//                Log.e(TAG, "onItemClick: FOUND IT $idx")
                 return@forEachIndexed
             }
         }
@@ -98,12 +85,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
 
     override fun onDetach() {
         super.onDetach()
-//        Log.e(TAG, "onDetach: listerning set to null")
         listener = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        Log.e(TAG, "onCreateOptionsMenu: SongFragment")
         inflater.inflate(R.menu.menu_songs, menu)
         val searchItem = menu.findItem(R.id.search_bar_songs)
         val searchView = searchItem.actionView as SearchView
@@ -145,19 +130,14 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
     fun handleSortClick(sortBy: String){
         val sharedpreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val editor = sharedpreferences.edit()
-//        Log.e(TAG, "handleSortClick: sortby $sortBy")
         editor.putString(resources.getString(R.string.save_state_sort_key), sortBy)
         editor.commit()
         listener?.onSettingsSort()
 
         updateRecViewer()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        Log.e(TAG, "onOptionsItemSelected clicked id: ${item.itemId}")
-//        Log.e(TAG, "onOptionsItemSelected clicked title: ${item.title}")
-
         when (item.itemId){
             R.id.sortArtistAscId -> {
                 item.isChecked = true
@@ -190,12 +170,10 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
                 return false
             }
             R.id.settingsId -> {
-//                Log.e(TAG, "onOptionsItemSelected: options click")
                 listener?.handleSettingsClick()
                 return false
             }
             R.id.contactId -> {
-//                Log.e(TAG, "onOptionsItemSelected: contactId click")
                 listener?.sendEmail()
                 return false
             }
@@ -205,7 +183,6 @@ class SongsFragment : Fragment(),  SongsAdaptor.OnItemListener {
             else -> super.onOptionsItemSelected(item)
         }
         return true
-        //return super.onOptionsItemSelected(item)
     }
 }
 

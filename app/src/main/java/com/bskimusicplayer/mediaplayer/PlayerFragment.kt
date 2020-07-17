@@ -1,8 +1,5 @@
 package com.bskimusicplayer.mediaplayer
 
-//import androidx.fragment.app.FragmentManager
-//import android.widget.Toolbar
-
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioManager
@@ -24,11 +21,6 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.math.abs
 import kotlin.math.atan2
-
-
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class PlayerFragment : Fragment() {
 
@@ -58,49 +50,31 @@ class PlayerFragment : Fragment() {
         fun getSongArtist(): String
     }
 
-
     override fun onStart() {
-//        Log.e(TAG, "onStart: PlayerFragment")
         super.onStart()
         setPlayer()
         getTitleStuff()
         playerView?.showController()
     }
 
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-//        Log.e(TAG, "onAttach: PlayerFragment")
         listener = context as PlayerFragListener
     }
 
-    override fun onResume() {
-        super.onResume()
-//        Log.e(TAG, "onResume: PlayerFragment")
-    }
 
     override fun onDetach() {
         super.onDetach()
-//        Log.e(TAG, "onDetach: detaching, listenr set to null")
         listener = null
-    }
-
-    override fun onStop() {
-//        Log.e(TAG, "onStop: stopping player")
-        super.onStop()
-        
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-//        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
-//        Log.e(TAG, "onDestroyView: ------------------ RELEASED -------------------")
         playbackStateListener?.let { player?.removeListener(it) }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-//        Log.e(TAG, "onCreateView Player Frag")
         var v: View = inflater.inflate(R.layout.fragment_player, container, false)
         audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         vibrator = activity?.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
@@ -116,36 +90,12 @@ class PlayerFragment : Fragment() {
         skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment), resources.getString(R.string.default_increment))?.toInt() ?: 15000
         slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
         isKeepScreenOn = sharedPreferences.getBoolean(resources.getString(R.string.save_state_screen), false)
-        Log.e(TAG, "SETTING IT - isKeepScreenOn?")
-        Log.e(TAG, isKeepScreenOn.toString())
 
         if (isKeepScreenOn) {
-            Log.e(TAG, "ON")
             activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
-            Log.e(TAG, "OFF")
             activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
-//
-//        val flags: Int = activity?.window?.getAttributes()?.flags!!
-//        Log.e(TAG, "--------FLAGS!!!------------")
-//        Log.e(TAG, flags.toString())
-//        Log.e(TAG, "--------------------")
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON).toString())
-//        Log.e(TAG,( flags == WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM).toString())
-//        Log.e(TAG,( flags == WindowManager.LayoutParams.FLAG_DIM_BEHIND).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FULLSCREEN).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FULLSCREEN).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS).toString())
-//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN).toString())
-//        //activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
 
         forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
         rewind_zone_degrees = 180 - forward_zone_degrees
@@ -159,38 +109,24 @@ class PlayerFragment : Fragment() {
         mDetector = GestureDetector(context, object : GestureDetector.OnGestureListener {
             override fun onShowPress(e: MotionEvent?) {
             }
-
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
-//                doVibrate()
                 listener?.togglePlayPause()
                 return true
             }
-
             override fun onDown(e: MotionEvent?): Boolean {
-//           Log.e(TAG, "onDown: ")
                 return true
             }
-
             override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
-//                Log.e(TAG, "onFling: ")
-//                Log.e(TAG, "onFling: e1: ${e1?.x}, ${e1?.y}")
-//                Log.e(TAG, "onFling: e2: ${e2?.x}, ${e2?.y}")
-
                 processSwipe(e1?.x, e1?.y, e2?.x, e2?.y)
-
                 return true
             }
-
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-//                Log.e(TAG, "onScroll: e1: ${e1?.x}, ${e1?.y}")
-//                Log.e(TAG, "onScroll: e2: ${e2?.x}, ${e2?.y}")
                 return true
             }
-
             override fun onLongPress(e: MotionEvent?) {
-
             }
         })
+
         playerView?.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View?, event: MotionEvent?): Boolean {
                 mDetector.onTouchEvent(event)
@@ -203,12 +139,9 @@ class PlayerFragment : Fragment() {
     fun getTitleStuff() {
         tvTitle?.isSelected = true
         tvTitle?.text = listener?.getSongTitle()
-
         tvArtist?.isSelected = true
         tvArtist?.text = listener?.getSongArtist()
         if (player != null) {
-//            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
-//            Log.e(TAG, "onCreateView: +++++++++++++++++++++ ADDED +++++++++++++++++++++")
             playbackStateListener?.let { player?.addListener(it) }
         }
     }
@@ -218,15 +151,10 @@ class PlayerFragment : Fragment() {
         if (arrayOf(x1, y1, x2, y2).contains(null)) {
             return
         }
-//        Log.e(TAG, "processSwipe: ==========================================")
         var distanceX = (x2!! - x1!!).toDouble()
         var distanceY = (y2!! - y1!!).toDouble()
         var angle = atan2(distanceY, distanceX)
         angle = Math.toDegrees(angle)
-//        Log.e(TAG, "processSwipe: distanceX $distanceX")
-//        Log.e(TAG, "processSwipe: distanceY $distanceY ")
-//        Log.e(TAG, "processSwipe: angle: $angle")
-//        Log.e(TAG, "processSwipe: abs(angle): ${abs(angle)}")
 
         if (abs(angle) < forward_zone_degrees && distanceX > slop_prevention) {
             skipForward()
@@ -242,10 +170,8 @@ class PlayerFragment : Fragment() {
                 volumeDown()
             }
         } else {
-//            doVibrate()
             listener?.togglePlayPause()
         }
-//        Log.e(TAG, "processSwipe: ==========================================")
     }
 
     private fun volumeUp() {
@@ -269,17 +195,13 @@ class PlayerFragment : Fragment() {
     }
 
     fun setPlayer() {
-//        Log.e(TAG, "setPlayer: ")
         if (listener?.isService() == true) {
-//            Log.e(TAG, "setPlayer: SETTING PLAYER ")
             playerView?.player = listener?.getPlayer()
         }
         if (player == null) {
-//            Log.e(TAG, "setPlayer: SETTING PLAYER AND IMPLEMETNIGN LISTERN ")
             player = listener?.getPlayer()
             playbackStateListener?.let { player?.addListener(it) }
         }
-//        Log.e(TAG, "setPlayer: done")
     }
 
     fun skipForward() {
@@ -323,23 +245,11 @@ class PlayerFragment : Fragment() {
                 ExoPlayer.STATE_ENDED -> "ExoPlayer.STATE_ENDED     -"
                 else -> "UNKNOWN_STATE             -"
             }
-//            Log.d(TAG, "changed state to " + stateString + " playWhenReady: " + playWhenReady)
         }
 
         override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
-//            Log.e(TAG, "onTracksChanged: CHANGED")
                 tvTitle.text = listener?.getSongTitle()
                 tvArtist.text = listener?.getSongArtist()
         }
     }
-
 }
-
-
-
-
-
-
-
-
-

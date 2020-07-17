@@ -4,5 +4,5 @@ interface IMainActivity {
     fun isService(): Boolean
     fun handleSettingsClick()
     fun sendEmail()
-    fun plzDoante()
+//    fun plzDoante()
 }

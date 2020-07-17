@@ -1,12 +1,7 @@
 package com.bskimusicplayer.mediaplayer
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-
-import com.google.android.exoplayer2.util.Log
-import kotlinx.android.synthetic.main.donate1.*
 
 // pro sample: https://github.com/android/play-billing-samples/tree/master/TrivialDriveKotlin
 // Test in-app billing with application licensing - https://support.google.com/googleplay/android-developer/answer/6062777?hl=en

@@ -2,6 +2,7 @@ package com.bskimusicplayer.mediaplayer
 
 import android.Manifest
 import android.content.*
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.net.Uri
@@ -42,10 +43,10 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     private var increment: Int? = null
     private var slop: Int? = null
     private var skipZone: Int? = null
+    private var isKeepScreenOn: Boolean? = null
 
     companion object { const val TAG = "MainActivity"
                         const val tag ="MainActivity"}
-
 
     private var restoredFragment: Fragment? = null
 
@@ -73,8 +74,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -82,7 +81,9 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             restoredFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
 //            Log.e(TAG, "onCreate: found some fragment $restoredFragment.tag")
         }
-//        initPlayer2()
+        // Dear Android, why should I, the dev, put this line in here. Should be default behavior
+        this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+        Log.e(TAG,"Main Activity: running")
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigationId)
         bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
@@ -99,12 +100,14 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), 0)
         skipZone = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 0)
+        isKeepScreenOn = sharedPreferences.getBoolean(resources.getString(R.string.save_state_screen), false)
 
         if (slop == 0 || skipZone == 0 ){
             val editor = sharedPreferences.edit()
             val defaultSlop = resources.getString(R.string.default_slop).toInt()
             editor.putInt(resources.getString(R.string.save_state_slop), defaultSlop)
             editor.putInt(resources.getString(R.string.save_state_skip_zone), 30)
+            editor.putBoolean(resources.getString(R.string.save_state_screen), false)
             editor.commit()
         }
 
@@ -157,8 +160,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         releasePlayer2()
     }
 
-
-
     private fun initPlayer2() {
 //        Log.e(TAG, "initPlayer2: '(mService != null)'  ${(mService != null)}")
         askPermissions()
@@ -189,12 +190,10 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
-
     fun continueBuildApp2() {
         startMyService()
         //inflateFragment(R.string.player_frag_tag)
     }
-
 
     // Android's Request App Permissions - https://developer.android.com/training/permissions/requesting
     // How to Request a Run Time Permission - Android Studio Tutorial https://www.youtube.com/watch?v=SMrB97JuIoM

@@ -9,9 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.song_item.view.*
 
-
-// songsList = songsList
-// type argument <>
 class SongsAdaptor( private val songList: MutableList<Song>, private val onItemListener: OnItemListener)
     : RecyclerView.Adapter<SongsAdaptor.SongsViewHolder>(), Filterable {
     private val songListFull: ArrayList<Song> = ArrayList(songList)
@@ -34,8 +31,8 @@ class SongsAdaptor( private val songList: MutableList<Song>, private val onItemL
         holder.songSubText.text = songList[position].artist
         holder.uriText.text = songList[position].uri.toString()
         //if (position == 0) { holder.tv1.setBackgroundColor(Color.YELLOW) }
-
     }
+
     override fun getItemCount() = songList.size
 
     class SongsViewHolder(itemView: View, val onItemListener: OnItemListener ) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -49,7 +46,7 @@ class SongsAdaptor( private val songList: MutableList<Song>, private val onItemL
         }
 
         override fun onClick(v: View?) {
-            val x0 = itemView.songMainTextId.text.toString()
+           // val x0 = itemView.songMainTextId.text.toString()
             val x = itemView.songUriId.text.toString()
             onItemListener.onItemClick(adapterPosition, x)
         }

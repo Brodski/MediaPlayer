@@ -6,8 +6,6 @@ class SongCreatedComparable(): Comparator<Song> {
     }
 }
 
-
-
 class SongArtistComparable(): Comparator<Song> {
     override fun compare(song1: Song, song2: Song): Int {
         if (song2.artist != "" && song1.artist != "") {

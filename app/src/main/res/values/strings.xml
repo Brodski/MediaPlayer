@@ -27,6 +27,7 @@
     <string name="save_state_song_playtime">save_state_song_playtime</string>
     <string name="save_state_slop">save_state_slop</string>
     <string name="save_state_skip_zone">save_state_skip_zone</string>
+    <string name="save_state_screen">save_state_screen</string>
 
 
     <string name="save_state_sort_key">save_state_sort_key</string>
@@ -35,8 +36,8 @@
         <item>Artist Descending</item>
         <item>Title Ascending</item>
         <item>Title Descending</item>
-        <item>Most Recent</item>
-        <item>Least Recent</item>
+        <item>Newest</item>
+        <item>Oldest</item>
     </string-array>
 
     <string-array name="sort_values">

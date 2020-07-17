@@ -13,11 +13,9 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.*
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.TrackGroupArray
@@ -42,6 +40,7 @@ class PlayerFragment : Fragment() {
 
     private lateinit var audioManager: AudioManager
     private lateinit var mDetector: GestureDetector
+    var isKeepScreenOn = false
     var slop_prevention = 100
     var forward_zone_degrees = 35
     var rewind_zone_degrees = 180 - forward_zone_degrees
@@ -116,6 +115,37 @@ class PlayerFragment : Fragment() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment), resources.getString(R.string.default_increment))?.toInt() ?: 15000
         slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
+        isKeepScreenOn = sharedPreferences.getBoolean(resources.getString(R.string.save_state_screen), false)
+        Log.e(TAG, "SETTING IT - isKeepScreenOn?")
+        Log.e(TAG, isKeepScreenOn.toString())
+
+        if (isKeepScreenOn) {
+            Log.e(TAG, "ON")
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            Log.e(TAG, "OFF")
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+//
+//        val flags: Int = activity?.window?.getAttributes()?.flags!!
+//        Log.e(TAG, "--------FLAGS!!!------------")
+//        Log.e(TAG, flags.toString())
+//        Log.e(TAG, "--------------------")
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON).toString())
+//        Log.e(TAG,( flags == WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM).toString())
+//        Log.e(TAG,( flags == WindowManager.LayoutParams.FLAG_DIM_BEHIND).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FULLSCREEN).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FULLSCREEN).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS).toString())
+//        Log.e(TAG, (flags == WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN).toString())
+//        //activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
 
         forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
         rewind_zone_degrees = 180 - forward_zone_degrees

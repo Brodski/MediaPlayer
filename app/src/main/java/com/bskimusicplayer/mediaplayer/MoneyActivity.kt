@@ -24,6 +24,7 @@ class MoneyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_money)
         skuList = resources.getStringArray(R.array.money_array).toMutableList()
+
 //        preskuList.forEach { skuList.add(it as String) }
 //        skuList.forEach { Log.e(TAG, "onCreate: $it") }
    //     setupBillingClient()

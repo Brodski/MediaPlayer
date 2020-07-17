@@ -57,6 +57,6 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
 
- //   implementation 'com.android.billingclient:billing:2.2.0'
+ //   implementation 'com.android.billingxxxxclient:billixxxxxng:2.2.0'
 
 }

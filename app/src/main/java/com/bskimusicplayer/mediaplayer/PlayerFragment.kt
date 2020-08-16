@@ -62,6 +62,14 @@ class PlayerFragment : Fragment() {
         listener = context as PlayerFragListener
     }
 
+    override fun onStop() {
+        super.onStop()
+        Log.e(TAG, "onStop: ")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.e(TAG, "onPause: ")
+    }
 
     override fun onDetach() {
         super.onDetach()

@@ -11,6 +11,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Binder
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.provider.MediaStore
 import android.support.v4.media.MediaDescriptionCompat
@@ -22,20 +23,21 @@ import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.preference.PreferenceManager
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Log
 import com.google.android.exoplayer2.util.Util
+import javax.security.auth.login.LoginException
 
 // Building feature-rich media apps with ExoPlayer (Google I/O '18)
 // https://www.youtube.com/watch?v=svdq1BWl4r8
@@ -59,14 +61,13 @@ class AudioPlayerService : Service() {
     private lateinit var mContext: Context
     val TAG = "AudioPlayerService"
 
-
     override fun onCreate() {
         super.onCreate()
         isFirst = true
         mContext = this
         exoPlayer = SimpleExoPlayer.Builder(this).build()
         exoPlayer?.playWhenReady = false
-
+        Log.e(TAG, "onCreate: building media")
         buildMediaStartUp()
         initializeNotificationManager()
 
@@ -90,7 +91,50 @@ class AudioPlayerService : Service() {
             .build()
         exoPlayer?.setAudioAttributes(audioAttributes, true)
 
+        // Save when user pauses.
+        exoPlayer?.addListener(object : Player.EventListener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (!isPlaying) {
+                    Log.e(TAG, "onIsPlayingChanged: SAVED!")
+                    saveState()
+                }
+            }
+
+            override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
+//                Log.e(TAG, "onTracksChanged: CHANGED")
+//                Log.e(TAG, "onTracksChanged: " + exoPlayer?.isLoading)
+                if (exoPlayer?.isPlaying == false && exoPlayer?.isLoading == true) {
+                    Log.e(TAG, "onTracksChanged exoPlayer?.isLoading: " + exoPlayer?.isLoading)
+                }
+            }
+        })
+        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+        // save media state evey 30 seconds
+        autoSave()
     }
+
+    private fun autoSave() {
+
+        val handler = Handler()
+        val runnableCode = Runnable() {
+            if ( exoPlayer?.isPlaying == true) {
+                Log.e(TAG, "autoSave: SAVED!!!")
+                saveState()
+            }
+            autoSave()
+        }
+        handler.postDelayed(runnableCode, 30000);
+
+
+
+
+    }
+
 
     private fun initializeNotificationManager() {
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
@@ -386,6 +430,7 @@ class AudioPlayerService : Service() {
     }
 
     override fun onDestroy() {
+        Log.e(TAG, "onDestroy: ")
         saveState()
         releasePlayer()
         super.onDestroy()
@@ -425,3 +470,4 @@ class AudioPlayerService : Service() {
     }
 
 }
+

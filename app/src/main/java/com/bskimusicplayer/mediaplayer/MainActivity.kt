@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import android.view.MenuItem
@@ -124,8 +125,19 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.e(TAG, "onPause: ")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e(TAG, "onStop: ")
+    }
+    
     override fun onDestroy() {
         super.onDestroy()
+        Log.e(TAG, "onDestroy: ")
         releasePlayer2()
     }
 

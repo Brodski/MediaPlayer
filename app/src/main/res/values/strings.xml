@@ -1,7 +1,10 @@
 <resources>
-    <string name="app_name">B.Ski\'s Player</string>
-    <string name="playback_channel_name">B.Ski\'s Player</string>
-    <string name="playback_channel_description">B.Ski\'s Minimalist Music Player</string>
+<!--    <string name="app_name">B.Ski\'s Player</string>-->
+<!--    <string name="playback_channel_name">B.Ski\'s Player</string>-->
+<!--    <string name="playback_channel_description">B.Ski\'s Minimalist Music Player</string>-->
+    <string name="app_name">Brodski Player</string>
+    <string name="playback_channel_name">Brodski Minimalist Music Player</string>
+    <string name="playback_channel_description">Brodski Minimalist Music Player</string>
     <string name="toolbar_name">Music Player</string>
     <string name="toolbar_name_browse">Browse</string>
 

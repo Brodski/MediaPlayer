@@ -198,7 +198,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
                 } else {
                     AlertDialog.Builder(this)
                         .setTitle("You have previously denied permissions")
-                        .setMessage("Try again \n\nOr go to app settings, find Bski's Music Player and turn on permissions")
+                        .setMessage("Try again \n\nOr go to app settings, find Brodski Player and turn on permissions")
                         .setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
 //                        .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() })
                         .create().show()

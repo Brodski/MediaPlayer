@@ -67,7 +67,6 @@ class AudioPlayerService : Service() {
         mContext = this
         exoPlayer = SimpleExoPlayer.Builder(this).build()
         exoPlayer?.playWhenReady = false
-        Log.e(TAG, "onCreate: building media")
         buildMediaStartUp()
         initializeNotificationManager()
 
@@ -91,29 +90,21 @@ class AudioPlayerService : Service() {
             .build()
         exoPlayer?.setAudioAttributes(audioAttributes, true)
 
-        // Save when user pauses.
+        // Save when user pauses, skips, and every 30 seconds.
         exoPlayer?.addListener(object : Player.EventListener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (!isPlaying) {
-                    Log.e(TAG, "onIsPlayingChanged: SAVED!")
                     saveState()
                 }
             }
 
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
-//                Log.e(TAG, "onTracksChanged: CHANGED")
-//                Log.e(TAG, "onTracksChanged: " + exoPlayer?.isLoading)
                 if (exoPlayer?.isPlaying == false && exoPlayer?.isLoading == true) {
-                    Log.e(TAG, "onTracksChanged exoPlayer?.isLoading: " + exoPlayer?.isLoading)
+                    saveState()
                 }
             }
         })
-        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
-        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
-        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
-        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
-        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
-        Log.e(TAG, "===== onCreate: AUTOSAVE =====")
+
         // save media state evey 30 seconds
         autoSave()
     }
@@ -123,16 +114,11 @@ class AudioPlayerService : Service() {
         val handler = Handler()
         val runnableCode = Runnable() {
             if ( exoPlayer?.isPlaying == true) {
-                Log.e(TAG, "autoSave: SAVED!!!")
                 saveState()
             }
             autoSave()
         }
-        handler.postDelayed(runnableCode, 30000);
-
-
-
-
+        handler.postDelayed(runnableCode, 30000)
     }
 
 

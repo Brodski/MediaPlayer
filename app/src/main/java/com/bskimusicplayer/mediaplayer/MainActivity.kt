@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
         // Dear Android, why should I, the dev, put this line in here. Should be default behavior
         this.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
-        Log.e(TAG,"Main Activity: running")
 
         var bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigationId)
         bottomNav.setOnNavigationItemSelectedListener { onNavClick(it) }
@@ -125,19 +124,8 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        Log.e(TAG, "onPause: ")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.e(TAG, "onStop: ")
-    }
-    
     override fun onDestroy() {
         super.onDestroy()
-        Log.e(TAG, "onDestroy: ")
         releasePlayer2()
     }
 

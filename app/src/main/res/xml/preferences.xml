@@ -21,7 +21,13 @@
             android:key="save_state_screen"
             android:title="Keep screen on?"
             android:summary="If checked then the screen will not timeout."
-            />
+        />
+        <CheckBoxPreference
+            android:key="swipe_skip_to_next_song"
+            android:title="Swipe skips entire song?"
+            android:summary="Change swipe left/right behavior. If checked swipes will skip entire song"
+
+        />
 
 <!--        <SeekBarPreference-->
 <!--            android:key="@string/save_state_slop"-->

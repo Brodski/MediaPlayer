@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
     private var slop: Int? = null
     private var skipZone: Int? = null
     private var isKeepScreenOn: Boolean? = null
+    private var isSkipFullSong: Boolean? = null
     companion object { const val TAG = "MainActivity"
                         const val tag ="MainActivity"}
     private var restoredFragment: Fragment? = null
@@ -85,6 +87,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         slop = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), 0)
         skipZone = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 0)
         isKeepScreenOn = sharedPreferences.getBoolean(resources.getString(R.string.save_state_screen), false)
+        isSkipFullSong = sharedPreferences.getBoolean(resources.getString(R.string.swipe_skip_to_next_song), false)
 
         if (slop == 0 || skipZone == 0 ){
             val editor = sharedPreferences.edit()
@@ -92,6 +95,7 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
             editor.putInt(resources.getString(R.string.save_state_slop), defaultSlop)
             editor.putInt(resources.getString(R.string.save_state_skip_zone), 30)
             editor.putBoolean(resources.getString(R.string.save_state_screen), false)
+            editor.putBoolean(resources.getString(R.string.swipe_skip_to_next_song), false)
             editor.commit()
         }
 
@@ -322,6 +326,20 @@ class MainActivity : AppCompatActivity(), PlayerFragment.PlayerFragListener, Son
         increment = sharedPreferences.getString(resources.getString(R.string.save_state_increment), "15000")?.toInt() ?: 15000
         mService?.exoPlayer?.currentPosition?.also { playPosition ->
             mService?.exoPlayer?.seekTo(playPosition - increment!!)
+        }
+    }
+
+    override fun nextSong() {
+        var nextIndex = mService?.exoPlayer?.nextWindowIndex
+        if (nextIndex != C.INDEX_UNSET && nextIndex != null) {
+            mService?.exoPlayer?.seekTo(nextIndex, 0)
+        }
+    }
+
+    override fun prevSong() {
+        var prevIndex = mService?.exoPlayer?.previousWindowIndex
+        if (prevIndex != C.INDEX_UNSET && prevIndex != null) {
+            mService?.exoPlayer?.seekTo(prevIndex, 0)
         }
     }
 

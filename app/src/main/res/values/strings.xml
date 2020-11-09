@@ -79,6 +79,9 @@
         <item>60000</item>
     </string-array>
 
+    <string name="swipe_skip_to_next_song">swipe_skip_to_next_song</string>
+<!--    <string name="swipe_skip_couple_seconds">swipe_skip_couple_seconds</string>-->
+
     <string-array name="money_array">
         <item>donate_1</item>
         <item>donate_2</item>

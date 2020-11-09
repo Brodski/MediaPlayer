@@ -95,17 +95,20 @@ class AudioPlayerService : Service() {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (!isPlaying) {
                     saveState()
+                    Log.e(TAG, "onIsPlayingChanged: Saved!")
                 }
             }
 
             override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
                 if (exoPlayer?.isPlaying == false && exoPlayer?.isLoading == true) {
+                    Log.e(TAG, "onTracksChanged: Saved")
                     saveState()
                 }
             }
         })
 
         // save media state evey 30 seconds
+        Log.e(TAG, "onCreate: THE VERY FIRST AUTOSAVE")
         autoSave()
     }
 
@@ -115,6 +118,9 @@ class AudioPlayerService : Service() {
         val runnableCode = Runnable() {
             if ( exoPlayer?.isPlaying == true) {
                 saveState()
+                Log.e(TAG, "autoSave: Saved")
+            } else {
+                Log.e(TAG, "autoSave: Not saved")
             }
             autoSave()
         }

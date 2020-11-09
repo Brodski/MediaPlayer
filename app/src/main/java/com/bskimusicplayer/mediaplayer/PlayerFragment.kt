@@ -29,9 +29,9 @@ class PlayerFragment : Fragment() {
     private var listener: PlayerFragListener? = null
     private var skipIncrement: Int = 10000
     private var playbackStateListener: PlaybackStateListener? = null
-
     private lateinit var audioManager: AudioManager
     private lateinit var mDetector: GestureDetector
+    var isSkipFullSong = false
     var isKeepScreenOn = false
     var slop_prevention = 100
     var forward_zone_degrees = 35
@@ -44,6 +44,8 @@ class PlayerFragment : Fragment() {
         fun getPlayer(): SimpleExoPlayer?
         fun skipForward(rewind: Boolean = false)
         fun skipRewind()
+        fun nextSong()
+        fun prevSong()
         fun isPlaying(): Boolean?
         fun togglePlayPause()
         fun getSongTitle(): String
@@ -86,17 +88,20 @@ class PlayerFragment : Fragment() {
 
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment), resources.getString(R.string.default_increment))?.toInt() ?: 15000
-        slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
-        isKeepScreenOn = sharedPreferences.getBoolean(resources.getString(R.string.save_state_screen), false)
-
+        if (sharedPreferences != null) {
+            skipIncrement = sharedPreferences.getString(resources.getString(R.string.save_state_increment), resources.getString(R.string.default_increment))?.toInt() ?: 15000
+            slop_prevention = sharedPreferences.getInt(resources.getString(R.string.save_state_slop), resources.getString(R.string.slop_max).toInt())
+            isKeepScreenOn = sharedPreferences.getBoolean(resources.getString(R.string.save_state_screen), false)
+            isSkipFullSong = sharedPreferences.getBoolean(resources.getString(R.string.swipe_skip_to_next_song), false)
+            Log.e(TAG, "onCreateView: isSkipFullSong " + isSkipFullSong)
+        }
         if (isKeepScreenOn) {
             activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
-        forward_zone_degrees = sharedPreferences.getInt(resources.getString(R.string.save_state_skip_zone), 35)
+//        forward_zone_degrees = sharedPreferences?.getInt(resources.getString(R.string.save_state_skip_zone), 35)
         rewind_zone_degrees = 180 - forward_zone_degrees
         playerView = v.findViewById(R.id.main_view2)
         playerView?.setRewindIncrementMs(skipIncrement)
@@ -156,9 +161,9 @@ class PlayerFragment : Fragment() {
         angle = Math.toDegrees(angle)
 
         if (abs(angle) < forward_zone_degrees && distanceX > slop_prevention) {
-            skipForward()
+            if (isSkipFullSong) nextSong() else skipForward()
         } else if (abs(angle) > rewind_zone_degrees && distanceX < (slop_prevention * -1)) {
-            skipRewind()
+            if (isSkipFullSong) prevSong() else skipRewind()
         } else if (distanceY < (slop_prevention * -1)) {
             if (listener?.isPlaying() == true) {
                 volumeUp()
@@ -211,6 +216,14 @@ class PlayerFragment : Fragment() {
     fun skipRewind() {
         doVibrate()
         listener?.skipRewind()
+    }
+    fun nextSong() {
+        doVibrate()
+        listener?.nextSong()
+    }
+    fun prevSong() {
+        doVibrate()
+        listener?.prevSong()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

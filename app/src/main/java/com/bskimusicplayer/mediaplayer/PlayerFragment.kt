@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -21,6 +22,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.math.abs
 import kotlin.math.atan2
+
 
 class PlayerFragment : Fragment() {
 
@@ -114,7 +116,22 @@ class PlayerFragment : Fragment() {
             override fun onShowPress(e: MotionEvent?) {
             }
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                listener?.togglePlayPause()
+                val displayMetrics = DisplayMetrics()
+                activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
+
+                val height = displayMetrics.heightPixels
+                val width = displayMetrics.widthPixels
+                if (e != null) {
+//                    Log.e(TAG,"y " + e?.x)
+//                    Log.e(TAG,"x " + e?.y)
+//                    Log.e(TAG, "height=" + height)
+//                    Log.e(TAG, "width=" + width)
+                    if (100 < e.x && e.x < width - 100
+                        && 100 < e.y && e.y < height - 150) {
+                        doVibrate()
+                        listener?.togglePlayPause()
+                    }
+                }
                 return true
             }
             override fun onDown(e: MotionEvent?): Boolean {
@@ -165,14 +182,15 @@ class PlayerFragment : Fragment() {
         } else if (abs(angle) > rewind_zone_degrees && distanceX < (slop_prevention * -1)) {
             if (isSkipFullSong) prevSong() else skipRewind()
         } else if (distanceY < (slop_prevention * -1)) {
-            if (listener?.isPlaying() == true) {
+//            if (listener?.isPlaying() == true) {
                 volumeUp()
-                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
-            }
+//                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI)
+//                audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_VIBRATE)
+//            }
         } else if (distanceY > slop_prevention) {
-            if (listener?.isPlaying() == true) {
+//            if (listener?.isPlaying() == true) {
                 volumeDown()
-            }
+//            }
         } else {
             listener?.togglePlayPause()
         }
@@ -191,10 +209,14 @@ class PlayerFragment : Fragment() {
 
     private fun doVibrate(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(80, VibrationEffect.EFFECT_TICK));
-        } else {
+            Log.e(TAG, "VIBRATING")
+//            vibrator?.vibrate(VibrationEffect.createOneShot(80, VibrationEffect.EFFECT_TICK))
+            vibrator?.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+
+        }
+        else {
             //deprecated in API 26
-            vibrator?.vibrate(80);
+            vibrator?.vibrate(200);
         }
     }
 

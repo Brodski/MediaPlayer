@@ -7,22 +7,22 @@
 <table>
   <tr>
     <td>
-      <img src="images/Capture1Coolx.png" alt="Example Image" width="200"/>
+      <img src="imagez/Capture1Coolx.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Cool3x.png" alt="Example Image" width="200"/>
+      <img src="imagez/Capture1Cool3x.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Cool2x.png" alt="Example Image" width="200"/>
+      <img src="imagez/Capture1Cool2x.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Cool4x.png" alt="Example Image" width="200"/>
+      <img src="imagez/Capture1Cool4x.png" alt="Example Image" width="200"/>
     </td>
   </tr>
 </table>
@@ -30,12 +30,12 @@
 <table>
   <tr>
     <td>
-      <img src="images/Capture1Coolx.png" alt="Example Image" width="200"/>
+      <img src="imagez/Capture1Coolx.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Coolx.png" alt="Example Image" width="200"/>
+      <img src="imagez/Capture1Coolx.png" alt="Example Image" width="200"/>
     </td>
   </tr>
 </table>

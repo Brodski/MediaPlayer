@@ -6,7 +6,7 @@
 
 <table>
   <tr>
-        <td style="text-align: center; vertical-align: middle;">
+        <td align="center">
         <img src="imagez/rawImages/foreground6.png" width="100"/>
         </td>
         <td>

@@ -29,6 +29,8 @@
   </tr>
 </table>
 
+* Google closed my account on the play store b/c I was inactive *
+---
 ### About   
 - **World's best** Music Player app for playing local audio files.   
 - Found at Google Play Store: [Brodski Minimalist Music Player with Swipe & Touch](https://play.google.com/store/apps/details?id=com.bskimusicplayer.mediaplayer)

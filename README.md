@@ -29,7 +29,7 @@
   </tr>
 </table>
 
-* Google closed my account on the play store b/c I was inactive *
+*Google closed my account on the play store b/c I was inactive*
 ---
 ### About   
 - **World's best** Music Player app for playing local audio files.   

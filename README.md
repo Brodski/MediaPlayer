@@ -1,13 +1,13 @@
 
 
-<img src="imagez/rawImages/foreground6.png" width="100">
+<!-- <img src="imagez/rawImages/foreground6.png" width="100"> -->
 
  <!-- ![banner feature](imagez/Feature3.png) -->
 
 <table>
   <tr>
         <td>
-        <img src="imagez/rawImages/foreground6.png" width="200"/>
+        <img src="imagez/rawImages/foreground6.png" width="100"/>
         </td>
         <td>
         <img src="imagez/Capture1Coolx.png" width="200"/>

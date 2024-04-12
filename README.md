@@ -7,21 +7,24 @@
 <table>
   <tr>
         <td>
-        <img src="imagez/Capture1Coolx.png" alt="Example Image" width="200"/>
+        <img src="imagez/rawImages/foreground6.png" width="200"/>
         </td>
         <td>
-        <img src="imagez/Capture1Cool3x.png" alt="Example Image" width="200"/>
+        <img src="imagez/Capture1Coolx.png" width="200"/>
         </td>
         <td>
-        <img src="imagez/Capture1Cool2x.png" alt="Example Image" width="200"/>
+        <img src="imagez/Capture1Cool2x.png" width="200"/>
         </td>
   </tr>
   <tr>
         <td>
-        <img src="imagez/Capture1Cool4x.png" alt="Example Image" width="200"/>
+        <img src="imagez/Capture1Cool4x.png" width="200"/>
         </td>
         <td>
-        <img src="imagez/Capture1Cool5x.png" alt="Example Image" width="200"/>
+        <img src="imagez/Capture1Cool5x.png" width="200"/>
+        </td>
+        <td>
+        <img src="imagez/Capture1Cool3x.png" width="200"/>
         </td>
   </tr>
 </table>

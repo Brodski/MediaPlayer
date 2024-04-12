@@ -1,6 +1,7 @@
 
 
-![Example Image](imagez/rawImages/foreground6.png)
+<img src="imagez/rawImages/foreground6.png" width="200">
+
 ### About   
 - **World's best** Music Player app for playing local audio files.   
 - Found at Google Play Store: [Brodski Minimalist Music Player with Swipe & Touch](https://play.google.com/store/apps/details?id=com.bskimusicplayer.mediaplayer)

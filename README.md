@@ -34,7 +34,7 @@
 ---
 ### About   
 - **World's best** Music Player app for playing local audio files.   
-- ---Found at Google Play Store: [Brodski Minimalist Music Player with Swipe & Touch](https://play.google.com/store/apps/details?id=com.bskimusicplayer.mediaplayer)--- removed b/c google 
+- ~~Found at Google Play Store: [Brodski Minimalist Music Player with Swipe & Touch](https://play.google.com/store/apps/details?id=com.bskimusicplayer.mediaplayer)~~ removed b/c google 
 - Selling point? Minimalist, no ads, very responsive. When you tap to pause it will pause (great for when you're driving). 
   
   

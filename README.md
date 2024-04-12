@@ -2,27 +2,27 @@
 
 <img src="imagez/rawImages/foreground6.png" width="100">
 
-![banner feature](imagez/Feature3.png)
+ <!-- ![banner feature](imagez/Feature3.png) -->
 
 <table>
   <tr>
     <td>
-      <img src="images/Capture1Coolx.png.png" alt="Example Image" width="200"/>
+      <img src="images/Capture1Coolx.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Cool3x.png.png" alt="Example Image" width="200"/>
+      <img src="images/Capture1Cool3x.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Cool2x.png.png" alt="Example Image" width="200"/>
+      <img src="images/Capture1Cool2x.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Cool4x.png.png" alt="Example Image" width="200"/>
+      <img src="images/Capture1Cool4x.png" alt="Example Image" width="200"/>
     </td>
   </tr>
 </table>
@@ -30,12 +30,12 @@
 <table>
   <tr>
     <td>
-      <img src="images/Capture1Coolx.png.png" alt="Example Image" width="200"/>
+      <img src="images/Capture1Coolx.png" alt="Example Image" width="200"/>
     </td>
   </tr>
   <tr>
     <td>
-      <img src="images/Capture1Coolx.png.png" alt="Example Image" width="200"/>
+      <img src="images/Capture1Coolx.png" alt="Example Image" width="200"/>
     </td>
   </tr>
 </table>
